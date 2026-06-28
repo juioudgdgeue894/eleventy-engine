@@ -1,4 +1,4 @@
-# @thatkind/eleventy-engine
+eleventy-engine
 
 The shared **engine** behind every client website — the brains that stay the same across sites.
 Improve SEO/CSS/JS/components here once, publish a new version, and bump each site to it when ready.
