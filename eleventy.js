@@ -27,7 +27,7 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
 
 /**
  * Shared Eleventy engine. A consuming site's .eleventy.js is just:
- *   module.exports = require("@thatkind/eleventy-engine/eleventy");
+ *   module.exports = require("@jacklamond/eleventy-engine/eleventy");
  * Layouts, partials, framework pages and the components catalog are synced into
  * the site's src/ tree by `eleventy-engine-sync` (run on postinstall / prebuild).
  */

@@ -1,4 +1,4 @@
-# @thatkind/eleventy-engine
+# @jacklamond/eleventy-engine
 
 The shared **engine** behind every client website — the brains that stay the same across sites.
 Improve SEO/CSS/JS/components here once, publish a new version, and bump each site to it when ready.
@@ -7,7 +7,7 @@ Improve SEO/CSS/JS/components here once, publish a new version, and bump each si
 
 | | |
 |---|---|
-| `eleventy.js` | Eleventy config as a plugin — shortcodes (`image`), filters, collections, passthrough, dir layout. A site's `.eleventy.js` is just `module.exports = require("@thatkind/eleventy-engine/eleventy")`. |
+| `eleventy.js` | Eleventy config as a plugin — shortcodes (`image`), filters, collections, passthrough, dir layout. A site's `.eleventy.js` is just `module.exports = require("@jacklamond/eleventy-engine/eleventy")`. |
 | `tailwind-preset.js` | Shared Tailwind theme + Flowbite plugin. |
 | `_includes/` | Layouts (`base`, `bare`, `post`) + all partials (the component library). |
 | `pages/` | Framework pages every site gets: 404, blog, feed, sitemap, robots, components catalog, legal pages, locations, thanks. |
@@ -32,8 +32,9 @@ deploys are self-contained.
 
 1. Make the change here (e.g. improve `partials/schema.njk` or add a component to `pages/components.njk`).
 2. Bump `version` in `package.json` (semver).
-3. Publish: `npm publish` (if using a registry) **or** `git tag v1.2.0 && git push --tags` (if sites
-   install via `github:thatkind/eleventy-engine#v1.2.0`).
+3. Publish: `git tag v1.2.0 && git push origin --tags`. Sites install from the tag tarball at
+   `https://github.com/juioudgdgeue894/eleventy-engine/archive/refs/tags/v1.2.0.tar.gz` — plain HTTPS,
+   no SSH/auth needed in CI (avoid the `github:owner/repo#tag` shorthand, which resolves to git+ssh).
 4. In each site, bump the engine version in `package.json` and run `npm install` when you're ready to
    adopt it. Sites on the old version are untouched.
 

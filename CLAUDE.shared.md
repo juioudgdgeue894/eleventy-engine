@@ -64,7 +64,7 @@ npm run build     # one-shot production build
 ## Component library
 
 > **Synced from the engine:** `src/components.njk`, `src/_includes/` and the framework pages are
-> **synced from `@thatkind/eleventy-engine`** on install/build (and are gitignored in the site repo).
+> **synced from `@jacklamond/eleventy-engine`** on install/build (and are gitignored in the site repo).
 > Do not edit these synced files in a client site — they're overwritten on the next sync. To change a
 > component, edit it in the engine, publish a new version, then bump the engine version in the site's
 > `package.json`. Only `business.json`, `user.css`, `index.njk` and assets are site-owned.
