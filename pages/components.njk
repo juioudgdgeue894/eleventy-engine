@@ -1,0 +1,1659 @@
+---
+layout: layouts/bare.njk
+title: Component Library
+permalink: components/index.html
+eleventyExcludeFromCollections: true
+---
+{% macro label(category, name, id, source) %}
+<div class="flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-2.5">
+  <div class="flex items-center gap-2">
+    <span class="text-sm font-semibold text-gray-900">{{ name }}</span>
+    <span class="text-xs text-gray-400">{{ category }}</span>
+    {% if source %}<span class="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">{{ source }}</span>{% endif %}
+  </div>
+  <button type="button" class="copy-id-btn inline-flex items-center gap-1.5 rounded-md border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-mono text-gray-600 hover:bg-gray-100" data-copy-id="{{ id }}">
+    <span class="copy-label">{{ id }}</span>
+    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+    </svg>
+  </button>
+</div>
+{% endmacro %}
+
+{% macro card(category, name, id, source) %}
+<section class="mb-10 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+  {{ label(category, name, id, source) }}
+  <div class="overflow-hidden">
+    {{ caller() }}
+  </div>
+</section>
+{% endmacro %}
+
+<div class="sticky top-0 z-20 border-b border-gray-200 bg-white/95 backdrop-blur">
+  <div class="mx-auto max-w-5xl px-4 py-4">
+    <h1 class="text-lg font-semibold">Component Library</h1>
+    <p class="mt-0.5 text-sm text-gray-500">
+      Click the ID badge on any component to copy it, then tell me which one(s) you want added or swapped in.
+      "Source" tags show the stylistic family each one is drawn from - everything is restyled with this
+      site's own colour/spacing tokens, so they all interoperate regardless of where the pattern originated.
+    </p>
+    <nav class="mt-3 flex flex-wrap gap-3 text-xs">
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-header">Header</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-statement">Statement</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-hero">Hero</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-stats">Stats</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-services">Services</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-portfolio">Portfolio</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-pricing">Pricing</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-about">About</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-team">Team</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-testimonials">Testimonials</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-faq">FAQ</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-gallery">Gallery</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-booking">Booking</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-cta">CTA</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-forms">Forms</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-footer">Footer</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-announcement">Announcement</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-elements">UI Elements</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-tables">Tables</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-interactive">Interactive</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-blog">Blog</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-logos">Social Proof</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-process">Process</a>
+      <a class="text-[var(--color-primary)] hover:underline" href="#cat-contact">Contact</a>
+    </nav>
+  </div>
+</div>
+
+<div class="mx-auto max-w-5xl px-4 py-10">
+
+  <h2 id="cat-header" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Header</h2>
+  {% call card("Header", "Sticky nav + utility bar (current)", "header-01", "Custom") %}
+    <div class="overflow-hidden">{% include "partials/header.njk" %}</div>
+  {% endcall %}
+  {% call card("Header", "Simple centered logo", "navbar-02", "Custom") %}
+    <nav class="border-b border-gray-100 bg-white">
+      <div class="cd-container flex h-16 items-center justify-center gap-10">
+        <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">Services</a>
+        <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">Work</a>
+        <span class="text-xl text-[var(--color-primary)]">{{ business.brand_name_primary }}</span>
+        <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">Pricing</a>
+        <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">Contact</a>
+      </div>
+    </nav>
+  {% endcall %}
+  {% call card("Header", "With dropdown menu (functional)", "navbar-03", "Preline-style") %}
+    <nav class="overflow-visible border-b border-gray-100 bg-white">
+      <div class="cd-container flex h-16 items-center justify-between">
+        <span class="text-xl text-[var(--color-primary)]">{{ business.brand_name_primary }}<span class="text-gray-900">{{ business.brand_name_accent }}</span></span>
+        <div class="hidden items-center gap-6 sm:flex">
+          <button id="nav-dropdown-btn" data-dropdown-toggle="nav-dropdown" class="flex items-center gap-1 text-sm text-gray-500 hover:text-[var(--color-primary)]" type="button">
+            Services
+            <svg class="h-3 w-3" fill="none" viewBox="0 0 10 6" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l4 4 4-4" /></svg>
+          </button>
+          <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">Pricing</a>
+          <a class="cd-btn cd-btn-primary text-sm" href="#">Contact</a>
+        </div>
+      </div>
+      <div id="nav-dropdown" class="z-20 hidden w-44 cd-rounded-img bg-white shadow-lg">
+        <ul class="py-2 text-sm text-gray-600">
+          {% for service in business.services %}
+          <li><a class="block px-4 py-2 hover:bg-gray-50" href="#{{ service.slug }}">{{ service.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </nav>
+  {% endcall %}
+
+  <h2 id="cat-statement" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Statement</h2>
+  {% call card("Statement", "Dark editorial large-text mission block", "statement-01", "Custom") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section">
+        <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-body-text)]">About</p>
+        <p class="mt-6 max-w-4xl text-2xl font-medium leading-snug text-white sm:text-3xl lg:text-4xl">
+          I've built websites for tattoo studios, beauty salons, property managers, and personal chefs.
+          The focus stays the same: <span class="cd-highlight">sites that actually work</span>,
+          <span class="cd-highlight">automation that saves real time</span>,
+          and digital strategy that moves the needle - not vanity metrics.
+        </p>
+        <div class="mt-10 flex items-center gap-4">
+          <div class="h-px flex-1 bg-white/10"></div>
+          <a href="#about" class="text-sm font-semibold text-white hover:text-[var(--color-primary)]">More about me →</a>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-hero" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Hero</h2>
+  {% call card("Hero", "Intro statement + tech stack pills", "hero-05", "Custom") %}
+    <section class="bg-gradient-to-b from-[var(--color-secondary)] to-[var(--color-bg)]">
+      <div class="cd-container cd-section">
+        <div class="max-w-3xl">
+          <h1 class="text-3xl font-medium leading-tight text-white sm:text-4xl lg:text-5xl">{{ business.sections.hero.heading }}</h1>
+          <div class="mt-8 max-w-2xl space-y-4 text-base leading-relaxed text-[var(--color-body-text)] sm:text-lg">
+            {% for para in business.sections.hero.intro_paragraphs %}
+            <p>{{ para }}</p>
+            {% endfor %}
+          </div>
+          <div class="mt-10">
+            <p class="text-sm text-[var(--color-body-text)]">{{ business.sections.hero.stack_label }}</p>
+            <ul class="mt-4 flex flex-wrap gap-2.5">
+              {% for tech in business.stack %}
+              <li class="rounded-[var(--radius-button)] border border-white/10 bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[var(--color-body-text)]">{{ tech }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Hero", "Split, image + stats (current)", "hero-01", "Custom") %}
+    {% include "partials/hero.njk" %}
+  {% endcall %}
+  {% call card("Hero", "Simple centered", "hero-02", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section text-center">
+        <h1 class="mx-auto max-w-2xl text-4xl sm:text-5xl">{{ business.tagline }}</h1>
+        <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600">{{ business.description }}</p>
+        <div class="mt-8 flex justify-center gap-4">
+          <a class="cd-btn cd-btn-primary text-sm" href="#">Get Started</a>
+          <a class="cd-btn cd-btn-outline text-sm" href="#">Learn More</a>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Hero", "Dark editorial text-dominant with arrow CTAs", "hero-04", "Custom") %}
+    <section class="bg-[var(--color-bg)]">
+      <div class="cd-container py-16">
+        <div class="mb-10 inline-flex items-center gap-2.5 text-xs font-medium text-emerald-400">
+          <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+          Available for projects
+        </div>
+        <h1 class="text-6xl font-black leading-none tracking-tight text-white">{{ business.brand_name_primary }}<br>{{ business.brand_name_accent }}</h1>
+        <p class="mt-6 max-w-xl text-lg text-[var(--color-body-text)]">{{ business.tagline }}</p>
+        <div class="mt-8 flex flex-wrap items-center gap-6">
+          <a href="#contact" class="group flex items-center gap-3 text-sm font-semibold text-white">
+            <span class="flex h-10 w-10 items-center justify-center border border-white/25 text-base transition group-hover:bg-white group-hover:text-[var(--color-bg)]">→</span>
+            Book a Free Call
+          </a>
+          <a href="#work" class="group flex items-center gap-3 text-sm font-semibold text-[var(--color-body-text)] transition hover:text-white">
+            <span class="flex h-10 w-10 items-center justify-center border border-white/10 text-base">→</span>
+            See My Work
+          </a>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Hero", "Centered with badge + trust line", "hero-03", "Preline-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section text-center">
+        <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-medium text-gray-600">
+          <span class="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"></span>
+          {{ business.stats[0].value }} {{ business.stats[0].label | lower }}
+        </span>
+        <h1 class="mx-auto mt-6 max-w-3xl text-4xl sm:text-6xl">{{ business.tagline }}</h1>
+        <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600">{{ business.description }}</p>
+        <div class="mt-8 flex justify-center gap-4">
+          <a class="cd-btn cd-btn-primary text-sm shadow-lg" href="#">Start a Project</a>
+          <a class="cd-btn cd-btn-outline text-sm" href="#">View Our Work</a>
+        </div>
+        <p class="mt-10 text-xs uppercase tracking-wide text-gray-400">[Trust line — e.g. 'Trusted by businesses across [region]']</p>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-stats" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Stats</h2>
+  {% call card("Stats", "Three-up stat band (current)", "stats-01", "Custom") %}
+    {% include "partials/stats.njk" %}
+  {% endcall %}
+  {% call card("Stats", "Horizontal divider band", "stats-03", "Flowbite-style") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {% for stat in business.stats %}
+        <div class="px-6 py-6 text-center">
+          <p class="text-3xl text-white">{{ stat.value }}</p>
+          <p class="mt-1 text-sm text-white/60">{{ stat.label }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Stats", "Icon + number cards", "stats-02", "Oxbow-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {% for stat in business.stats %}
+        <div class="flex items-center gap-4 cd-rounded-img border border-gray-100 p-6">
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center cd-rounded-img bg-[var(--color-primary-light)] text-[var(--color-primary)]">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+          </span>
+          <div>
+            <p class="text-2xl text-gray-900">{{ stat.value }}</p>
+            <p class="text-sm text-gray-500">{{ stat.label }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-services" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Services</h2>
+  {% call card("Services", "Icon cards - featured first, balanced grid", "services-05", "Custom") %}
+    {% set svcIcons = {
+      "code": "M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5",
+      "search": "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z",
+      "spark": "M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z",
+      "design": "m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z",
+      "support": "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
+      "cart": "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
+    } %}
+    {% set total = business.services | length %}
+    <section id="services">
+      <div class="cd-container cd-section">
+        <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.services.heading }}</h2>
+        <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {% for service in business.services %}
+          {% set isFull = loop.first or (loop.last and total % 2 == 0) %}
+          <div class="{{ 'sm:col-span-2' if isFull else '' }} group rounded-[var(--radius-image)] border border-white/10 bg-white/[0.02] p-6 transition hover:border-white/20 hover:bg-white/[0.04]">
+            <span class="flex h-10 w-10 items-center justify-center rounded-[var(--radius-button)] border border-white/10 text-[var(--color-primary)]">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="{{ svcIcons[service.icon] }}" />
+              </svg>
+            </span>
+            <h3 class="mt-5 text-lg font-medium text-white">{{ service.name }}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-[var(--color-body-text)]">{{ service.description }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Services", "Icon-circle card grid (current)", "services-01", "Custom") %}
+    {% include "partials/services.njk" %}
+  {% endcall %}
+  {% call card("Services", "Two-column list with arrow links", "services-02", "Preline-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">What We Do</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-1 gap-x-12 gap-y-6 sm:grid-cols-2">
+          {% for service in business.services %}
+          <a class="group flex items-start justify-between gap-4 border-b border-gray-100 py-4" href="#{{ service.slug }}">
+            <div>
+              <h3 class="text-lg">{{ service.name }}</h3>
+              <p class="mt-1 text-sm text-gray-600">{{ service.description }}</p>
+            </div>
+            <svg class="mt-1 h-5 w-5 shrink-0 text-[var(--color-primary)] transition group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Services", "Dark editorial accordion with + icon", "services-04", "Custom") %}
+    <section class="bg-[var(--color-bg)] py-10">
+      <div class="cd-container">
+        <div class="mb-6 border-b border-white/10 pb-6">
+          <span class="text-xs font-semibold uppercase tracking-widest text-[var(--color-body-text)]">What I Do</span>
+          <h2 class="mt-3 text-2xl font-black text-white">Services</h2>
+        </div>
+        <div data-accordion="collapse">
+          {% for service in business.services %}
+          <h3 id="lib-svc-heading-{{ loop.index }}">
+            <button type="button"
+              class="group flex w-full items-center justify-between gap-4 border-b border-white/10 py-5 text-left"
+              data-accordion-target="#lib-svc-body-{{ loop.index }}"
+              aria-expanded="{{ 'true' if loop.first else 'false' }}"
+              aria-controls="lib-svc-body-{{ loop.index }}">
+              <span class="flex items-center gap-5">
+                <span class="font-mono text-xs text-[var(--color-body-text)]">{% if loop.index < 10 %}0{% endif %}{{ loop.index }}</span>
+                <span class="font-semibold text-white group-hover:text-[var(--color-primary)] transition">{{ service.name }}</span>
+              </span>
+              <span class="svc-acc-icon text-xl font-light text-[var(--color-body-text)]">+</span>
+            </button>
+          </h3>
+          <div id="lib-svc-body-{{ loop.index }}" class="{{ '' if loop.first else 'hidden' }}" aria-labelledby="lib-svc-heading-{{ loop.index }}">
+            <p class="py-5 pl-10 text-sm text-[var(--color-body-text)]">{{ service.description }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Services", "Numbered minimal list", "services-03", "Oxbow-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">What We Do</h2>
+        </div>
+        <div class="mx-auto mt-12 max-w-2xl divide-y divide-gray-200">
+          {% for service in business.services %}
+          <div class="flex items-start gap-4 py-5">
+            <span class="text-sm font-mono text-[var(--color-primary)]">{{ loop.index }}</span>
+            <div>
+              <h3 class="font-semibold">{{ service.name }}</h3>
+              <p class="mt-1 text-sm text-gray-600">{{ service.description }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-portfolio" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Portfolio</h2>
+  {% call card("Portfolio", "Project cards - preview + label below", "work-05", "Custom") %}
+    {% set gradients = {
+      "primary": "from-[var(--color-primary)] to-[var(--color-primary-dark)]",
+      "secondary": "from-[var(--color-secondary)] to-[var(--color-secondary-dark)]",
+      "accent": "from-[var(--color-accent)] to-[var(--color-accent-dark)]"
+    } %}
+    <section id="work" class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section">
+        <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.work.heading }}</h2>
+        <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
+          {% for project in business.portfolio %}
+          <a class="group block" href="{{ project.href }}" target="_blank" rel="noopener">
+            {% if project.image %}
+            <div class="relative flex aspect-[5/4] items-center justify-center overflow-hidden rounded-[var(--radius-image)] border border-white/10 bg-[var(--color-bg)] transition group-hover:border-white/25">
+              {# Library preview uses plain <img> - the async {% image %} shortcode can't render inside a Nunjucks macro caller. The live partial (work.njk) uses the optimised shortcode. #}
+              <div class="absolute inset-0 scale-125 bg-cover bg-center blur-2xl opacity-40" style="background-image:url(/images/{{ project.image }})" aria-hidden="true"></div>
+              <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+              <div class="relative w-[84%] overflow-hidden rounded-[var(--radius-image)] border border-white/15 shadow-2xl shadow-black/60">
+                <div class="flex items-center gap-2 bg-[#3a3a3e] px-3 py-1">
+                  <span class="flex shrink-0 gap-1.5">
+                    <span class="h-2.5 w-2.5 bg-[#ff5f57]" style="border-radius:9999px"></span>
+                    <span class="h-2.5 w-2.5 bg-[#febc2e]" style="border-radius:9999px"></span>
+                    <span class="h-2.5 w-2.5 bg-[#28c840]" style="border-radius:9999px"></span>
+                  </span>
+                  <span class="mx-auto flex min-w-0 items-center gap-1 rounded bg-black/30 px-3 py-0.5 text-[10px] text-white/55">
+                    <svg class="h-2.5 w-2.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" /></svg>
+                    <span class="truncate">{{ project.href | replace("https://", "") | replace("http://", "") | replace("/", "") }}</span>
+                  </span>
+                  <span class="w-9 shrink-0"></span>
+                </div>
+                <div class="relative aspect-[16/9] w-full overflow-hidden">
+                  <img src="/images/{{ project.image }}" alt="{{ project.name }} website preview" loading="lazy" class="absolute inset-0 h-full w-full object-cover {{ 'object-center' if project.focus == 'center' else 'object-top' }}" />
+                </div>
+              </div>
+            </div>
+            {% else %}
+            <div class="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-[var(--radius-image)] border border-white/10 bg-gradient-to-br {{ gradients[project.gradient] }} p-6 transition group-hover:border-white/25">
+              <span class="text-center text-2xl font-medium text-white">{{ project.name }}</span>
+            </div>
+            {% endif %}
+            <p class="mt-4 font-mono text-xs uppercase tracking-wider text-[var(--color-body-text)]">// {{ project.category }}</p>
+            <h3 class="mt-1.5 text-lg font-medium text-white transition group-hover:text-[var(--color-primary)]">{{ project.name }}<span class="sr-only"> (opens in new tab)</span></h3>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Portfolio", "Overlay case-study cards (current)", "portfolio-01", "Custom") %}
+    {% include "partials/work.njk" %}
+  {% endcall %}
+  {% call card("Portfolio", "Grid with category tags", "portfolio-02", "Flowbite-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Recent Projects</h2>
+        </div>
+        <div class="mt-8 flex flex-wrap justify-center gap-2">
+          <span class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs text-white">All</span>
+          <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">Hospitality</span>
+          <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">Retail</span>
+          <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">Trades</span>
+        </div>
+        <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {% for project in business.portfolio %}
+          <div class="cd-rounded-img aspect-video bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Portfolio", "Alternating image/text rows", "portfolio-03", "Oxbow-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section space-y-12">
+        {% for project in business.portfolio %}
+        <div class="grid grid-cols-1 items-center gap-8 sm:grid-cols-2">
+          <div class="cd-rounded-img aspect-video bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          <div>
+            <p class="text-xs uppercase tracking-wide text-[var(--color-primary)]">{{ project.category }}</p>
+            <h3 class="mt-2 text-2xl">{{ project.name }}</h3>
+            <a class="mt-3 inline-block text-sm font-semibold text-[var(--color-primary)]" href="{{ project.href }}">View case study &rarr;</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-pricing" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Pricing</h2>
+  {% call card("Pricing", "Three-tier cards, featured highlight (current)", "pricing-01", "Custom") %}
+    {% include "partials/pricing.njk" %}
+  {% endcall %}
+  {% call card("Pricing", "Compact comparison list", "pricing-02", "Oxbow-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Plans &amp; Pricing</h2>
+        </div>
+        <div class="mx-auto mt-10 max-w-2xl divide-y divide-gray-200 cd-rounded-img border border-gray-100 bg-white">
+          {% for plan in business.pricing %}
+          <div class="flex items-center justify-between gap-4 p-6">
+            <div>
+              <p class="font-semibold">{{ plan.tier }}</p>
+              <p class="text-sm text-gray-500">{{ plan.features | join(", ") }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xl text-[var(--color-primary)]">{{ plan.price }}</p>
+              <a class="text-sm font-semibold text-[var(--color-primary)]" href="{{ plan.cta_href }}">{{ plan.cta_label }} &rarr;</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Pricing", "Feature comparison table", "pricing-03", "Preline-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Compare Plans</h2>
+        </div>
+        <div class="mt-12 overflow-x-auto">
+          <table class="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="py-4"></th>
+                {% for plan in business.pricing %}
+                <th class="px-4 py-4 text-center {{ 'text-[var(--color-primary)]' if plan.featured }}">
+                  {{ plan.tier }}<br /><span class="text-2xl">{{ plan.price }}</span>
+                </th>
+                {% endfor %}
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              {% for feature in business.pricing[1].features %}
+              <tr>
+                <td class="py-3 text-gray-600">{{ feature }}</td>
+                {% for plan in business.pricing %}
+                <td class="px-4 py-3 text-center">
+                  {% if feature in plan.features %}
+                  <svg class="mx-auto h-5 w-5 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                  {% else %}
+                  <span class="text-gray-300">&mdash;</span>
+                  {% endif %}
+                </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-about" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">About</h2>
+  {% call card("About", "Horizontal timeline (current)", "about-01", "Custom") %}
+    {% include "partials/about.njk" %}
+  {% endcall %}
+  {% call card("About", "Two-column image + text", "about-02", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+        <div class="cd-rounded-img aspect-[4/3] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+        <div>
+          <h2 class="text-3xl sm:text-4xl">{{ business.about.heading }}</h2>
+          <p class="mt-4 text-gray-600">{{ business.about.paragraphs[0] }}</p>
+          <a class="cd-btn cd-btn-primary mt-8 inline-block text-sm" href="{{ business.about.cta_href }}">{{ business.about.cta_label }}</a>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("About", "Quote-led minimal", "about-03", "Oxbow-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section text-center">
+        <p class="mx-auto max-w-2xl text-2xl sm:text-3xl">{{ business.about.paragraphs[0] }}</p>
+        <a class="cd-btn cd-btn-outline mt-8 inline-block text-sm" href="{{ business.about.cta_href }}">{{ business.about.cta_label }}</a>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-team" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Team</h2>
+  {% call card("Team", "Photo/role/bio grid (current)", "team-01", "Custom") %}
+    {% include "partials/team.njk" %}
+  {% endcall %}
+  {% call card("Team", "Card grid with socials", "team-03", "Preline-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {% for person in business.team %}
+        <div class="cd-rounded-img border border-gray-100 p-6 text-center shadow-sm">
+          <div class="cd-rounded-img mx-auto h-20 w-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          <h3 class="mt-4 text-lg">{{ person.name }}</h3>
+          <p class="text-sm text-[var(--color-primary)]">{{ person.role }}</p>
+          <div class="mt-3 flex justify-center gap-3 text-xs text-gray-400">
+            <a class="hover:text-[var(--color-primary)]" href="#">LinkedIn</a>
+            <a class="hover:text-[var(--color-primary)]" href="#">Instagram</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Team", "Horizontal list with socials", "team-02", "Flowbite-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section divide-y divide-gray-200">
+        {% for person in business.team %}
+        <div class="flex items-center justify-between gap-4 py-5">
+          <div class="flex items-center gap-4">
+            <div class="cd-rounded-img h-12 w-12 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+            <div>
+              <p class="font-semibold">{{ person.name }}</p>
+              <p class="text-sm text-gray-500">{{ person.role }}</p>
+            </div>
+          </div>
+          <div class="flex gap-3 text-sm text-gray-400">
+            <a class="hover:text-[var(--color-primary)]" href="#">In</a>
+            <a class="hover:text-[var(--color-primary)]" href="#">X</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-testimonials" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Testimonials</h2>
+  {% call card("Testimonials", "Carousel with star rating (current, functional)", "testimonial-01", "Flowbite-style") %}
+    {% include "partials/testimonials.njk" %}
+  {% endcall %}
+  {% call card("Testimonials", "Static 3-up grid", "testimonial-02", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {% for t in business.testimonials %}
+          <div class="cd-rounded-img border border-gray-100 p-6 shadow-sm">
+            <p class="text-sm text-gray-600">&ldquo;{{ t.quote }}&rdquo;</p>
+            <p class="mt-4 font-semibold">{{ t.name }}</p>
+            <p class="text-xs text-gray-500">{{ t.role }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Testimonials", "Single large featured quote", "testimonial-03", "Preline-style") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-3xl text-center">
+          <p class="text-2xl text-white sm:text-3xl">&ldquo;{{ business.testimonials[0].quote }}&rdquo;</p>
+          <div class="mt-6 flex items-center justify-center gap-3">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm text-white">{{ business.testimonials[0].name | first }}</span>
+            <div class="text-left">
+              <p class="text-sm text-white">{{ business.testimonials[0].name }}</p>
+              <p class="text-xs text-white/60">{{ business.testimonials[0].role }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Testimonials", "Dark 2-up grid with stars", "testimonial-04", "Custom") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section">
+        <div class="flex flex-col gap-4 border-b border-white/10 pb-10 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-widest text-[var(--color-body-text)]">Testimonials</span>
+            <h2 class="mt-3 text-3xl font-black text-white sm:text-4xl">What clients say</h2>
+          </div>
+        </div>
+        <div class="mt-10 grid grid-cols-1 gap-px bg-white/[0.06] sm:grid-cols-2">
+          {% for t in business.testimonials %}
+          <div class="flex flex-col gap-6 bg-[var(--color-secondary)] p-8">
+            {% if t.rating %}
+            <div class="flex items-center gap-0.5" role="img" aria-label="{{ t.rating }} out of 5 stars">
+              {% for i in range(1, 6) %}
+              <svg class="h-3.5 w-3.5 {{ 'text-[var(--color-accent)]' if i <= t.rating else 'text-white/10' }}" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M10 1l2.93 6.38 6.99.6-5.3 4.63 1.61 6.85L10 16.01l-6.23 3.45 1.61-6.85-5.3-4.63 6.99-.6L10 1z" />
+              </svg>
+              {% endfor %}
+            </div>
+            {% endif %}
+            <p class="flex-1 text-[var(--color-body-text)]">&ldquo;{{ t.quote }}&rdquo;</p>
+            <div>
+              <p class="font-medium text-white">{{ t.name }}</p>
+              <p class="text-sm text-[var(--color-body-text)]">{{ t.role }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-faq" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">FAQ</h2>
+  {% call card("FAQ", "Accordion (current, functional)", "faq-01", "Flowbite-style") %}
+    {% include "partials/faq.njk" %}
+  {% endcall %}
+  {% call card("FAQ", "Two-column static grid", "faq-02", "Oxbow-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Frequently Asked Questions</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2">
+          {% for item in business.faq %}
+          <div>
+            <h3 class="font-semibold">{{ item.question }}</h3>
+            <p class="mt-2 text-sm text-gray-600">{{ item.answer }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("FAQ", "Simple stacked list", "faq-03", "Custom") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl">
+          <h2 class="text-center text-3xl sm:text-4xl">FAQs</h2>
+          <div class="mt-10 divide-y divide-gray-200">
+            {% for item in business.faq %}
+            <div class="py-5">
+              <h3 class="font-semibold">{{ item.question }}</h3>
+              <p class="mt-2 text-sm text-gray-600">{{ item.answer }}</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-gallery" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Gallery</h2>
+  {% call card("Gallery", "Plain image grid (placeholder - business.gallery is empty)", "gallery-01", "Custom") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {% for i in range(0, 8) %}
+          <div class="cd-rounded-img aspect-square bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Gallery", "Featured + grid (placeholder)", "gallery-02", "Oxbow-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div class="cd-rounded-img col-span-2 row-span-2 aspect-square bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          {% for i in range(0, 4) %}
+          <div class="cd-rounded-img aspect-square bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-secondary)]"></div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  {% call card("Gallery", "Masonry columns (placeholder)", "gallery-03", "Preline-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="columns-2 gap-4 sm:columns-3">
+          {% for i in range(0, 7) %}
+          <div class="cd-rounded-img mb-4 break-inside-avoid bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] {{ 'aspect-square' if loop.index % 3 == 0 else ('aspect-[3/4]' if loop.index % 2 == 0 else 'aspect-video') }}"></div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Gallery", "Full-bleed scroll strip (placeholder)", "gallery-04", "Custom") %}
+    <div class="overflow-x-auto">
+      <div class="flex gap-3 px-6 py-6 w-max">
+        {% for i in range(0, 6) %}
+        <div class="cd-rounded-img h-52 w-72 shrink-0 bg-gradient-to-br {{ 'from-[var(--color-primary)] to-[var(--color-secondary)]' if loop.index % 2 == 0 else 'from-[var(--color-accent)] to-[var(--color-secondary)]' }}"></div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endcall %}
+
+  <h2 id="cat-gallery2-placeholder" class="hidden"></h2>
+  <h2 id="cat-booking" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Booking</h2>
+  {% call card("Booking", "Third-party embed slot (disabled by default)", "booking-01", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Choose a time that works for you</h2>
+        </div>
+        <div class="mx-auto mt-10 flex h-48 max-w-3xl items-center justify-center cd-rounded-img border border-dashed border-gray-300 bg-gray-50 text-sm text-gray-400">
+          Booking iframe renders here when business.booking.enabled = true
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Booking", "Split layout with details panel", "booking-02", "Custom") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div class="cd-rounded-img bg-white p-6 shadow-sm">
+          <h3 class="text-lg">Before you book</h3>
+          <ul class="mt-3 space-y-2 text-sm text-gray-600">
+            <li>Free 15-minute consultation</li>
+            <li>No obligation</li>
+            <li>Response within 1 business day</li>
+          </ul>
+        </div>
+        <div class="cd-rounded-img flex h-48 items-center justify-center border border-dashed border-gray-300 bg-white text-sm text-gray-400 lg:col-span-2">
+          Booking iframe renders here when business.booking.enabled = true
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Booking", "Outbound link button (no embed)", "booking-03", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section text-center">
+        <h2 class="text-3xl sm:text-4xl">Ready to book?</h2>
+        <p class="mx-auto mt-4 max-w-xl text-gray-600">Booking happens on our partner platform - it only takes a minute.</p>
+        <a class="cd-btn cd-btn-primary mt-8 inline-block text-sm" href="#" target="_blank" rel="noopener">Book Now &rarr;</a>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-cta" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">CTA</h2>
+  {% call card("CTA", "Full gradient banner (current)", "cta-01", "Custom") %}
+    {% include "partials/cta.njk" %}
+  {% endcall %}
+  {% call card("CTA", "Split banner with email capture", "cta-02", "Custom") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section flex flex-col items-center justify-between gap-6 sm:flex-row">
+        <div class="text-center sm:text-left">
+          <h2 class="text-2xl text-white">{{ business.cta_banner.heading }}</h2>
+          <p class="mt-2 text-white/70">{{ business.cta_banner.body }}</p>
+        </div>
+        <form class="flex w-full max-w-sm gap-2">
+          <input class="w-full cd-rounded-img border-0 bg-white/10 p-3 text-sm text-white placeholder:text-white/50" placeholder="you@example.com" type="email" />
+          <button class="cd-btn cd-btn-primary shrink-0 text-sm" type="submit">Subscribe</button>
+        </form>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("CTA", "Centered, two stacked actions", "cta-03", "Oxbow-style") %}
+    <section class="bg-white">
+      <div class="mx-auto max-w-xl cd-section text-center">
+        <h2 class="text-3xl sm:text-4xl">{{ business.cta_banner.heading }}</h2>
+        <p class="mt-4 text-gray-600">{{ business.cta_banner.body }}</p>
+        <div class="mt-8 flex flex-col items-center gap-3">
+          <a class="cd-btn cd-btn-primary w-full max-w-xs text-sm" href="#">{{ business.cta_banner.button_label }}</a>
+          <a class="text-sm text-gray-500 hover:text-[var(--color-primary)]" href="#">or send us an email instead</a>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-forms" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Forms</h2>
+  {% call card("Forms", "Full contact form (current)", "contact-form-01", "Custom") %}
+    {% include "partials/contact-form.njk" %}
+  {% endcall %}
+  {% call card("Forms", "Compact newsletter signup", "newsletter-01", "Custom") %}
+    <div class="cd-container cd-section">
+      {% include "partials/newsletter-form.njk" %}
+    </div>
+  {% endcall %}
+  {% call card("Forms", "Inline newsletter strip", "newsletter-02", "Flowbite-style") %}
+    <div class="cd-container py-10">
+      <form class="flex flex-col items-center gap-3 cd-rounded-img bg-gray-50 p-6 text-center sm:flex-row sm:justify-between sm:text-left">
+        <p class="text-sm text-gray-600">Get occasional updates - no spam.</p>
+        <div class="flex w-full gap-2 sm:w-auto">
+          <input class="w-full cd-rounded-img border border-gray-200 p-2.5 text-sm sm:w-56" placeholder="you@example.com" type="email" />
+          <button class="cd-btn cd-btn-primary shrink-0 text-sm" type="submit">Join</button>
+        </div>
+      </form>
+    </div>
+  {% endcall %}
+  {% call card("Forms", "Sign-in", "auth-01", "Flowbite-style") %}
+    <section class="bg-white">
+      <div class="mx-auto max-w-sm py-10">
+        <h2 class="text-2xl">Sign in</h2>
+        <form class="mt-6 space-y-4">
+          <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Email address" type="email" />
+          <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Password" type="password" />
+          <button class="cd-btn cd-btn-primary w-full text-sm" type="submit">Sign In</button>
+          <p class="text-center text-xs text-gray-500">Don't have an account? <a class="text-[var(--color-primary)]" href="#">Sign up</a></p>
+        </form>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Forms", "Sign-up", "auth-02", "Flowbite-style") %}
+    <section class="bg-gray-50">
+      <div class="mx-auto max-w-sm py-10">
+        <h2 class="text-2xl">Create an account</h2>
+        <form class="mt-6 space-y-4">
+          <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Full name" type="text" />
+          <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Email address" type="email" />
+          <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Password" type="password" />
+          <button class="cd-btn cd-btn-primary w-full text-sm" type="submit">Create Account</button>
+        </form>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-footer" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Footer</h2>
+  {% call card("Footer", "Newsletter strip + link columns (current)", "footer-01", "Custom") %}
+    {% include "partials/footer.njk" %}
+  {% endcall %}
+  {% call card("Footer", "Simple centered minimal", "footer-02", "Oxbow-style") %}
+    <footer class="border-t border-gray-100 bg-white">
+      <div class="cd-container cd-section flex flex-col items-center gap-4 text-center">
+        <span class="text-lg text-[var(--color-primary)]">{{ business.brand_name_primary }}{{ business.brand_name_accent }}</span>
+        <nav class="flex flex-wrap justify-center gap-6 text-sm text-gray-500" aria-label="Site">
+          {% for item in business.nav %}
+          <a class="hover:text-[var(--color-primary)]" href="{{ item.href }}">{{ item.label }}</a>
+          {% endfor %}
+        </nav>
+        <nav class="flex flex-wrap justify-center gap-4 text-xs text-gray-400" aria-label="Legal">
+          <a class="hover:text-[var(--color-primary)]" href="/privacy-policy/">Privacy Policy</a>
+          <a class="hover:text-[var(--color-primary)]" href="/terms/">Terms &amp; Conditions</a>
+          <a class="hover:text-[var(--color-primary)]" href="/accessibility/">Accessibility</a>
+          <a class="hover:text-[var(--color-primary)]" href="#" data-cd-cookie-settings>Cookie Settings</a>
+        </nav>
+        <p class="text-xs text-gray-400">&copy; {{ "now" | currentYear }} {{ business.business_name }}. All rights reserved.</p>
+        {%- if business.legal and (business.legal.company_number or business.legal.place_of_registration or business.legal.vat_number or business.legal.ico_number) %}
+        <div class="space-y-0.5 text-xs text-gray-400">
+          {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
+          {% if not business.legal.registered_address_same and business.legal.registered_address and business.legal.registered_address.line1 %}<p>Registered office: {{ business.legal.registered_address.line1 }}, {{ business.legal.registered_address.city }}, {{ business.legal.registered_address.postcode }}.</p>{% endif %}
+          {% if business.legal.vat_number %}<p>VAT {{ business.legal.vat_number }}.</p>{% endif %}
+          {% if business.legal.ico_number %}<p>ICO {{ business.legal.ico_number }}.</p>{% endif %}
+        </div>
+        {%- endif %}
+      </div>
+    </footer>
+  {% endcall %}
+
+  {% call card("Footer", "Dark single-row bar", "footer-03", "Flowbite-style") %}
+    <footer class="bg-[var(--color-secondary)]">
+      <div class="cd-container flex flex-col items-center justify-between gap-4 py-6 sm:flex-row">
+        <p class="text-sm text-white/60">&copy; {{ "now" | currentYear }} {{ business.business_name }}</p>
+        <nav class="flex flex-wrap justify-center gap-6 text-sm text-white/60" aria-label="Site">
+          {% for item in business.nav %}
+          <a class="hover:text-white transition" href="{{ item.href }}">{{ item.label }}</a>
+          {% endfor %}
+        </nav>
+        <div class="flex gap-4">
+          {% for s in business.social %}
+          <a class="text-white/50 hover:text-white transition" href="{{ s.url }}" aria-label="{{ s.label }}" target="_blank" rel="noopener">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="border-t border-white/10">
+        <div class="cd-container flex flex-col items-center justify-between gap-3 py-4 text-xs text-white/40 sm:flex-row">
+          <nav class="flex flex-wrap justify-center gap-4" aria-label="Legal">
+            <a class="hover:text-white/70" href="/privacy-policy/">Privacy Policy</a>
+            <a class="hover:text-white/70" href="/terms/">Terms &amp; Conditions</a>
+            <a class="hover:text-white/70" href="/accessibility/">Accessibility</a>
+            <a class="hover:text-white/70" href="#" data-cd-cookie-settings>Cookie Settings</a>
+          </nav>
+          {%- if business.legal and (business.legal.company_number or business.legal.place_of_registration or business.legal.vat_number or business.legal.ico_number) %}
+          <div class="space-y-0.5 text-center sm:text-right">
+            {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
+            {% if business.legal.vat_number %}<p>VAT {{ business.legal.vat_number }}.</p>{% endif %}
+            {% if business.legal.ico_number %}<p>ICO {{ business.legal.ico_number }}.</p>{% endif %}
+          </div>
+          {%- endif %}
+        </div>
+      </div>
+    </footer>
+  {% endcall %}
+  {% call card("Footer", "Two-tone dark columns", "footer-04", "Custom") %}
+    <footer class="bg-[var(--color-secondary-dark)]">
+      <div class="cd-container py-12 grid grid-cols-1 gap-8 sm:grid-cols-3">
+        <div class="sm:col-span-1">
+          <span class="text-lg text-[var(--color-primary-light)]">{{ business.brand_name_primary }}<span class="text-white">{{ business.brand_name_accent }}</span></span>
+          <p class="mt-3 text-sm text-white/50 max-w-xs">{{ business.footer.tagline }}</p>
+        </div>
+        {% for col in business.footer.columns %}
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-white/40">{{ col.heading }}</p>
+          <ul class="mt-3 space-y-2">
+            {% for link in col.links %}
+            <li>
+              {% if link.href == "#cookies" %}
+              <a class="text-sm text-white/60 hover:text-white transition" href="#" data-cd-cookie-settings>{{ link.label }}</a>
+              {% else %}
+              <a class="text-sm text-white/60 hover:text-white transition" href="{{ link.href }}">{{ link.label }}</a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="border-t border-white/10">
+        <div class="cd-container py-6 text-center text-xs text-white/30">
+          <p>&copy; {{ "now" | currentYear }} {{ business.business_name }}. All rights reserved.</p>
+          {%- if business.legal and (business.legal.company_number or business.legal.place_of_registration or business.legal.vat_number or business.legal.ico_number) %}
+          <div class="mt-1 space-y-0.5">
+            {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
+            {% if not business.legal.registered_address_same and business.legal.registered_address and business.legal.registered_address.line1 %}<p>Registered office: {{ business.legal.registered_address.line1 }}, {{ business.legal.registered_address.city }}, {{ business.legal.registered_address.postcode }}.</p>{% endif %}
+            {% if business.legal.vat_number %}<p>VAT {{ business.legal.vat_number }}.</p>{% endif %}
+            {% if business.legal.ico_number %}<p>ICO {{ business.legal.ico_number }}.</p>{% endif %}
+          </div>
+          {%- endif %}
+        </div>
+      </div>
+    </footer>
+  {% endcall %}
+
+  <h2 id="cat-announcement" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Announcement</h2>
+  {% call card("Announcement", "Top urgency/promo bar", "announcement-01", "Custom") %}
+    {% include "partials/announcement.njk" %}
+  {% endcall %}
+
+  {% call card("Announcement", "Dismissible banner", "announcement-02", "Flowbite-style") %}
+    <div id="ann-02-bar" class="flex items-center justify-between gap-3 bg-[var(--color-primary)] px-4 py-3 text-sm text-white">
+      <span class="flex-1 text-center">New: We now offer <a class="underline hover:no-underline" href="#">ongoing website care plans</a> from just £49/mo.</span>
+      <button type="button" onclick="document.getElementById('ann-02-bar').style.display='none'" class="shrink-0 text-white/70 hover:text-white" aria-label="Dismiss">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+  {% endcall %}
+  {% call card("Announcement", "Centered pill notification", "announcement-03", "Custom") %}
+    <div class="cd-container flex justify-center py-4">
+      <a href="#" class="inline-flex items-center gap-2 rounded-full bg-[var(--color-primary-light)] px-4 py-2 text-sm text-[var(--color-primary-dark)] hover:bg-[var(--color-primary)] hover:text-white transition">
+        <span class="font-semibold">Spring offer</span>
+        <span class="opacity-50">·</span>
+        Free hosting for 12 months on new sites
+        <svg class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+      </a>
+    </div>
+  {% endcall %}
+
+  <h2 id="cat-elements" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">UI Elements</h2>
+  {% call card("Alert", "Info", "alert-01", "Flowbite-style") %}
+    <div class="cd-container py-6">
+      <div class="flex items-start gap-3 cd-rounded-img border border-[var(--color-primary)]/20 bg-[var(--color-primary-light)] p-4 text-sm text-[var(--color-primary-dark)]">
+        <svg class="mt-0.5 h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10A8 8 0 112 10a8 8 0 0116 0zM9 9a1 1 0 012 0v4a1 1 0 11-2 0V9zm1-4a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" /></svg>
+        <div><span class="font-semibold">Heads up -</span> this is an informational alert banner.</div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Alert", "Success", "alert-02", "Flowbite-style") %}
+    <div class="cd-container py-6">
+      <div class="flex items-start gap-3 cd-rounded-img border border-green-200 bg-green-50 p-4 text-sm text-green-700">
+        <svg class="mt-0.5 h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clip-rule="evenodd" /></svg>
+        <div><span class="font-semibold">Success -</span> your message has been sent.</div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Alert", "Warning", "alert-03", "Flowbite-style") %}
+    <div class="cd-container py-6">
+      <div class="flex items-start gap-3 cd-rounded-img border border-[var(--color-accent)]/30 bg-orange-50 p-4 text-sm text-[var(--color-accent-dark)]">
+        <svg class="mt-0.5 h-5 w-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.3 3.86l-6.1 10.5A1.5 1.5 0 003.5 16.6h13a1.5 1.5 0 001.3-2.24l-6.1-10.5a1.5 1.5 0 00-2.6 0zM10 7a1 1 0 011 1v3a1 1 0 11-2 0V8a1 1 0 011-1zm0 7a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" /></svg>
+        <div><span class="font-semibold">Warning -</span> double-check before submitting.</div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Badges", "Pill / dot / outline styles", "badges-01", "Flowbite-style") %}
+    <div class="cd-container flex flex-wrap items-center gap-3 py-8">
+      <span class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-white">New</span>
+      <span class="rounded-full bg-[var(--color-primary-light)] px-3 py-1 text-xs font-medium text-[var(--color-primary-dark)]">In Progress</span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"><span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Available</span>
+      <span class="rounded-full border border-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-primary)]">Outline</span>
+    </div>
+  {% endcall %}
+  {% call card("Badges", "With icons", "badges-02", "Custom") %}
+    <div class="cd-container flex flex-wrap items-center gap-3 py-8">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-white">
+        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+        Verified
+      </span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+        Pending
+      </span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+        Error
+      </span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+        <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+        Active
+      </span>
+    </div>
+  {% endcall %}
+  {% call card("Badges", "Monospace tag chips", "badges-03", "Oxbow-style") %}
+    <div class="cd-container flex flex-wrap items-center gap-2 py-8">
+      <span class="rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600">tailwindcss</span>
+      <span class="rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600">eleventy</span>
+      <span class="rounded border border-[var(--color-primary)]/30 bg-[var(--color-primary-light)] px-2 py-1 font-mono text-xs text-[var(--color-primary)]">featured</span>
+      <span class="rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600">web design</span>
+      <span class="rounded border border-gray-200 bg-gray-50 px-2 py-1 font-mono text-xs text-gray-600">seo</span>
+      <span class="rounded border border-red-200 bg-red-50 px-2 py-1 font-mono text-xs text-red-600">deprecated</span>
+    </div>
+  {% endcall %}
+  {% call card("Avatars", "Single + stacked group", "avatars-01", "Flowbite-style") %}
+    <div class="cd-container flex flex-wrap items-center gap-8 py-8">
+      <img class="h-10 w-10 rounded-full object-cover" src="https://i.pravatar.cc/80?img=12" alt="Avatar" />
+      <div class="flex -space-x-3">
+        <img class="h-10 w-10 rounded-full border-2 border-white object-cover" src="https://i.pravatar.cc/80?img=12" alt="" />
+        <img class="h-10 w-10 rounded-full border-2 border-white object-cover" src="https://i.pravatar.cc/80?img=32" alt="" />
+        <img class="h-10 w-10 rounded-full border-2 border-white object-cover" src="https://i.pravatar.cc/80?img=45" alt="" />
+        <span class="flex h-10 w-10 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-xs font-medium text-gray-600">+5</span>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Avatars", "With name + role", "avatars-02", "Flowbite-style") %}
+    <div class="cd-container py-8 space-y-3">
+      {% for person in business.team %}
+      <div class="flex items-center gap-3">
+        <img class="h-9 w-9 rounded-full object-cover" src="https://i.pravatar.cc/80?img={{ loop.index + 10 }}" alt="{{ person.name }}" />
+        <div>
+          <p class="text-sm font-semibold leading-tight">{{ person.name }}</p>
+          <p class="text-xs text-gray-500">{{ person.role }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endcall %}
+  {% call card("Avatars", "Initials-only circles", "avatars-03", "Custom") %}
+    <div class="cd-container flex flex-wrap items-center gap-3 py-8">
+      {% for person in business.team %}
+      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-white" title="{{ person.name }}">{{ person.name | first }}</span>
+      {% endfor %}
+      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-600">+3</span>
+    </div>
+  {% endcall %}
+  {% call card("Breadcrumb", "Simple breadcrumb trail", "breadcrumb-01", "Flowbite-style") %}
+    <div class="cd-container py-6">
+      <nav class="flex text-sm text-gray-500">
+        <a class="hover:text-[var(--color-primary)]" href="#">Home</a>
+        <span class="mx-2">/</span>
+        <a class="hover:text-[var(--color-primary)]" href="#">Services</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">Web Design</span>
+      </nav>
+    </div>
+  {% endcall %}
+  {% call card("Breadcrumb", "With home icon + chevrons", "breadcrumb-02", "Custom") %}
+    <div class="cd-container py-6">
+      <nav class="flex items-center gap-2 text-sm text-gray-500">
+        <a href="#" class="text-[var(--color-primary)] hover:underline">
+          <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+        </a>
+        <svg class="h-4 w-4 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <a href="#" class="hover:text-[var(--color-primary)]">Services</a>
+        <svg class="h-4 w-4 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <span class="text-gray-900">Web Design</span>
+      </nav>
+    </div>
+  {% endcall %}
+  {% call card("Breadcrumb", "Pill step indicator", "breadcrumb-03", "Oxbow-style") %}
+    <div class="cd-container py-6">
+      <nav class="flex flex-wrap items-center gap-2">
+        <span class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-white">1. Contact</span>
+        <svg class="h-4 w-4 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <span class="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-400">2. Details</span>
+        <svg class="h-4 w-4 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        <span class="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-medium text-gray-400">3. Confirm</span>
+      </nav>
+    </div>
+  {% endcall %}
+  {% call card("Pagination", "Numbered pagination", "pagination-01", "Flowbite-style") %}
+    <div class="cd-container flex items-center justify-center gap-1 py-8">
+      <a class="cd-rounded-img px-3 py-2 text-sm text-gray-500 hover:bg-gray-100" href="#">&laquo;</a>
+      <a class="cd-rounded-img bg-[var(--color-primary)] px-3 py-2 text-sm text-white" href="#">1</a>
+      <a class="cd-rounded-img px-3 py-2 text-sm text-gray-600 hover:bg-gray-100" href="#">2</a>
+      <a class="cd-rounded-img px-3 py-2 text-sm text-gray-600 hover:bg-gray-100" href="#">3</a>
+      <a class="cd-rounded-img px-3 py-2 text-sm text-gray-500 hover:bg-gray-100" href="#">&raquo;</a>
+    </div>
+  {% endcall %}
+
+  {% call card("Pagination", "Prev / Next only", "pagination-02", "Custom") %}
+    <div class="cd-container flex items-center justify-between gap-4 py-8">
+      <a class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[var(--color-primary)]" href="#">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Previous
+      </a>
+      <a class="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[var(--color-primary)]" href="#">
+        Next
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+      </a>
+    </div>
+  {% endcall %}
+  {% call card("Pagination", "With result count", "pagination-03", "Flowbite-style") %}
+    <div class="cd-container flex flex-col items-center justify-between gap-4 py-8 sm:flex-row">
+      <span class="text-sm text-gray-500">Showing <span class="font-semibold text-gray-900">1-6</span> of <span class="font-semibold text-gray-900">24</span> results</span>
+      <div class="flex items-center gap-1">
+        <a class="cd-rounded-img px-3 py-2 text-sm text-gray-500 hover:bg-gray-100" href="#">&laquo;</a>
+        <a class="cd-rounded-img bg-[var(--color-primary)] px-3 py-2 text-sm text-white" href="#">1</a>
+        <a class="cd-rounded-img px-3 py-2 text-sm text-gray-600 hover:bg-gray-100" href="#">2</a>
+        <a class="cd-rounded-img px-3 py-2 text-sm text-gray-600 hover:bg-gray-100" href="#">3</a>
+        <a class="cd-rounded-img px-3 py-2 text-sm text-gray-600 hover:bg-gray-100" href="#">4</a>
+        <a class="cd-rounded-img px-3 py-2 text-sm text-gray-500 hover:bg-gray-100" href="#">&raquo;</a>
+      </div>
+    </div>
+  {% endcall %}
+
+  <h2 id="cat-tables" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Tables</h2>
+  {% call card("Tables", "Simple data table", "table-01", "Flowbite-style") %}
+    <div class="cd-container py-10">
+      <div class="overflow-x-auto cd-rounded-img border border-gray-100">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+            <tr><th class="px-6 py-3">Project</th><th class="px-6 py-3">Client</th><th class="px-6 py-3">Status</th></tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {% for project in business.portfolio %}
+            <tr>
+              <td class="px-6 py-4 font-medium text-gray-900">{{ project.name }}</td>
+              <td class="px-6 py-4 text-gray-500">{{ project.category }}</td>
+              <td class="px-6 py-4"><span class="rounded-full bg-green-50 px-2 py-1 text-xs text-green-700">Live</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Tables", "Striped table with actions", "table-02", "Flowbite-style") %}
+    <div class="cd-container py-10">
+      <div class="overflow-x-auto cd-rounded-img border border-gray-100">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-[var(--color-secondary)] text-xs uppercase text-white/70">
+            <tr><th class="px-6 py-3">Service</th><th class="px-6 py-3">Description</th><th class="px-6 py-3 text-right">Action</th></tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {% for service in business.services %}
+            <tr class="{{ 'bg-gray-50' if loop.index % 2 == 0 else '' }}">
+              <td class="px-6 py-4 font-medium text-gray-900">{{ service.name }}</td>
+              <td class="px-6 py-4 text-gray-500">{{ service.description }}</td>
+              <td class="px-6 py-4 text-right"><a class="font-semibold text-[var(--color-primary)]" href="#">View &rarr;</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endcall %}
+
+  {% call card("Tables", "Card-list rows (no table element)", "table-03", "Oxbow-style") %}
+    <div class="cd-container py-10 space-y-3">
+      {% for project in business.portfolio %}
+      <div class="flex items-center justify-between gap-4 cd-rounded-img border border-gray-100 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-4">
+          <div class="h-10 w-10 shrink-0 cd-rounded-img bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          <div>
+            <p class="font-medium text-gray-900">{{ project.name }}</p>
+            <p class="text-xs text-gray-500">{{ project.category }}</p>
+          </div>
+        </div>
+        <span class="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">Live</span>
+      </div>
+      {% endfor %}
+    </div>
+  {% endcall %}
+
+  <h2 id="cat-interactive" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Interactive</h2>
+  {% call card("Tabs", "Underline tabs (functional)", "tabs-01", "Flowbite-style") %}
+    <div class="cd-container py-10">
+      <div data-tabs-toggle="#tab-content" data-tabs-active-classes="border-[var(--color-primary)] text-[var(--color-primary)]" data-tabs-inactive-classes="border-transparent text-gray-500" role="tablist">
+        <ul class="flex flex-wrap gap-6 border-b border-gray-200 text-sm font-medium">
+          <li role="presentation"><button class="border-b-2 border-transparent px-1 py-3" id="tab-design-btn" data-tabs-target="#tab-design" type="button" role="tab" aria-controls="tab-design">Design</button></li>
+          <li role="presentation"><button class="border-b-2 border-transparent px-1 py-3" id="tab-build-btn" data-tabs-target="#tab-build" type="button" role="tab" aria-controls="tab-build">Build</button></li>
+          <li role="presentation"><button class="border-b-2 border-transparent px-1 py-3" id="tab-launch-btn" data-tabs-target="#tab-launch" type="button" role="tab" aria-controls="tab-launch">Launch</button></li>
+        </ul>
+      </div>
+      <div id="tab-content">
+        <div id="tab-design" role="tabpanel" aria-labelledby="tab-design-btn" class="py-6 text-sm text-gray-600">We start with wireframes and a visual direction before writing any code.</div>
+        <div id="tab-build" role="tabpanel" aria-labelledby="tab-build-btn" class="hidden py-6 text-sm text-gray-600">Then we build it for real - fast, accessible, and mobile-first.</div>
+        <div id="tab-launch" role="tabpanel" aria-labelledby="tab-launch-btn" class="hidden py-6 text-sm text-gray-600">Finally we launch, test, and hand over the keys.</div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Tabs", "Pill tabs (functional)", "tabs-02", "Preline-style") %}
+    <div class="cd-container py-10">
+      <div data-tabs-toggle="#pill-tab-content" data-tabs-active-classes="bg-[var(--color-primary)] text-white" data-tabs-inactive-classes="text-gray-600 hover:bg-gray-100" role="tablist">
+        <ul class="flex flex-wrap gap-2 text-sm font-medium">
+          <li role="presentation"><button class="rounded-full px-4 py-2 text-gray-600" id="ptab-design-btn" data-tabs-target="#ptab-design" type="button" role="tab">Design</button></li>
+          <li role="presentation"><button class="rounded-full px-4 py-2 text-gray-600" id="ptab-build-btn" data-tabs-target="#ptab-build" type="button" role="tab">Build</button></li>
+          <li role="presentation"><button class="rounded-full px-4 py-2 text-gray-600" id="ptab-launch-btn" data-tabs-target="#ptab-launch" type="button" role="tab">Launch</button></li>
+        </ul>
+      </div>
+      <div id="pill-tab-content" class="mt-4">
+        <div id="ptab-design" role="tabpanel" class="text-sm text-gray-600">Wireframes and a clear visual direction before a single line of code.</div>
+        <div id="ptab-build" role="tabpanel" class="hidden text-sm text-gray-600">Built fast, accessible, and mobile-first.</div>
+        <div id="ptab-launch" role="tabpanel" class="hidden text-sm text-gray-600">Launched, tested, and handed over to you.</div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Tabs", "Vertical sidebar tabs", "tabs-03", "Custom") %}
+    <div class="cd-container py-10 flex gap-8">
+      <ul class="w-40 shrink-0 space-y-1 text-sm">
+        <li><a class="block rounded px-3 py-2 bg-[var(--color-primary-light)] font-semibold text-[var(--color-primary)]" href="#">Design</a></li>
+        <li><a class="block rounded px-3 py-2 text-gray-600 hover:bg-gray-100" href="#">Build</a></li>
+        <li><a class="block rounded px-3 py-2 text-gray-600 hover:bg-gray-100" href="#">Launch</a></li>
+        <li><a class="block rounded px-3 py-2 text-gray-600 hover:bg-gray-100" href="#">Support</a></li>
+      </ul>
+      <div class="text-sm text-gray-600">
+        <h3 class="mb-2 font-semibold text-gray-900">Design phase</h3>
+        <p>We start every project with wireframes and a clear visual direction - so you can see the look and feel before we write a single line of code.</p>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Modal", "Dialog with form (functional - click to open)", "modal-01", "Flowbite-style") %}
+    <div class="cd-container py-10 text-center">
+      <button data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="cd-btn cd-btn-primary text-sm" type="button">Open Modal</button>
+    </div>
+    <div id="demo-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:inset-0">
+      <div class="relative max-h-full w-full max-w-md">
+        <div class="relative cd-rounded-img bg-white shadow">
+          <div class="flex items-center justify-between border-b border-gray-200 p-4">
+            <h3 class="text-lg font-semibold text-gray-900">Get in touch</h3>
+            <button type="button" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-900" data-modal-hide="demo-modal">
+              <svg class="h-3 w-3" fill="none" viewBox="0 0 14 14" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1l12 12M13 1L1 13" /></svg>
+            </button>
+          </div>
+          <div class="space-y-4 p-4">
+            <p class="text-sm text-gray-600">This is a Flowbite-pattern modal dialog, restyled with this site's tokens.</p>
+            <input class="w-full cd-rounded-img border border-gray-200 p-3 text-sm" placeholder="Email address" type="email" />
+            <button class="cd-btn cd-btn-primary w-full text-sm" type="button">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endcall %}
+
+  {% call card("Modal", "Confirmation dialog (functional - click to open)", "modal-02", "Custom") %}
+    <div class="cd-container py-10 text-center">
+      <button data-modal-target="confirm-modal" data-modal-toggle="confirm-modal" class="cd-btn cd-btn-outline text-sm" type="button">Delete item</button>
+    </div>
+    <div id="confirm-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:inset-0">
+      <div class="relative max-h-full w-full max-w-sm">
+        <div class="relative cd-rounded-img bg-white p-8 text-center shadow">
+          <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900">Are you sure?</h3>
+          <p class="mt-2 text-sm text-gray-500">This action cannot be undone.</p>
+          <div class="mt-6 flex justify-center gap-3">
+            <button type="button" data-modal-hide="confirm-modal" class="cd-btn cd-btn-outline text-sm">Cancel</button>
+            <button type="button" data-modal-hide="confirm-modal" class="cd-btn bg-red-600 text-sm text-white hover:bg-red-700">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Modal", "Image lightbox (functional - click a tile to open)", "modal-03", "Preline-style") %}
+    <div class="cd-container py-10">
+      <div class="grid grid-cols-3 gap-3">
+        {% for i in range(0, 3) %}
+        <button data-modal-target="lightbox-modal" data-modal-toggle="lightbox-modal" type="button" class="cd-rounded-img aspect-video w-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] hover:opacity-80 transition"></button>
+        {% endfor %}
+      </div>
+    </div>
+    <div id="lightbox-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden p-4 md:inset-0">
+      <div class="relative max-h-full w-full max-w-3xl">
+        <div class="relative flex cd-rounded-img aspect-video items-center justify-center bg-[var(--color-secondary)] shadow">
+          <span class="text-sm text-white/40">Full-size image preview here</span>
+          <button type="button" class="absolute right-3 top-3 text-white/60 hover:text-white" data-modal-hide="lightbox-modal">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  {% endcall %}
+
+  <h2 id="cat-blog" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Blog</h2>
+  {% call card("Blog", "Article card grid", "blog-grid-01", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">From the Blog</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {% for post in collections.posts %}
+          <a class="block cd-rounded-img overflow-hidden border border-gray-100 shadow-sm transition hover:shadow-lg" href="{{ post.url }}">
+            <div class="aspect-video bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+            <div class="p-5">
+              <p class="text-xs uppercase tracking-wide text-[var(--color-primary)]">{{ post.date | readableDate }}</p>
+              <h3 class="mt-2 text-lg">{{ post.data.title }}</h3>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  {% call card("Blog", "List layout with date sidebar", "blog-grid-02", "Preline-style") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="mx-auto mb-10 max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">Latest Articles</h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          {% for post in collections.posts %}
+          <a class="group -mx-4 block px-4 py-6 transition hover:bg-gray-100" href="{{ post.url }}">
+            <div class="flex items-start gap-6">
+              <div class="w-28 shrink-0 pt-1 text-xs text-gray-400">{{ post.date | readableDate }}</div>
+              <div>
+                <h3 class="font-semibold transition group-hover:text-[var(--color-primary)]">{{ post.data.title }}</h3>
+                {% if post.data.description %}<p class="mt-1 text-sm text-gray-500">{{ post.data.description }}</p>{% endif %}
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Blog", "Featured hero post + smaller cards", "blog-grid-03", "Flowbite-style") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        {% if collections.posts and collections.posts.length %}
+        <a class="mb-8 block overflow-hidden cd-rounded-img border border-gray-100 shadow-sm transition hover:shadow-lg" href="{{ collections.posts[0].url }}">
+          <div class="aspect-[16/6] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+          <div class="p-6">
+            <p class="text-xs font-semibold uppercase tracking-wide text-[var(--color-primary)]">Featured</p>
+            <h2 class="mt-2 text-2xl">{{ collections.posts[0].data.title }}</h2>
+          </div>
+        </a>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {% for post in collections.posts %}
+          {% if not loop.first %}
+          <a class="block overflow-hidden cd-rounded-img border border-gray-100 shadow-sm transition hover:shadow-md" href="{{ post.url }}">
+            <div class="p-5">
+              <p class="text-xs text-gray-400">{{ post.date | readableDate }}</p>
+              <h3 class="mt-1 font-semibold">{{ post.data.title }}</h3>
+            </div>
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-logos" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Social Proof</h2>
+  {% call card("Logos", "Trusted-by logo cloud (placeholder)", "logos-01", "Custom") %}
+    <div class="cd-container py-10 text-center">
+      <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">[Trust line]</p>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-6 opacity-60">
+        {% for i in range(0, 5) %}
+        <span class="text-lg font-semibold text-gray-400">LOGO {{ i + 1 }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endcall %}
+
+  {% call card("Logos", "Grid of logo slots", "logos-02", "Preline-style") %}
+    <div class="cd-container cd-section">
+      <p class="mb-8 text-center text-xs font-semibold uppercase tracking-wide text-gray-400">Businesses we've worked with</p>
+      <div class="grid grid-cols-3 gap-px overflow-hidden cd-rounded-img bg-gray-200">
+        {% for i in range(0, 6) %}
+        <div class="flex items-center justify-center bg-white py-8">
+          <span class="text-base font-semibold text-gray-300">LOGO {{ i + 1 }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endcall %}
+  {% call card("Logos", "Single row with dividers", "logos-03", "Flowbite-style") %}
+    <div class="cd-container py-10">
+      <p class="mb-6 text-center text-xs font-semibold uppercase tracking-wide text-gray-400">[Trust line]</p>
+      <div class="flex divide-x divide-gray-200 overflow-hidden cd-rounded-img border border-gray-200">
+        {% for i in range(0, 5) %}
+        <div class="flex flex-1 items-center justify-center py-6">
+          <span class="text-sm font-semibold text-gray-300">LOGO {{ i + 1 }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endcall %}
+
+  {% call card("Logos", "Tools & technologies strip with icons", "logos-04", "Custom") %}
+    <section class="border-y border-slate-200 bg-white py-10">
+      <div class="cd-container">
+        <p class="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-slate-400">Tools &amp; technologies I work with</p>
+        <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14.25 2.26L13.5 2h-3l-.75.26L3 7v10l.75.74 8.25 4.26 8.25-4.26.75-.74V7l-6.75-4.74zM12 4.07L17.32 7.5 12 10.93 6.68 7.5 12 4.07zM5 9.18l6 3.09v5.45L5 14.64V9.18zm8 8.54v-5.45l6-3.09v5.46l-6 3.08z"/></svg>
+            WordPress
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-yellow-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15v-4H7l5-8v4h4l-5 8z"/></svg>
+            Zapier
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.18 23.76c.35.2.8.2 1.16-.01L12 19.1l7.66 4.65c.36.21.81.21 1.16.01.35-.2.57-.57.57-.97V1.21C21.39.54 20.85 0 20.18 0H3.82C3.15 0 2.61.54 2.61 1.21v21.58c0 .4.22.77.57.97z"/></svg>
+            Google Workspace
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.71 0C5.24 0 0 5.24 0 11.71c0 6.46 5.24 11.71 11.71 11.71 6.46 0 11.71-5.24 11.71-11.71C23.42 5.24 18.17 0 11.71 0zm.32 19.72c-3.38 0-5.77-1.67-6.93-4.12l2.5-1.44c.84 1.77 2.27 2.82 4.49 2.82 1.89 0 3.09-.95 3.09-2.26 0-1.57-1.23-2.13-3.29-3.04l-1.13-.49C7.87 10.3 6.3 9.09 6.3 6.56c0-2.31 1.76-4.07 4.5-4.07 1.96 0 3.37.68 4.38 2.45l-2.4 1.54c-.53-.95-1.1-1.32-1.98-1.32-.9 0-1.47.57-1.47 1.32 0 .93.57 1.3 1.89 1.87l1.13.49c2.98 1.28 4.55 2.44 4.55 5.23 0 2.99-2.35 4.65-5.47 4.65z"/></svg>
+            Google Analytics
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M1.5 0h21l-1.91 21.563L11.977 24l-8.565-2.438L1.5 0zm17.09 4.413L5.41 4.41l.213 2.622 10.125.002-.255 2.716h-6.64l.24 2.573h6.182l-.366 3.523-2.91.804-2.956-.81-.188-2.11h-2.61l.29 3.855L12 19.288l5.373-1.53L18.59 4.414z"/></svg>
+            HTML5 / CSS
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-blue-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14.31.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.83l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.23l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05L0 11.97l.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.24l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05 1.07.13zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09-.33.22zM21.1 6.11l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.04z"/></svg>
+            Python
+          </span>
+          <span class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.17 8.4H1.5L12 21.6 22.5 8.4h-5.67L12 14.99 7.17 8.4zM12 2.4L8.37 7.2h7.26L12 2.4z"/></svg>
+            Adobe Creative Suite
+          </span>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-process" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Process</h2>
+  {% call card("Process", "Numbered how-it-works steps", "steps-01", "Custom") %}
+    {% set steps = [
+      { "n": "01", "title": "Discover", "desc": "We learn about your business and goals." },
+      { "n": "02", "title": "Design", "desc": "Wireframes and visuals before any code." },
+      { "n": "03", "title": "Build", "desc": "Fast, accessible, mobile-first development." },
+      { "n": "04", "title": "Launch", "desc": "Live, tested, and handed over to you." }
+    ] %}
+    <section class="bg-white">
+      <div class="cd-container cd-section">
+        <div class="mx-auto max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">How We Work</h2>
+        </div>
+        <div class="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-4">
+          {% for step in steps %}
+          <div>
+            <span class="text-3xl font-light text-[var(--color-primary)]/40">{{ step.n }}</span>
+            <h3 class="mt-2 text-lg">{{ step.title }}</h3>
+            <p class="mt-1 text-sm text-gray-600">{{ step.desc }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  {% call card("Process", "Vertical timeline", "steps-02", "Preline-style") %}
+    {% set steps_v2 = [
+      { "n": "01", "title": "Discover", "desc": "We learn about your business and goals." },
+      { "n": "02", "title": "Design", "desc": "Wireframes and visuals before any code." },
+      { "n": "03", "title": "Build", "desc": "Fast, accessible, mobile-first development." },
+      { "n": "04", "title": "Launch", "desc": "Live, tested, and handed over to you." }
+    ] %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="mx-auto mb-10 max-w-2xl text-center">
+          <h2 class="text-3xl sm:text-4xl">How We Work</h2>
+        </div>
+        <div class="relative mx-auto max-w-lg">
+          <div class="absolute bottom-0 left-6 top-0 w-px bg-gray-200"></div>
+          {% for step in steps_v2 %}
+          <div class="relative flex gap-6 pb-10 last:pb-0">
+            <div class="z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-white">{{ step.n }}</div>
+            <div class="pt-2">
+              <h3 class="font-semibold">{{ step.title }}</h3>
+              <p class="mt-1 text-sm text-gray-600">{{ step.desc }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Process", "Numbered dark cards", "steps-03", "Flowbite-style") %}
+    {% set steps_v3 = [
+      { "n": "01", "title": "Discover", "desc": "We learn about your business and goals." },
+      { "n": "02", "title": "Design", "desc": "Wireframes and visuals before any code." },
+      { "n": "03", "title": "Build", "desc": "Fast, accessible, mobile-first development." },
+      { "n": "04", "title": "Launch", "desc": "Live, tested, and handed over to you." }
+    ] %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section">
+        <div class="mx-auto mb-10 max-w-2xl text-center">
+          <h2 class="text-3xl text-white">How We Work</h2>
+        </div>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {% for step in steps_v3 %}
+          <div class="cd-rounded-img border border-white/10 bg-white/5 p-6">
+            <span class="text-2xl font-light text-[var(--color-primary)]/60">{{ step.n }}</span>
+            <h3 class="mt-3 font-semibold text-white">{{ step.title }}</h3>
+            <p class="mt-1 text-sm text-white/60">{{ step.desc }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  <h2 id="cat-contact" class="mb-4 scroll-mt-32 text-xs font-semibold uppercase tracking-wide text-gray-400">Contact</h2>
+  {% call card("Contact", "Two-column - intro + message form", "contact-02", "Custom") %}
+    <section id="contact" class="bg-[var(--color-secondary)]">
+      <div class="cd-container cd-section grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div>
+          <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.contact.side_heading }}</h2>
+          <p class="mt-6 max-w-md leading-relaxed text-[var(--color-body-text)]">{{ business.sections.contact.side_text }}</p>
+          <ul class="mt-8 space-y-3 text-sm">
+            <li>
+              <a class="inline-flex items-center gap-3 text-[var(--color-body-text)] transition hover:text-white" href="mailto:{{ business.contact.email }}">
+                <svg class="h-4 w-4 text-[var(--color-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                {{ business.contact.email }}
+              </a>
+            </li>
+            {% for s in business.social %}
+            <li>
+              <a class="inline-flex items-center gap-3 text-[var(--color-body-text)] transition hover:text-white" href="{{ s.url }}" target="_blank" rel="noopener">
+                <span class="text-[var(--color-primary)]">↗</span>{{ s.label }}<span class="sr-only"> (opens in new tab)</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-medium text-white">{{ business.sections.contact.heading }}</h3>
+          <form class="mt-6 space-y-4" method="POST" action="#" name="contact" data-netlify="true" data-netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="contact" />
+            <p class="hidden" aria-hidden="true"><label>Don't fill this out: <input name="bot-field" tabindex="-1" /></label></p>
+            <div>
+              <label class="sr-only" for="name">Full name</label>
+              <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-primary)] focus:outline-none" type="text" name="name" id="name" placeholder="Name" autocomplete="name" required />
+            </div>
+            <div>
+              <label class="sr-only" for="email">Email address</label>
+              <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-primary)] focus:outline-none" type="email" name="email" id="email" placeholder="Email" autocomplete="email" required />
+            </div>
+            <div>
+              <label class="sr-only" for="message">Message</label>
+              <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-primary)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
+            </div>
+            <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
+            <p class="text-xs text-[var(--color-body-text)]">By sending this message you agree to our <a class="underline hover:text-white" href="/privacy-policy/">Privacy Policy</a>.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Contact", "Phone / email / address cards", "contact-info-01", "Custom") %}
+    <section class="bg-gray-50">
+      <div class="cd-container cd-section">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div class="cd-rounded-img bg-white p-6 text-center shadow-sm">
+            <p class="text-sm text-gray-500">Phone</p>
+            <a class="mt-1 block text-lg text-[var(--color-primary)]" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>
+          </div>
+          <div class="cd-rounded-img bg-white p-6 text-center shadow-sm">
+            <p class="text-sm text-gray-500">Email</p>
+            <a class="mt-1 block text-lg text-[var(--color-primary)]" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>
+          </div>
+          <div class="cd-rounded-img bg-white p-6 text-center shadow-sm">
+            <p class="text-sm text-gray-500">Address</p>
+            <p class="mt-1 text-lg">{{ business.address.city }}, {{ business.address.region }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+
+  {% call card("Contact", "Map placeholder + details panel", "contact-info-02", "Custom") %}
+    <section class="bg-white">
+      <div class="cd-container cd-section grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+        <div class="cd-rounded-img flex aspect-video w-full items-center justify-center bg-gray-100 text-sm text-gray-400">
+          Map embed here (Google Maps / Mapbox iframe)
+        </div>
+        <div class="space-y-6">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Address</p>
+            <p class="mt-1 text-gray-900">{{ business.address.line1 }}, {{ business.address.city }}, {{ business.address.postcode }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Phone</p>
+            <a class="mt-1 block text-[var(--color-primary)]" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Email</p>
+            <a class="mt-1 block text-[var(--color-primary)]" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endcall %}
+  {% call card("Contact", "Dark inline contact bar", "contact-info-03", "Oxbow-style") %}
+    <section class="bg-[var(--color-secondary)]">
+      <div class="cd-container flex flex-col items-center justify-center gap-6 py-8 sm:flex-row sm:gap-12">
+        <a class="flex items-center gap-3 text-white transition hover:text-[var(--color-primary-light)]" href="{{ business.contact.phone_href }}">
+          <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+          <span class="text-sm">{{ business.contact.phone }}</span>
+        </a>
+        <div class="hidden h-6 w-px bg-white/20 sm:block"></div>
+        <a class="flex items-center gap-3 text-white transition hover:text-[var(--color-primary-light)]" href="mailto:{{ business.contact.email }}">
+          <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          <span class="text-sm">{{ business.contact.email }}</span>
+        </a>
+        <div class="hidden h-6 w-px bg-white/20 sm:block"></div>
+        <span class="flex items-center gap-3 text-sm text-white/60">
+          <svg class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          {{ business.address.city }}, {{ business.address.region }}
+        </span>
+      </div>
+    </section>
+  {% endcall %}
+
+</div>
+
+<script>
+  document.querySelectorAll(".copy-id-btn").forEach(function (btn) {
+    var label = btn.querySelector(".copy-label");
+    var original = label.textContent;
+    btn.addEventListener("click", function () {
+      navigator.clipboard.writeText(btn.dataset.copyId).then(function () {
+        label.textContent = "Copied!";
+        setTimeout(function () { label.textContent = original; }, 1200);
+      });
+    });
+  });
+</script>

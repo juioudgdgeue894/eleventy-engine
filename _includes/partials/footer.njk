@@ -1,0 +1,50 @@
+<footer class="bg-[var(--color-secondary)]">
+  <div class="cd-container cd-section">
+    <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <span class="text-lg font-medium text-white">{{ business.business_name }}</span>
+        <p class="mt-4 max-w-xs text-sm text-gray-400">{{ business.footer.tagline }}</p>
+      </div>
+
+      {% for column in business.footer.columns %}
+      <div>
+        <p class="font-medium text-white">{{ column.heading }}</p>
+        <nav class="mt-4 space-y-2 text-sm">
+          {% for link in column.links %}
+          {% if link.href == "#cookies" %}
+          <a class="block text-gray-400 hover:text-white" href="#" data-cd-cookie-settings>{{ link.label }}</a>
+          {% else %}
+          <a class="block text-gray-400 hover:text-white" href="{{ link.href }}">{{ link.label }}</a>
+          {% endif %}
+          {% endfor %}
+        </nav>
+      </div>
+      {% endfor %}
+    </div>
+
+    {# Service-area links — populated from src/_data/towns.json. Toggle off via business.service_areas.enabled. #}
+    {% if business.service_areas.enabled and towns and towns.length %}
+    <div class="mt-10 border-t border-white/10 pt-8">
+      <p class="text-sm font-medium text-white">{{ business.service_areas.heading }}</p>
+      <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        {% for town in towns %}
+        <li><a class="text-gray-400 hover:text-white" href="/{{ town.slug }}/">{{ business.service_areas.link_prefix }} {{ town.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="mt-12 border-t border-white/10 pt-8 text-center text-xs text-gray-400">
+      <p>&copy; {{ "now" | currentYear }} {{ business.business_name }}. All rights reserved.</p>
+      {%- if business.legal and (business.legal.company_number or business.legal.place_of_registration or business.legal.vat_number or business.legal.ico_number) %}
+      <div class="mt-2 space-y-0.5">
+        {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
+        {% if not business.legal.registered_address_same and business.legal.registered_address and business.legal.registered_address.line1 %}<p>Registered office: {{ business.legal.registered_address.line1 }}, {{ business.legal.registered_address.city }}, {{ business.legal.registered_address.postcode }}.</p>{% endif %}
+        {% if business.legal.vat_number %}<p>VAT {{ business.legal.vat_number }}.</p>{% endif %}
+        {% if business.legal.ico_number %}<p>ICO {{ business.legal.ico_number }}.</p>{% endif %}
+      </div>
+      {%- endif %}
+      {% include "partials/credit.njk" %}
+    </div>
+  </div>
+</footer>

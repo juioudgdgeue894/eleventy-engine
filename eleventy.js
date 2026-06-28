@@ -1,0 +1,95 @@
+const path = require("path");
+const Image = require("@11ty/eleventy-img");
+
+// {% image "filename.jpg", "Alt text" %}
+// {% image "filename.jpg", "Alt text", "(min-width:640px) 50vw, 100vw" %}
+// {% image "filename.jpg", "Alt text", "100vw", "cd-rounded-img object-cover" %}
+// Source files must live in src/images/. Outputs WebP + JPEG at 480/800/1200 w.
+// Alt text is required; pass "" for purely decorative images.
+async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "lazy") {
+  if (alt === undefined) {
+    throw new Error(`{% image %} is missing alt text for: ${src}`);
+  }
+  const meta = await Image(`./src/images/${src}`, {
+    widths: [480, 800, 1200],
+    formats: ["webp", "jpeg"],
+    outputDir: "./_site/images/",
+    urlPath: "/images/",
+  });
+  return Image.generateHTML(meta, {
+    alt,
+    sizes,
+    loading,
+    decoding: "async",
+    ...(cls ? { class: cls } : {}),
+  });
+}
+
+/**
+ * Shared Eleventy engine. A consuming site's .eleventy.js is just:
+ *   module.exports = require("@thatkind/eleventy-engine/eleventy");
+ * Layouts, partials, framework pages and the components catalog are synced into
+ * the site's src/ tree by `eleventy-engine-sync` (run on postinstall / prebuild).
+ */
+module.exports = function (eleventyConfig) {
+  // Synced engine files (framework pages, _includes) are gitignored in the site repo so
+  // they're never committed. Eleventy honours .gitignore for input by default, which would
+  // wrongly skip them — disable that so the synced pages are always built.
+  eleventyConfig.setUseGitIgnore(false);
+
+  eleventyConfig.addAsyncShortcode("image", imageShortcode);
+  // Tailwind CSS is output directly to _site/css/style.css by the css / css:watch scripts.
+
+  eleventyConfig.addPassthroughCopy({ "src/fonts": "fonts" });
+
+  // Any plain JS / images you drop in src/js or src/images ship as-is.
+  eleventyConfig.addPassthroughCopy({ "src/js": "js" });
+  eleventyConfig.addPassthroughCopy({ "src/images": "images" });
+
+  // Flowbite's bundled JS — resolved from wherever npm installed it (hoisted or
+  // nested), so the site has zero runtime CDN dependency.
+  const flowbiteJs = require.resolve("flowbite/dist/flowbite.min.js");
+  eleventyConfig.addPassthroughCopy({
+    [path.relative(process.cwd(), flowbiteJs)]: "js/flowbite.min.js",
+  });
+
+  // Handy in footers: {{ "now" | currentYear }} -> 2026
+  eleventyConfig.addFilter("currentYear", () => new Date().getFullYear());
+
+  // {{ post.date | readableDate }} -> 15 January 2026
+  eleventyConfig.addFilter("readableDate", (date) =>
+    new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
+  );
+
+  // {{ post.date | isoDate }} -> 2026-01-15 (used in sitemap.xml <lastmod>)
+  eleventyConfig.addFilter("isoDate", (date) => new Date(date).toISOString().split("T")[0]);
+
+  // {{ business.social | pluck("url") }} -> ["https://...", "https://..."]
+  eleventyConfig.addFilter("pluck", (arr, key) => (arr || []).map((item) => item[key]));
+
+  // {{ content | readingTime }} -> 4  (whole minutes, ~200 wpm, min 1)
+  eleventyConfig.addFilter("readingTime", (html) => {
+    const text = String(html || "").replace(/<[^>]+>/g, " ");
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  });
+
+  // Re-build the site whenever business.json changes, even with --serve running.
+  eleventyConfig.addWatchTarget("src/_data/business.json");
+
+  // Blog scaffold: drop markdown files in src/posts/ to add posts.
+  eleventyConfig.addCollection("posts", (collectionApi) =>
+    collectionApi.getFilteredByGlob("src/posts/*.md")
+  );
+
+  return {
+    dir: {
+      input: "src",
+      includes: "_includes",
+      data: "_data",
+      output: "_site",
+    },
+    htmlTemplateEngine: "njk",
+    markdownTemplateEngine: "njk",
+  };
+};

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+{#- Minimal layout for internal tooling pages (component library, etc.) -
+   no site header/footer/announcement bar, always noindex. -#}
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ title }}</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="bg-gray-100">
+{{ content | safe }}
+<script src="/js/flowbite.min.js" defer></script>
+</body>
+</html>

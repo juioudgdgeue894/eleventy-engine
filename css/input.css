@@ -1,0 +1,7 @@
+/* Design tokens + overrides (formerly user.css) — must load before Tailwind's
+   layers so the CSS variables exist when utilities reference them. */
+@import "./user.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

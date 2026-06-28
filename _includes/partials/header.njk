@@ -1,0 +1,40 @@
+{# Based on navbar-01 - minimal sticky dark nav #}
+<header class="sticky top-0 z-30 border-b border-white/[0.06] bg-[var(--color-bg)]/95 backdrop-blur">
+  <div class="cd-container">
+    <div class="flex h-16 items-center justify-between">
+
+      <a class="text-lg font-medium tracking-tight text-white" href="/">
+        {{ business.business_name }}
+      </a>
+
+      <div class="flex items-center gap-6 md:gap-8">
+        <nav aria-label="Global" class="hidden md:block">
+          <ul class="flex items-center gap-7 text-sm font-medium">
+            {% for item in business.nav %}
+            <li><a class="text-[var(--color-body-text)] transition hover:text-white" href="{{ item.href }}">{{ item.label }}</a></li>
+            {% endfor %}
+          </ul>
+        </nav>
+
+        <a class="hidden md:inline-flex cd-btn cd-btn-primary text-sm" href="{{ business.cta_header.href }}">{{ business.cta_header.label }}</a>
+
+        <button type="button" data-collapse-toggle="mobile-menu" aria-controls="mobile-menu" aria-expanded="false"
+          aria-label="Open navigation menu"
+          class="flex h-9 w-9 items-center justify-center border border-white/10 text-[var(--color-body-text)] hover:text-white md:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" focusable="false">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <nav id="mobile-menu" aria-label="Mobile navigation" class="hidden border-t border-white/[0.06] pb-4 md:hidden">
+      <ul class="space-y-1 pt-4 text-sm">
+        {% for item in business.nav %}
+        <li><a class="block py-2 text-[var(--color-body-text)] hover:text-white" href="{{ item.href }}">{{ item.label }}</a></li>
+        {% endfor %}
+        <li class="pt-2"><a class="cd-btn cd-btn-primary inline-flex text-sm" href="{{ business.cta_header.href }}">{{ business.cta_header.label }}</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,64 @@
+{# Based on contact-02 - two-column intro + message form.
+   Netlify Forms handler (default). To switch handlers see the notes in the
+   component library / previous template version: remove data-netlify* attrs,
+   set action to your processor endpoint, add its domain to the CSP connect-src
+   in netlify.toml / vercel.json, and list it in the Privacy Policy data table.
+   Labels are sr-only with mirrored placeholders - still WCAG AA (name is
+   programmatically determinable via the associated <label for>). #}
+<section id="contact" class="bg-[var(--color-secondary)]">
+  <div class="cd-container cd-section grid grid-cols-1 gap-12 lg:grid-cols-2">
+
+    <div>
+      <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.contact.side_heading }}</h2>
+      <p class="mt-6 max-w-md leading-relaxed text-[var(--color-body-text)]">{{ business.sections.contact.side_text }}</p>
+      <ul class="mt-8 space-y-3 text-sm">
+        <li>
+          <a class="inline-flex items-center gap-3 text-[var(--color-body-text)] transition hover:text-white" href="mailto:{{ business.contact.email }}">
+            <svg class="h-4 w-4 text-[var(--color-accent-link)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+            {{ business.contact.email }}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-medium text-white">{{ business.sections.contact.heading }}</h3>
+      <form
+        class="mt-6 space-y-4"
+        method="POST"
+        action="/thanks/"
+        name="contact"
+        data-netlify="true"
+        data-netlify-honeypot="bot-field"
+      >
+        {# Netlify hidden form-name (required when building with a static site generator) #}
+        <input type="hidden" name="form-name" value="contact" />
+
+        {# Honeypot: hidden from real users, bots fill it in → submission discarded #}
+        <p class="hidden" aria-hidden="true">
+          <label>Don't fill this out: <input name="bot-field" tabindex="-1" /></label>
+        </p>
+
+        <div>
+          <label class="sr-only" for="name">Full name</label>
+          <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" placeholder="Name" autocomplete="name" required />
+        </div>
+        <div>
+          <label class="sr-only" for="email">Email address</label>
+          <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" placeholder="Email" autocomplete="email" required />
+        </div>
+        <div>
+          <label class="sr-only" for="message">Message</label>
+          <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
+        </div>
+
+        <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
+
+        <p class="text-xs text-[var(--color-body-text)]">
+          By sending this message you agree to our <a class="underline hover:text-white" href="/privacy-policy/">Privacy Policy</a>. We will only use your details to respond to your enquiry.
+        </p>
+      </form>
+    </div>
+
+  </div>
+</section>

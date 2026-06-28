@@ -1,0 +1,59 @@
+{#- JSON-LD structured data. LocalBusiness always renders; FAQPage only if
+   business.faq has entries - that's a free shot at FAQ rich snippets in
+   Google since the data already exists for the on-page accordion.
+   Every value goes through the `dump` filter (JSON.stringify) rather than
+   manual quoting, so apostrophes/quotes in client data can't break the JSON. -#}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": {{ business.seo.schema_type | dump | safe }},
+  "name": {{ business.business_name | dump | safe }},
+  "description": {{ business.description | dump | safe }},
+  "url": {{ business.seo.site_url | dump | safe }},
+  {% if business.contact.phone %}"telephone": {{ business.contact.phone | dump | safe }},
+  {% endif %}"email": {{ business.contact.email | dump | safe }},
+  "logo": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
+  "image": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
+  {% if business.service_areas.enabled and towns and towns.length %}"areaServed": [
+    {% for town in towns %}{{ town.name | dump | safe }}{% if not loop.last %}, {% endif %}{% endfor %}
+  ],
+  {% endif %}
+  "priceRange": {{ business.seo.price_range | dump | safe }},
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": {{ business.address.line1 | dump | safe }},
+    "addressLocality": {{ business.address.city | dump | safe }},
+    "addressRegion": {{ business.address.region | dump | safe }},
+    "postalCode": {{ business.address.postcode | dump | safe }},
+    "addressCountry": "GB"
+  }{% if business.seo.geo %},
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ business.seo.geo.latitude }},
+    "longitude": {{ business.seo.geo.longitude }}
+  }{% endif %}{% if business.seo.opening_hours and business.seo.opening_hours.length %},
+  "openingHours": {{ business.seo.opening_hours | dump | safe }}{% endif %}{% if business.social and business.social.length %},
+  "sameAs": {{ business.social | pluck("url") | dump | safe }}{% endif %}
+}
+</script>
+
+{% if business.faq and business.faq.length %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {% for item in business.faq %}
+    {
+      "@type": "Question",
+      "name": {{ item.question | dump | safe }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ item.answer | dump | safe }}
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endif %}

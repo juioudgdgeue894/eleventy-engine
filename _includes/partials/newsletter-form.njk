@@ -1,0 +1,26 @@
+{# Compact email-capture block - drop into the footer or a sidebar.
+   Heading, intro, and consent text are driven by business.newsletter.*  #}
+<div class="rounded-xl bg-gray-50 p-6 text-center">
+  <h3 class="text-lg">{{ business.newsletter.heading }}</h3>
+  <p class="mt-1 text-sm text-gray-500">{{ business.newsletter.intro }}</p>
+
+  <form class="mt-4 flex flex-col gap-2 sm:flex-row" method="POST" action="#" name="newsletter" data-netlify="true">
+    <input type="hidden" name="form-name" value="newsletter" />
+    <label class="sr-only" for="newsletter-sidebar-email">Email address</label>
+    <input
+      class="w-full rounded-lg border-gray-200 p-3 text-sm sm:flex-1"
+      placeholder="you@example.com"
+      type="email"
+      name="email"
+      id="newsletter-sidebar-email"
+      autocomplete="email"
+      required
+    />
+    <button class="cd-btn cd-btn-primary text-sm" type="submit">Subscribe</button>
+  </form>
+
+  <label class="mt-3 flex items-start gap-2 text-left text-xs text-gray-500 sm:justify-center">
+    <input type="checkbox" class="mt-0.5 shrink-0 accent-[var(--color-primary)]" name="consent" required />
+    <span>{{ business.newsletter.consent_text | safe }}</span>
+  </label>
+</div>

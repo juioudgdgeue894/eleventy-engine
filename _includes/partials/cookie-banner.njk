@@ -1,0 +1,103 @@
+{#- Cookie consent banner (PECR / UK GDPR compliant)
+   - Shown on first visit; hidden once a choice is made.
+   - Choice stored in localStorage under 'cd-cookie-consent': 'all' | 'essential'.
+   - Rejecting must be as easy as accepting (ICO guidance) - buttons are equal weight.
+   - On mobile it sits above the fixed mobile-cta bar (bottom-16 = 4rem clearance).
+   - Any footer link with data-cd-cookie-settings triggers re-display.
+   - Focus is moved into the banner on show and returned to the trigger on close.
+   - Tab/Shift+Tab are trapped within the banner while it is visible. -#}
+<div
+  id="cd-cookie-banner"
+  class="hidden fixed inset-x-0 bottom-16 z-50 sm:bottom-0"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Cookie consent"
+  aria-describedby="cd-cookie-desc"
+  tabindex="-1"
+>
+  <div class="border-t border-white/[0.06] bg-[var(--color-secondary)] shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
+    <div class="cd-container flex flex-col items-start justify-between gap-4 py-4 sm:flex-row sm:items-center">
+      <p id="cd-cookie-desc" class="max-w-2xl text-sm text-[var(--color-body-text)]">
+        We use essential cookies to make this site work. With your permission we'd also like to use analytics cookies to understand how visitors use it - no personal data is sold or shared.
+        <a class="font-medium text-[var(--color-accent-link)] hover:underline" href="/privacy-policy/#cookies">Cookie policy</a>.
+      </p>
+      <div class="flex shrink-0 flex-col gap-2 sm:flex-row">
+        <button
+          id="cd-cookie-essential"
+          class="cd-btn cd-btn-outline whitespace-nowrap text-sm"
+          type="button"
+        >
+          Essential only
+        </button>
+        <button
+          id="cd-cookie-accept"
+          class="cd-btn cd-btn-primary whitespace-nowrap text-sm"
+          type="button"
+        >
+          Accept all cookies
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STORAGE_KEY = 'cd-cookie-consent';
+  var banner = document.getElementById('cd-cookie-banner');
+  var btnEssential = document.getElementById('cd-cookie-essential');
+  var btnAccept = document.getElementById('cd-cookie-accept');
+  var lastFocus = null;
+
+  var focusable = [btnEssential, btnAccept];
+
+  function hideBanner() {
+    banner.classList.add('hidden');
+    banner.setAttribute('aria-hidden', 'true');
+    if (lastFocus) { lastFocus.focus(); lastFocus = null; }
+  }
+
+  function showBanner(triggerEl) {
+    lastFocus = triggerEl || document.activeElement || document.body;
+    banner.classList.remove('hidden');
+    banner.removeAttribute('aria-hidden');
+    btnEssential.focus();
+  }
+
+  // Trap Tab/Shift+Tab within the banner
+  banner.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // Show banner if no choice recorded yet
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    showBanner(null);
+  }
+
+  btnAccept.addEventListener('click', function () {
+    localStorage.setItem(STORAGE_KEY, 'all');
+    hideBanner();
+  });
+
+  btnEssential.addEventListener('click', function () {
+    localStorage.setItem(STORAGE_KEY, 'essential');
+    hideBanner();
+  });
+
+  // Allow any element with data-cd-cookie-settings to re-open the banner
+  document.querySelectorAll('[data-cd-cookie-settings]').forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      localStorage.removeItem(STORAGE_KEY);
+      showBanner(el);
+    });
+  });
+})();
+</script>

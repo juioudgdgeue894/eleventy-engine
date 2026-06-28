@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{#- Per-page frontmatter can override: title, description, og_image, og_type, noindex -#}
+<html lang="{{ business.seo.locale }}">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{{ title }} | {{ business.business_name }}</title>
+<meta name="description" content="{{ description or business.description }}" />
+<meta name="robots" content="{{ 'noindex, nofollow' if noindex else 'index, follow' }}" />
+<link rel="canonical" href="{{ business.seo.site_url }}{{ page.url }}" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="{{ og_type or 'website' }}" />
+<meta property="og:site_name" content="{{ business.business_name }}" />
+<meta property="og:title" content="{{ title }} | {{ business.business_name }}" />
+<meta property="og:description" content="{{ description or business.description }}" />
+<meta property="og:url" content="{{ business.seo.site_url }}{{ page.url }}" />
+<meta property="og:image" content="{{ business.seo.site_url }}{{ og_image or business.seo.og_image }}" />
+<meta property="og:locale" content="{{ business.seo.locale | replace('-', '_') }}" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="{{ title }} | {{ business.business_name }}" />
+<meta name="twitter:description" content="{{ description or business.description }}" />
+<meta name="twitter:image" content="{{ business.seo.site_url }}{{ og_image or business.seo.og_image }}" />
+{% if business.seo.twitter_handle %}<meta name="twitter:site" content="{{ business.seo.twitter_handle }}" />{% endif %}
+
+<!-- Favicon / theme -->
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+<meta name="theme-color" content="{{ business.seo.theme_color }}" />
+
+<link rel="preload" href="/fonts/NeueMontreal-Regular.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/NeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ business.business_name }} Blog" />
+
+{% include "partials/schema.njk" %}
+</head>
+{#- Root-relative paths above/below need a real server: use `npm run dev`,
+   not double-clicking _site/index.html. -#}
+<body class="pb-16 sm:pb-0">
+
+<a class="cd-skip-link" href="#main-content">Skip to main content</a>
+
+{% include "partials/announcement.njk" %}
+{% include "partials/header.njk" %}
+
+<main id="main-content">
+{{ content | safe }}
+</main>
+
+{% include "partials/footer.njk" %}
+{% include "partials/mobile-cta.njk" %}
+{% include "partials/cookie-banner.njk" %}
+
+{#
+  ── Third-party / non-essential scripts ──────────────────────────────────────
+  Analytics, pixels, chat widgets, A/B testing tools, and any other non-essential
+  scripts MUST check cookie consent before loading. Unconditional loading violates PECR.
+
+  Use this pattern (replace the comment with your actual snippet):
+
+  <script>
+    if (localStorage.getItem('cd-cookie-consent') === 'all') {
+      // paste your analytics / marketing snippet here
+    }
+  </script>
+
+  If you add external domains (e.g. www.googletagmanager.com, static.hotjar.com)
+  you must also add them to the Content-Security-Policy in netlify.toml / vercel.json.
+  ─────────────────────────────────────────────────────────────────────────────
+#}
+<script src="/js/flowbite.min.js" defer></script>
+</body>
+</html>

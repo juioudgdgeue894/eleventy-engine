@@ -1,0 +1,20 @@
+{# Plain image grid - for portfolio-heavy clients (tattoo studio, property photos, etc).
+   Renders nothing if business.gallery is empty; use work.njk instead for case-study style cards. #}
+{% if business.gallery and business.gallery.length %}
+<section id="gallery" class="bg-gray-50">
+  <div class="cd-container cd-section">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">Gallery</span>
+      <h2 class="mt-2 text-3xl sm:text-4xl">Recent Work</h2>
+    </div>
+
+    <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      {% for item in business.gallery %}
+      <a class="block cd-rounded-img aspect-square overflow-hidden" href="{{ item.src }}" target="_blank" rel="noopener">
+        <img class="h-full w-full object-cover transition hover:scale-105" src="{{ item.src }}" alt="{{ item.alt }}" loading="lazy" />
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

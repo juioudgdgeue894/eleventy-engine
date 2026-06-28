@@ -1,0 +1,53 @@
+{# Based on work-05 - project cards: centered site preview on a plain backdrop.
+   Each item's "image" is a website screenshot in src/images/; the gradient
+   mapping is a fallback for items without one. #}
+{% set gradients = {
+  "primary": "from-[var(--color-primary)] to-[var(--color-primary-dark)]",
+  "secondary": "from-[var(--color-secondary)] to-[var(--color-secondary-dark)]",
+  "accent": "from-[var(--color-accent)] to-[var(--color-accent-dark)]"
+} %}
+
+<section id="work" class="bg-[var(--color-secondary)]">
+  <div class="cd-container cd-section">
+    <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.work.heading }}</h2>
+    <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
+      {% for project in business.portfolio %}
+      <a class="group block" href="{{ project.href }}" target="_blank" rel="noopener">
+        {% if project.image %}
+        <div class="relative flex aspect-[5/4] items-center justify-center overflow-hidden rounded-[var(--radius-image)] border border-white/10 bg-[var(--color-bg)] transition group-hover:border-white/25">
+          {# Dim, blurred, scaled-in version of the same screenshot as the backdrop (optimised) #}
+          <div class="absolute inset-0 scale-125 overflow-hidden blur-2xl opacity-40" aria-hidden="true">
+            {% image project.image, "", "(min-width: 640px) 40vw, 90vw", "absolute inset-0 h-full w-full object-cover" %}
+          </div>
+          <div class="absolute inset-0 bg-black/50" aria-hidden="true"></div>
+          {# Smaller floating preview, framed in a Safari window #}
+          <div class="relative w-[84%] overflow-hidden rounded-[var(--radius-image)] border border-white/15 shadow-2xl shadow-black/60 transition duration-300 group-hover:-translate-y-1">
+            <div class="flex items-center gap-2 bg-[#3a3a3e] px-3 py-1">
+              <span class="flex shrink-0 gap-1.5">
+                <span class="h-2.5 w-2.5 bg-[#ff5f57]" style="border-radius:9999px"></span>
+                <span class="h-2.5 w-2.5 bg-[#febc2e]" style="border-radius:9999px"></span>
+                <span class="h-2.5 w-2.5 bg-[#28c840]" style="border-radius:9999px"></span>
+              </span>
+              <span class="mx-auto flex min-w-0 items-center gap-1 rounded bg-black/30 px-3 py-0.5 text-[10px] text-white/55">
+                <svg class="h-2.5 w-2.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd" /></svg>
+                <span class="truncate">{{ project.href | replace("https://", "") | replace("http://", "") | replace("/", "") }}</span>
+              </span>
+              <span class="w-9 shrink-0"></span>
+            </div>
+            <div class="relative aspect-[16/9] w-full overflow-hidden">
+              {% image project.image, project.name + " website preview", "(min-width: 640px) 32vw, 65vw", "absolute inset-0 h-full w-full object-cover " + ("object-center" if project.focus == "center" else "object-top") %}
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="flex aspect-[16/10] items-center justify-center overflow-hidden rounded-[var(--radius-image)] border border-white/10 bg-gradient-to-br {{ gradients[project.gradient] }} p-6 transition group-hover:border-white/25">
+          <span class="text-center text-2xl font-medium text-white">{{ project.name }}</span>
+        </div>
+        {% endif %}
+        <p class="mt-4 font-mono text-xs uppercase tracking-wider text-[var(--color-body-text)]">// {{ project.category }}</p>
+        <h3 class="mt-1.5 text-lg font-medium text-white transition group-hover:text-[var(--color-accent-link)]">{{ project.name }}<span class="sr-only"> (opens in new tab)</span></h3>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>

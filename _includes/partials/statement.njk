@@ -1,0 +1,15 @@
+{# Based on statement-01 - dark editorial large-text mission block #}
+<section class="bg-[var(--color-secondary)]">
+  <div class="cd-container cd-section">
+    <p class="text-xs font-semibold uppercase tracking-widest text-[var(--color-body-text)]">{{ business.sections.statement.eyebrow }}</p>
+    <p class="mt-6 max-w-4xl text-2xl font-medium leading-snug text-white sm:text-3xl lg:text-[2.5rem] lg:leading-[1.2]">
+      {{ business.sections.statement.text | safe }}
+    </p>
+    <div class="mt-10 flex items-center gap-4">
+      <div class="h-px flex-1 bg-white/10"></div>
+      <a href="{{ business.sections.statement.cta_href }}" class="text-sm font-semibold text-white hover:text-[var(--color-accent-link)]">
+        {{ business.sections.statement.cta_label }} →
+      </a>
+    </div>
+  </div>
+</section>

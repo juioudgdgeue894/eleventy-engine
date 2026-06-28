@@ -1,0 +1,25 @@
+---
+layout: layouts/base.njk
+title: Page Not Found
+description: The page you were looking for could not be found.
+permalink: 404.html
+eleventyExcludeFromCollections: true
+---
+<section>
+  <div class="cd-container cd-section flex flex-col items-center text-center">
+    <p class="text-8xl font-medium text-[var(--color-accent-link)]" aria-hidden="true">404</p>
+    <h1 class="mt-4 text-3xl font-medium text-white sm:text-4xl">Page not found</h1>
+    <p class="mt-4 max-w-md text-[var(--color-body-text)]">
+      The page you were looking for doesn't exist or may have been moved.
+      Try going back to the home page, or get in touch if you need help.
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a class="cd-btn cd-btn-primary text-sm" href="/">Go to homepage</a>
+      <a class="cd-btn cd-btn-outline text-sm" href="mailto:{{ business.contact.email }}">Email me</a>
+    </div>
+    <p class="mt-10 text-sm text-[var(--color-body-text)]">
+      Error 404 - if you followed a link that led here, please
+      <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">let me know</a>.
+    </p>
+  </div>
+</section>

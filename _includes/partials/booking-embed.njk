@@ -1,0 +1,16 @@
+{# Generic iframe slot for third-party booking systems (e.g. that-time.co.uk, Fresha, Calendly).
+   Set business.booking.enabled=true and embed_url, renders nothing otherwise. #}
+{% if business.booking and business.booking.enabled and business.booking.embed_url %}
+<section id="booking" class="bg-white">
+  <div class="cd-container cd-section">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">Book Online</span>
+      <h2 class="mt-2 text-3xl sm:text-4xl">Choose a time that works for you</h2>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-3xl cd-rounded-img border border-gray-100 shadow-sm">
+      <iframe src="{{ business.booking.embed_url }}" class="h-[640px] w-full cd-rounded-img" title="Online booking" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+{% endif %}

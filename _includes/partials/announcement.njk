@@ -1,0 +1,11 @@
+{# Urgency / promo banner - toggle off by setting business.announcement.enabled to false. #}
+{% if business.announcement and business.announcement.enabled %}
+<div class="bg-[var(--color-accent)] text-[var(--color-on-accent)]">
+  <div class="cd-container flex h-10 items-center justify-center gap-3 text-center text-xs sm:text-sm">
+    <span>{{ business.announcement.message }}</span>
+    {% if business.announcement.cta_label %}
+    <a class="font-semibold underline hover:no-underline text-[var(--color-on-accent)]" href="{{ business.announcement.cta_href }}">{{ business.announcement.cta_label }}</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

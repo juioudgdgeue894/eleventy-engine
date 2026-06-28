@@ -1,0 +1,29 @@
+{# Based on services-05 - icon cards, featured first, balanced grid #}
+{% set svcIcons = {
+  "code": "M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5",
+  "search": "m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z",
+  "spark": "M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z",
+  "design": "m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z",
+  "support": "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z",
+  "cart": "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"
+} %}
+{% set total = business.services | length %}
+<section id="services">
+  <div class="cd-container cd-section">
+    <h2 class="text-2xl font-medium text-white sm:text-3xl">{{ business.sections.services.heading }}</h2>
+    <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {% for service in business.services %}
+      {% set isFull = loop.first or (loop.last and total % 2 == 0) %}
+      <div class="{{ 'sm:col-span-2' if isFull else '' }} group rounded-[var(--radius-image)] border border-white/10 bg-white/[0.02] p-6 transition hover:border-white/20 hover:bg-white/[0.04]">
+        <span class="flex h-10 w-10 items-center justify-center rounded-[var(--radius-button)] border border-white/10 text-[var(--color-accent-link)]">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="{{ svcIcons[service.icon] }}" />
+          </svg>
+        </span>
+        <h3 class="mt-5 text-lg font-medium text-white">{{ service.name }}</h3>
+        <p class="mt-2 text-sm leading-relaxed text-[var(--color-body-text)]">{{ service.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

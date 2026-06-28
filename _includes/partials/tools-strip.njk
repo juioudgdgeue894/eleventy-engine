@@ -1,0 +1,13 @@
+{# Based on logos-04 - tools & technologies / "trusted by" logo strip.
+   Placeholder slots by default. For production, replace each LOGO span with a
+   real <img> (or inline SVG) of the tool/partner/client logo. #}
+<section class="border-y border-white/[0.06] py-10">
+  <div class="cd-container">
+    <p class="mb-6 text-center text-xs font-semibold uppercase tracking-widest text-slate-400">[Logo strip label — e.g. 'Tools we work with']</p>
+    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5 opacity-60">
+      {% for i in range(0, 6) %}
+      <span class="text-sm font-semibold text-slate-400">LOGO {{ i + 1 }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</section>

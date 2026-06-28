@@ -1,0 +1,31 @@
+{# Renders nothing if business.team is empty - safe to leave in index.njk for every client. #}
+{% if business.team and business.team.length %}
+<section id="team" class="bg-white">
+  <div class="cd-container cd-section">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">Meet The Team</span>
+      <h2 class="mt-2 text-3xl sm:text-4xl">The people behind {{ business.business_name }}</h2>
+    </div>
+
+    <div class="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+      {% for person in business.team %}
+      <div class="text-center">
+        {% if person.photo %}
+        <div class="cd-rounded-img mx-auto aspect-square w-32 overflow-hidden">
+          {% image person.photo, person.name, "128px", "h-full w-full object-cover" %}
+        </div>
+        {% else %}
+        <div class="cd-rounded-img mx-auto aspect-square w-32 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
+        {% endif %}
+        <h3 class="mt-4 text-lg">{{ person.name }}</h3>
+        <p class="text-sm text-[var(--color-accent-link)]">{{ person.role }}</p>
+        {% if person.bio %}<p class="mt-2 text-sm text-gray-600">{{ person.bio }}</p>{% endif %}
+        {% if person.phone %}
+        <a class="mt-2 inline-block text-sm text-gray-500 hover:text-[var(--color-accent-link)]" href="tel:{{ person.phone }}">{{ person.phone }}</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}

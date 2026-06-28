@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+title: "[Blog Title — e.g. 'Insights & Articles']"
+description: "[Blog meta description — what the blog covers and who it's for.]"
+permalink: blog/index.html
+---
+<section>
+  <div class="cd-container cd-section">
+    <div class="mx-auto max-w-2xl text-center">
+      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">Blog</span>
+      <h1 class="mt-2 text-3xl font-medium text-white sm:text-4xl">[Blog Heading]</h1>
+      <p class="mt-4 text-[var(--color-body-text)]">[Short blog intro line describing what readers will find here.]</p>
+    </div>
+
+    <div class="mx-auto mt-14 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {% for post in collections.posts | reverse %}
+      <a class="group flex flex-col rounded-[var(--radius-image)] border border-white/10 bg-[var(--color-secondary)] p-6 transition hover:border-white/25 hover:bg-[var(--color-secondary-dark)]" href="{{ post.url }}">
+        <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-accent-link)]">
+          <span>{{ post.templateContent | readingTime }} min read</span>
+        </div>
+        <h2 class="mt-3 text-lg font-medium leading-loose text-white group-hover:text-white">{{ post.data.title }}</h2>
+        <p class="mt-2 flex-1 text-sm leading-relaxed text-[var(--color-body-text)]">{{ post.data.description }}</p>
+        <span class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-accent-link)] group-hover:text-white">
+          Read article
+          <svg class="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
