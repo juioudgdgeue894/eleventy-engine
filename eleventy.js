@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const Image = require("@11ty/eleventy-img");
 
 // {% image "filename.jpg", "Alt text" %}
@@ -45,6 +46,13 @@ module.exports = function (eleventyConfig) {
   // Any plain JS / images you drop in src/js or src/images ship as-is.
   eleventyConfig.addPassthroughCopy({ "src/js": "js" });
   eleventyConfig.addPassthroughCopy({ "src/images": "images" });
+
+  // Emit a root /favicon.ico when the site provides one. Browsers auto-discover
+  // it at the root, and Safari needs a raster icon here (it won't render the SVG
+  // favicon when that SVG just wraps a raster image).
+  if (fs.existsSync("src/images/favicon.ico")) {
+    eleventyConfig.addPassthroughCopy({ "src/images/favicon.ico": "favicon.ico" });
+  }
 
   // Flowbite's bundled JS — resolved from wherever npm installed it (hoisted or
   // nested), so the site has zero runtime CDN dependency.

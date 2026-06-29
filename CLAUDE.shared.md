@@ -217,6 +217,7 @@ All images in templates and blog posts should use the `{% image %}` shortcode in
 
 Assets:
 - [ ] Replace `src/images/favicon.svg` with client's real favicon
+- [ ] Add `src/images/favicon.ico` (raster, e.g. 32–64px) — Safari uses this; it won't render an SVG favicon that wraps a raster image. Emitted at root `/favicon.ico`.
 - [ ] Replace `src/images/og-default.jpg` with a real branded 1200×630 social share image
 - [ ] Replace `src/images/apple-touch-icon.png` with a real 180×180 PNG logo
 - [ ] Swap all placeholder portfolio images in `business.json → portfolio`

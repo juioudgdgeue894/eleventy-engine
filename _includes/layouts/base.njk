@@ -3,7 +3,7 @@
 <html lang="{{ business.seo.locale }}">
 <head>
 <meta charset="UTF-8" />
-<meta name="generator" content="@jacklamond/eleventy-engine v1.2.0" />
+<meta name="generator" content="@jacklamond/eleventy-engine v1.3.0" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{{ title }} | {{ business.business_name }}</title>
 <meta name="description" content="{{ description or business.description }}" />
@@ -27,6 +27,10 @@
 {% if business.seo.twitter_handle %}<meta name="twitter:site" content="{{ business.seo.twitter_handle }}" />{% endif %}
 
 <!-- Favicon / theme -->
+{#- /favicon.ico is emitted at the site root (see eleventy.js). Safari uses this
+   raster icon; it will not render an SVG that wraps a raster image. Chrome and
+   Firefox prefer the SVG below; sizes="any" stops them downloading the .ico. -#}
+<link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
 <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 <meta name="theme-color" content="{{ business.seo.theme_color }}" />
