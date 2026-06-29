@@ -11,7 +11,13 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
   if (alt === undefined) {
     throw new Error(`{% image %} is missing alt text for: ${src}`);
   }
-  const meta = await Image(`./src/images/${src}`, {
+  // Resolve from src/photos first — that folder is NOT passthrough-copied, so the
+  // full-res originals never ship (only the optimised output below does). Falls
+  // back to src/images for backward compatibility with existing sites.
+  const input =
+    [`./src/photos/${src}`, `./src/images/${src}`].find((p) => fs.existsSync(p)) ||
+    `./src/images/${src}`;
+  const meta = await Image(input, {
     widths: [480, 800, 1200],
     formats: ["webp", "jpeg"],
     outputDir: "./_site/images/",
