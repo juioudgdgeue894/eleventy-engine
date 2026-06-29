@@ -3,9 +3,13 @@
 <html lang="{{ business.seo.locale }}">
 <head>
 <meta charset="UTF-8" />
-<meta name="generator" content="@jacklamond/eleventy-engine v1.4.0" />
+<meta name="generator" content="@jacklamond/eleventy-engine v1.5.0" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>{{ title }} | {{ business.business_name }}</title>
+{#- Append the business name as a title suffix, unless the page title already
+   contains it (avoids "David Hughes … | David Hughes" duplication). -#}
+{%- set _t = title or business.business_name -%}
+{%- set fullTitle = _t if (business.business_name in _t) else _t + " | " + business.business_name -%}
+<title>{{ fullTitle }}</title>
 <meta name="description" content="{{ description or business.description }}" />
 <meta name="robots" content="{{ 'noindex, nofollow' if noindex else 'index, follow' }}" />
 <link rel="canonical" href="{{ business.seo.site_url }}{{ page.url }}" />
@@ -13,7 +17,7 @@
 <!-- Open Graph -->
 <meta property="og:type" content="{{ og_type or 'website' }}" />
 <meta property="og:site_name" content="{{ business.business_name }}" />
-<meta property="og:title" content="{{ title }} | {{ business.business_name }}" />
+<meta property="og:title" content="{{ fullTitle }}" />
 <meta property="og:description" content="{{ description or business.description }}" />
 <meta property="og:url" content="{{ business.seo.site_url }}{{ page.url }}" />
 <meta property="og:image" content="{{ business.seo.site_url }}{{ og_image or business.seo.og_image }}" />
@@ -21,7 +25,7 @@
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="{{ title }} | {{ business.business_name }}" />
+<meta name="twitter:title" content="{{ fullTitle }}" />
 <meta name="twitter:description" content="{{ description or business.description }}" />
 <meta name="twitter:image" content="{{ business.seo.site_url }}{{ og_image or business.seo.og_image }}" />
 {% if business.seo.twitter_handle %}<meta name="twitter:site" content="{{ business.seo.twitter_handle }}" />{% endif %}
