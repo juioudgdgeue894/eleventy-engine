@@ -3,7 +3,7 @@
 <html lang="{{ business.seo.locale }}">
 <head>
 <meta charset="UTF-8" />
-<meta name="generator" content="@jacklamond/eleventy-engine v1.3.0" />
+<meta name="generator" content="@jacklamond/eleventy-engine v1.4.0" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>{{ title }} | {{ business.business_name }}</title>
 <meta name="description" content="{{ description or business.description }}" />
@@ -35,8 +35,13 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 <meta name="theme-color" content="{{ business.seo.theme_color }}" />
 
-<link rel="preload" href="/fonts/NeueMontreal-Regular.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" href="/fonts/NeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
+{#- Preload the fonts the site actually uses. Override per-site with
+   business.seo.preload_fonts (array of .woff2 URLs); set [] to preload none.
+   Defaults to the engine's NeueMontreal so existing sites are unchanged. -#}
+{%- set preloadFonts = business.seo.preload_fonts or ["/fonts/NeueMontreal-Regular.woff2", "/fonts/NeueMontreal-Medium.woff2"] -%}
+{% for font in preloadFonts -%}
+<link rel="preload" href="{{ font }}" as="font" type="font/woff2" crossorigin />
+{% endfor -%}
 <link rel="stylesheet" href="/css/style.css" />
 <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ business.business_name }} Blog" />
 

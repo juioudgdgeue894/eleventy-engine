@@ -174,7 +174,12 @@ You can safely include all of these in `index.njk` unconditionally; just leave t
 
 All images in templates and blog posts should use the `{% image %}` shortcode instead of raw `<img>` tags. It automatically generates WebP and JPEG versions at three widths (480, 800, 1200 px), writes a correct `srcset`, and sets `loading="lazy"` and `decoding="async"`.
 
-**Drop the source file into `src/images/`, then:**
+**Where to put source files:**
+- **Photos used via `{% image %}` → `src/photos/`** (preferred). This folder is *not* passthrough-copied, so the full-res originals never ship to the build — only the optimised WebP/JPEG output does. This keeps deploys lean.
+- **Raw-referenced assets → `src/images/`** (favicon, `og-default.jpg`, apple-touch-icon, any file you link by a literal `/images/...` URL or CSS `url()`). Everything in `src/images/` ships as-is.
+- The shortcode resolves `src/photos/` first, then falls back to `src/images/` — so existing sites keep working, but new photos should go in `src/photos/`.
+
+**Drop the source file into `src/photos/` (or `src/images/`), then:**
 
 ```njk
 {# Basic usage — sizes defaults to "100vw" #}
