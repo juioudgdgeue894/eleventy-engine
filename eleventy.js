@@ -96,6 +96,15 @@ module.exports = function (eleventyConfig) {
     collectionApi.getFilteredByGlob("src/posts/*.md")
   );
 
+  // Normalise typography: replace em-dashes (—) and en-dashes (–) with plain
+  // hyphens (-) across all rendered HTML. Applies site-wide to every project.
+  eleventyConfig.addTransform("dashesToHyphens", function (content) {
+    if ((this.page.outputPath || "").endsWith(".html")) {
+      return content.replace(/[—–]/g, "-");
+    }
+    return content;
+  });
+
   return {
     dir: {
       input: "src",
