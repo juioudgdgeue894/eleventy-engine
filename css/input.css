@@ -64,7 +64,11 @@ header button[data-collapse-toggle][aria-expanded="true"]::after  { transform: t
   background-color: var(--color-menu-surface, var(--color-bg));
   margin-left: -1rem;
   margin-right: -1rem;
-  padding: 0 1rem 1.75rem;
+  /* Horizontal padding only. Vertical spacing lives on the inner <ul> so that a
+     collapsed (max-height:0) menu truly has 0 height — padding on #mobile-menu
+     itself can't be clipped below the box in border-box mode and would leave a
+     thin bar of the menu's background colour. */
+  padding: 0 1rem;
   transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
 }
 @media (min-width: 640px) {
@@ -79,10 +83,10 @@ header button[data-collapse-toggle][aria-expanded="true"]::after  { transform: t
   max-height: 85vh;
   opacity: 1;
   pointer-events: auto;
-  padding-top: 0.5rem;
 }
-/* Links — generous tap targets, hairline dividers, hover that nudges right. */
-#mobile-menu ul { padding-top: 0.25rem; }
+/* Links — generous tap targets, hairline dividers, hover that nudges right.
+   The list carries the menu's vertical padding (clipped when collapsed). */
+#mobile-menu ul { padding-top: 0.75rem; padding-bottom: 1.75rem; }
 #mobile-menu a:not(.cd-btn) {
   display: block;
   padding: 0.95rem 0;
