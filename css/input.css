@@ -102,4 +102,11 @@ header button[data-collapse-toggle][aria-expanded="true"]::after  { transform: t
 }
 /* CTA — full-width pill below the links. */
 #mobile-menu li:has(.cd-btn) { padding-top: 1.1rem; }
-#mobile-menu .cd-btn-primary { display: flex !important; width: 100%; }
+#mobile-menu .cd-btn-primary {
+  display: flex !important;
+  width: 100%;
+  /* centre the label ourselves — the full-width flex would otherwise fall back to
+     justify-content:flex-start on sites whose .cd-btn doesn't center it */
+  justify-content: center;
+  text-align: center;
+}
