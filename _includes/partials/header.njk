@@ -28,7 +28,10 @@
       </div>
     </div>
 
-    <nav id="mobile-menu" aria-label="Mobile navigation" class="hidden border-t border-white/[0.06] pb-4 md:hidden">
+    {# Self-contained surface (its own background) so the dropdown is always
+       legible, independent of the header's background or a transparent-header
+       theme. Sites add their own elevation/shadow if desired. #}
+    <nav id="mobile-menu" aria-label="Mobile navigation" class="hidden border-t border-white/[0.06] bg-[var(--color-bg)] pb-4 md:hidden">
       <ul class="space-y-1 pt-4 text-sm">
         {% for item in business.nav %}
         <li><a class="block py-2 text-[var(--color-body-text)] hover:text-white" href="{{ item.href }}">{{ item.label }}</a></li>
