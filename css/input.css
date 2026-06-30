@@ -5,3 +5,97 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* =========================================================
+   MOBILE MENU — shared engine component
+   A full-width drop panel that animates open/closed with NO flash, plus a
+   borderless hamburger that morphs into an ×. Driven by Flowbite's
+   data-collapse-toggle, which toggles the panel's own `hidden` class and the
+   button's aria-expanded — so the animation needs no :has() support and never
+   flips display (the cause of the open flash).
+
+   Fully themed from tokens (override any of these in a site's user.css):
+     --color-menu-surface   panel background        (default: --color-bg)
+     --color-menu-on        link text colour        (default: --color-body-text)
+     --color-menu-divider   hairline between links  (default: --color-border)
+   Link hover uses --color-primary. The hamburger bars use currentColor, so they
+   follow the button's themed text colour automatically.
+
+   Appended after Tailwind's layers so it reliably wins over the engine header's
+   utility classes (border, sizing, background) without editing header.njk.
+   ========================================================= */
+
+/* Hamburger — drop the engine border; draw a two-bar icon that morphs to ×. */
+header button[data-collapse-toggle] {
+  position: relative;
+  height: 2.75rem;
+  width: 2.75rem;
+  border: 0;
+  border-radius: var(--radius-button);
+  transition: background-color 0.2s ease;
+}
+header button[data-collapse-toggle] svg { display: none; }      /* hide the engine hamburger glyph */
+header button[data-collapse-toggle]::before,
+header button[data-collapse-toggle]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.35rem;
+  height: 2px;
+  border-radius: 2px;
+  background-color: currentColor;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+header button[data-collapse-toggle]::before { transform: translate(-50%, -6px); }
+header button[data-collapse-toggle]::after  { transform: translate(-50%,  6px); }
+header button[data-collapse-toggle][aria-expanded="true"]::before { transform: translate(-50%, 0) rotate(45deg); }
+header button[data-collapse-toggle][aria-expanded="true"]::after  { transform: translate(-50%, 0) rotate(-45deg); }
+
+/* Panel — its own surface + full-width breakout, opened via its own `hidden`
+   class so it animates (max-height + opacity) instead of flashing. */
+#mobile-menu {
+  display: block !important;          /* override Flowbite's .hidden (display:none) */
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+  background-color: var(--color-menu-surface, var(--color-bg));
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 0 1rem 1.75rem;
+  transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.28s ease;
+}
+@media (min-width: 640px) {
+  #mobile-menu {
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+#mobile-menu:not(.hidden) {
+  max-height: 85vh;
+  opacity: 1;
+  pointer-events: auto;
+  padding-top: 0.5rem;
+}
+/* Links — generous tap targets, hairline dividers, hover that nudges right. */
+#mobile-menu ul { padding-top: 0.25rem; }
+#mobile-menu a:not(.cd-btn) {
+  display: block;
+  padding: 0.95rem 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--color-menu-on, var(--color-body-text)) !important;
+  border-bottom: 1px solid var(--color-menu-divider, var(--color-border));
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+#mobile-menu a:not(.cd-btn):hover {
+  color: var(--color-primary) !important;
+  padding-left: 0.4rem;
+}
+/* CTA — full-width pill below the links. */
+#mobile-menu li:has(.cd-btn) { padding-top: 1.1rem; }
+#mobile-menu .cd-btn-primary { display: flex !important; width: 100%; }
