@@ -13,7 +13,8 @@
     "eleventy-engine-sync": "bin/sync.mjs"
   },
   "scripts": {
-    "sync:all": "node bin/sync-all.mjs"
+    "sync:all": "node bin/sync-all.mjs",
+    "release": "node bin/release.mjs"
   },
   "files": [
     "eleventy.js",

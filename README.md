@@ -30,13 +30,29 @@ deploys are self-contained.
 
 ## Releasing a new version
 
-1. Make the change here (e.g. improve `partials/schema.njk` or add a component to `pages/components.njk`).
-2. Bump `version` in `package.json` (semver).
-3. Publish: `git tag v1.2.0 && git push origin --tags`. Sites install from the tag tarball at
-   `https://github.com/juioudgdgeue894/eleventy-engine/archive/refs/tags/v1.2.0.tar.gz` — plain HTTPS,
-   no SSH/auth needed in CI (avoid the `github:owner/repo#tag` shorthand, which resolves to git+ssh).
-4. In each site, bump the engine version in `package.json` and run `npm install` when you're ready to
-   adopt it. Sites on the old version are untouched.
+Make the change here, then run **one command**:
+
+```sh
+npm run release -- patch -m "fix collapsed menu bar"
+# or: npm run release -- minor -m "new pricing component"
+# or: npm run release -- 1.8.0 -m "..."
+```
+
+`release` (see `bin/release.mjs`) bumps `version`, commits the working tree, creates `vX.Y.Z` and
+**pushes the tag** to origin (sites install from the tag tarball at
+`…/archive/refs/tags/vX.Y.Z.tar.gz` — plain HTTPS, no SSH/auth; avoid the `github:owner/repo#tag`
+shorthand, which resolves to git+ssh). It then bumps **every consuming site's** `package.json` to
+the new tag and runs `npm install` (re-syncing them).
+
+It does **not** commit/push the sites — review each, then commit + push (and confirm each site's
+`origin` is its own repo, not the shared starter). Options:
+
+- `--sites a,b` — only roll out to these sites (default: all)
+- `--engine-only` — publish the tag, touch no sites
+- `--dry-run` — print the plan, change nothing
+
+Releases via **tags**, not the `main` branch (the branch can lag origin; only the tag matters).
+For local iteration without releasing, use `npm run sync:all` instead (see *Local development*).
 
 ## Local development (fast loop)
 
