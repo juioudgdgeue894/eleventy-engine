@@ -107,7 +107,7 @@ src/
       bare.njk            ← minimal shell for internal tool pages (no nav/footer)
       post.njk            ← blog post layout, chains to base.njk
     partials/             ← synced from the engine package
-      header.njk          ← sticky nav + utility bar (desktop + Flowbite mobile)
+      header.njk          ← sticky nav + utility bar (desktop + Flowbite mobile menu; styled by the shared mobile-menu component in input.css)
       hero.njk            ← page hero section (CTAs from business.sections.hero)
       services.njk        ← services grid (heading/intro from business.sections.services)
       work.njk            ← portfolio / case studies (heading/intro from business.sections.work)
@@ -130,7 +130,7 @@ src/
       credit.njk          ← "Built by" credit line in footer
   css/
     user.css              ← design tokens + .prose blog styles
-    input.css             ← @import user.css then @tailwind directives
+    input.css             ← @import user.css, @tailwind directives, then the shared mobile-menu component
   images/
     favicon.svg           ← replace with client's SVG favicon
     og-default.jpg        ← 1200×630 social share image (replace with real branded image)
@@ -215,6 +215,23 @@ All images in templates and blog posts should use the `{% image %}` shortcode in
 - Corner radii are globally overridden in `user.css` — `.rounded-*` classes all resolve to `var(--radius-button)`. To exempt an element (e.g. a circular image), add the class `cd-rounded-img` instead, which uses `var(--radius-image)`.
 - Never use `color-mix()` inside Tailwind arbitrary value brackets — it silently fails. Always define pre-computed shade variables in `user.css` (e.g. `--color-primary-light`) and reference those.
 - Common layout helpers defined in `user.css`: `.cd-container`, `.cd-section`, `.cd-btn`, `.cd-btn-primary`, `.cd-btn-outline`, `.cd-btn-light`.
+
+### Mobile menu (shared component, in `input.css`)
+
+The Flowbite mobile menu is styled by a shared component at the bottom of `input.css` (synced — do not edit per-site). It gives every site:
+- a **borderless hamburger that morphs into an ×** (drawn with pseudo-elements; the engine's `<svg>` glyph is hidden),
+- a **full-width drop panel that animates** open/closed with **no flash** (driven by the panel's own `hidden` class + `max-height`/`opacity`, so it needs no `:has()` and never flips `display`),
+- generous tap targets, hairline dividers, and a full-width CTA pill.
+
+It is **fully themed from tokens** — override any of these in the site's `user.css` to restyle it:
+
+| Token | Controls | Default |
+|---|---|---|
+| `--color-menu-surface` | panel background | `--color-bg` |
+| `--color-menu-on` | link text colour | `--color-body-text` |
+| `--color-menu-divider` | hairline between links | `--color-border` |
+
+Link hover uses `--color-primary`; the hamburger bars use `currentColor` (the button's themed text colour). On the dark default theme it adapts automatically. A **light-themed** site that wants a dark menu just sets `--color-menu-surface`/`--color-menu-on`/`--color-menu-divider` to dark values (and, if its header is transparent over a hero, darkens the header bar itself when `[data-collapse-toggle][aria-expanded="true"]`).
 
 ---
 
