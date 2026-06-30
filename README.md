@@ -38,6 +38,30 @@ deploys are self-contained.
 4. In each site, bump the engine version in `package.json` and run `npm install` when you're ready to
    adopt it. Sites on the old version are untouched.
 
+## Local development (fast loop)
+
+To iterate on the engine and see it across **every** site immediately — no version
+bump, no tag, no `npm install`:
+
+```sh
+# from the engine repo, after editing any shared file:
+npm run sync:all
+```
+
+This pushes the **local** engine's shared files (`_includes/`, `pages/`, `css/input.css`,
+`CLAUDE.shared.md`) straight into the `src/` of every sibling directory that depends on the
+engine (auto-discovered). Synced files are gitignored in the sites, so this never dirties their
+git trees — it's purely local preview. Limit to specific sites with
+`npm run sync:all -- ivylounge.uk drprivatedining.co.uk`.
+
+If a site's dev server (`npm run dev`) is already running, its watcher rebuilds on the spot.
+
+**Caveat:** a site's own `predev`/`prebuild`/`postinstall` hooks run the sync from its
+*installed* (pinned tarball) version. So if you **restart** a site's dev server, it re-syncs the
+released version and overwrites the local preview — just re-run `npm run sync:all`, or keep the
+dev server running while you iterate. `sync:all` is for preview; production still uses the
+pinned tag (see *Releasing a new version*).
+
 ## Notes / gotchas
 
 - **`content` lives in the site's `tailwind.config.js`, not this preset.** Tailwind resolves content
