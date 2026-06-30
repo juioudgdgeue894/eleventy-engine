@@ -12,6 +12,9 @@
   "bin": {
     "eleventy-engine-sync": "bin/sync.mjs"
   },
+  "scripts": {
+    "sync:all": "node bin/sync-all.mjs"
+  },
   "files": [
     "eleventy.js",
     "tailwind-preset.js",
