@@ -1,10 +1,40 @@
 {# Based on contact-02 - two-column intro + message form.
-   Netlify Forms handler (default). To switch handlers see the notes in the
-   component library / previous template version: remove data-netlify* attrs,
-   set action to your processor endpoint, add its domain to the CSP connect-src
-   in netlify.toml / vercel.json, and list it in the Privacy Policy data table.
+   Form handler is driven by business.forms.provider (default "cloudflare"):
+     • "cloudflare" → posts to the /api/contact Pages Function, which sends the
+        enquiry via Cloudflare Email Sending (see functions/api/contact.js).
+     • "netlify"    → legacy Netlify Forms markup (data-netlify + hidden
+        form-name), for sites not yet migrated to Cloudflare Pages.
    Labels are sr-only with mirrored placeholders - still WCAG AA (name is
    programmatically determinable via the associated <label for>). #}
+{% set formProvider = business.forms.provider | default("cloudflare") %}
+
+{# Shared input fields, reused by both handler variants. #}
+{% set formFields %}
+  {# Honeypot: hidden from real users, bots fill it in → submission discarded #}
+  <p class="hidden" aria-hidden="true">
+    <label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+  </p>
+
+  <div>
+    <label class="sr-only" for="name">Full name</label>
+    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" placeholder="Name" autocomplete="name" required />
+  </div>
+  <div>
+    <label class="sr-only" for="email">Email address</label>
+    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" placeholder="Email" autocomplete="email" required />
+  </div>
+  <div>
+    <label class="sr-only" for="message">Message</label>
+    <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
+  </div>
+
+  <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
+
+  <p class="text-xs text-[var(--color-body-text)]">
+    By sending this message you agree to our <a class="underline hover:text-white" href="/privacy-policy/">Privacy Policy</a>. We will only use your details to respond to your enquiry.
+  </p>
+{% endset %}
+
 <section id="contact" class="bg-[var(--color-secondary)]">
   <div class="cd-container cd-section grid grid-cols-1 gap-12 lg:grid-cols-2">
 
@@ -23,41 +53,18 @@
 
     <div>
       <h3 class="text-lg font-medium text-white">{{ business.sections.contact.heading }}</h3>
-      <form
-        class="mt-6 space-y-4"
-        method="POST"
-        action="/thanks/"
-        name="contact"
-        data-netlify="true"
-        data-netlify-honeypot="bot-field"
-      >
-        {# Netlify hidden form-name (required when building with a static site generator) #}
+      {% if formProvider == "netlify" %}
+      {# Legacy Netlify Forms handler #}
+      <form class="mt-6 space-y-4" method="POST" action="/thanks/" name="contact" data-netlify="true" data-netlify-honeypot="bot-field">
         <input type="hidden" name="form-name" value="contact" />
-
-        {# Honeypot: hidden from real users, bots fill it in → submission discarded #}
-        <p class="hidden" aria-hidden="true">
-          <label>Don't fill this out: <input name="bot-field" tabindex="-1" /></label>
-        </p>
-
-        <div>
-          <label class="sr-only" for="name">Full name</label>
-          <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" placeholder="Name" autocomplete="name" required />
-        </div>
-        <div>
-          <label class="sr-only" for="email">Email address</label>
-          <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" placeholder="Email" autocomplete="email" required />
-        </div>
-        <div>
-          <label class="sr-only" for="message">Message</label>
-          <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
-        </div>
-
-        <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
-
-        <p class="text-xs text-[var(--color-body-text)]">
-          By sending this message you agree to our <a class="underline hover:text-white" href="/privacy-policy/">Privacy Policy</a>. We will only use your details to respond to your enquiry.
-        </p>
+        {{ formFields | safe }}
       </form>
+      {% else %}
+      {# Cloudflare Pages Function handler → Cloudflare Email Sending #}
+      <form class="mt-6 space-y-4" method="POST" action="/api/contact">
+        {{ formFields | safe }}
+      </form>
+      {% endif %}
     </div>
 
   </div>

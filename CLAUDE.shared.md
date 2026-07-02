@@ -120,7 +120,7 @@ src/
       gallery.njk         ← image grid (self-guards: hidden if business.gallery is empty)
       booking-embed.njk   ← third-party booking widget (self-guards on business.booking.enabled)
       cta.njk             ← call-to-action banner
-      contact-form.njk    ← contact form (Netlify Forms + honeypot, visible labels, GDPR notice)
+      contact-form.njk    ← contact form (Cloudflare Email Sending via /api/contact, or Netlify legacy; honeypot, visible labels, GDPR notice)
       newsletter-form.njk ← standalone newsletter block (data from business.newsletter.*)
       footer.njk          ← site footer (newsletter, columns, contact, legal disclosure)
       announcement.njk    ← top bar (self-guards on business.announcement.enabled)
@@ -329,12 +329,30 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
 
 ### Contact and newsletter forms
 
-`contact-form.njk` ships with Netlify Forms as the default handler:
-- `data-netlify="true"` — Netlify detects and processes submissions automatically
-- `data-netlify-honeypot="bot-field"` — hidden field that catches bots
-- `<input type="hidden" name="form-name" value="contact" />` — required for SSG builds
+`contact-form.njk` is driven by **`business.forms.provider`** (default `"cloudflare"`):
 
-To switch handlers, read the comment block at the top of `contact-form.njk`. For any third-party processor, add their domain to `Content-Security-Policy` (connect-src) in `netlify.toml` / `vercel.json`, and list it in the Privacy Policy data table.
+- **`"cloudflare"`** (default, for sites on Cloudflare Pages) — the form POSTs to the
+  `/api/contact` Pages Function (`functions/api/contact.js`, synced from the engine),
+  which sends the enquiry via **Cloudflare Email Sending** (`env.EMAIL.send`). It needs,
+  per Pages project:
+  - a **`send_email` binding named `EMAIL`**,
+  - env vars **`CONTACT_TO`** (recipient) and **`CONTACT_FROM`** (verified sender on an
+    onboarded domain, e.g. `"Site Name <noreply@yourdomain.com>"`),
+  - the account on the **Workers Paid plan** and the sender domain **onboarded to
+    Cloudflare Email Service**. See https://developers.cloudflare.com/email-service/.
+
+  The Function honours the honeypot (`bot-field`) and 303-redirects to `/thanks/` on
+  success, so it works without JavaScript.
+
+- **`"netlify"`** (legacy, for sites still on Netlify) — renders the old Netlify Forms
+  markup (`data-netlify`, `data-netlify-honeypot`, hidden `form-name`). Set this in
+  `business.json` until the site is migrated to Cloudflare Pages, otherwise the form will
+  POST to `/api/contact`, which Netlify won't handle.
+
+The contact form is same-origin (`form-action 'self'` already allows `/api/contact`), so no
+CSP change is needed. For any third-party processor instead, add its domain to
+`Content-Security-Policy` (connect-src) in your host's headers and list it in the Privacy
+Policy data table.
 
 Newsletter forms (footer and `newsletter-form.njk`) include a **required consent checkbox** for UK PECR compliance. Heading, intro text, and checkbox label all come from `business.newsletter.*`.
 

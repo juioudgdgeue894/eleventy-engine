@@ -11,6 +11,7 @@
  *   <engine>/_includes        -> <site>/src/_includes
  *   <engine>/pages/*          -> <site>/src/*            (framework pages)
  *   <engine>/css/input.css    -> <site>/src/css/input.css
+ *   <engine>/functions/*      -> <site>/functions/*      (Cloudflare Pages Functions)
  *   <engine>/CLAUDE.shared.md -> <site>/.engine/CLAUDE.shared.md
  *
  * It never touches site-owned files: src/index.njk, src/_data/*, src/css/user.css,
@@ -44,7 +45,15 @@ for (const file of fs.readdirSync(pagesDir)) {
 mkdirp(path.join(site, "src", "css"));
 cp(path.join(engineRoot, "css", "input.css"), path.join(site, "src", "css", "input.css"));
 
-// 4. Shared Claude rules (imported by the site's CLAUDE.md)
+// 4. Cloudflare Pages Functions (serverless handlers, e.g. contact-form email).
+//    Regenerated at build time, so sites gitignore ./functions like other synced files.
+const fnDir = path.join(engineRoot, "functions");
+if (fs.existsSync(fnDir)) {
+  cp(fnDir, path.join(site, "functions"));
+  copied += 1;
+}
+
+// 5. Shared Claude rules (imported by the site's CLAUDE.md)
 mkdirp(path.join(site, ".engine"));
 cp(path.join(engineRoot, "CLAUDE.shared.md"), path.join(site, ".engine", "CLAUDE.shared.md"));
 
