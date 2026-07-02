@@ -53,6 +53,14 @@ if (fs.existsSync(fnDir)) {
   copied += 1;
 }
 
+// 4b. Cloudflare Worker entry (static-assets sites). The site's wrangler.jsonc
+//     points main -> worker/index.js; regenerated at build time (gitignored).
+const workerDir = path.join(engineRoot, "worker");
+if (fs.existsSync(workerDir)) {
+  cp(workerDir, path.join(site, "worker"));
+  copied += 1;
+}
+
 // 5. Shared Claude rules (imported by the site's CLAUDE.md)
 mkdirp(path.join(site, ".engine"));
 cp(path.join(engineRoot, "CLAUDE.shared.md"), path.join(site, ".engine", "CLAUDE.shared.md"));
