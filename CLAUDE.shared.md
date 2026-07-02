@@ -356,6 +356,19 @@ Policy data table.
 
 Newsletter forms (footer and `newsletter-form.njk`) include a **required consent checkbox** for UK PECR compliance. Heading, intro text, and checkbox label all come from `business.newsletter.*`.
 
+**Deploying with Cloudflare Email Sending.** The `/api/contact` handler ships two ways from
+the engine so it works on either Cloudflare host shape:
+- **Worker with static assets** (the git-connected default on Workers & Pages) — the engine
+  syncs `worker/index.js`, which serves the built `_site` via the `ASSETS` binding and routes
+  `POST /api/contact` to the shared handler. The site adds a **`wrangler.jsonc`** (site-owned)
+  with `main: "worker/index.js"`, `assets.directory: "./_site"`, `send_email: [{ name: "EMAIL" }]`,
+  and `vars: { CONTACT_TO, CONTACT_FROM }`.
+- **Cloudflare Pages** — the synced `functions/api/contact.js` runs automatically; set the
+  `EMAIL` binding and `CONTACT_TO`/`CONTACT_FROM` vars on the Pages project.
+
+Both require the account on the **Workers Paid plan** and the sender domain **onboarded to
+Cloudflare Email Service** (`CONTACT_FROM` must be on that domain).
+
 ### 404 page
 
 `src/404.njk` generates `_site/404.html`. Netlify and Vercel both serve this file automatically for unmatched routes — no extra config required.
