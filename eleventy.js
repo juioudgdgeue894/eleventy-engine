@@ -22,6 +22,10 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
     formats: ["webp", "jpeg"],
     outputDir: "./_site/images/",
     urlPath: "/images/",
+    // Lean, visually-lossless compression. WebP q72 and mozjpeg q78 roughly
+    // halve photo weight versus the sharp defaults with no perceptible loss.
+    sharpWebpOptions: { quality: 72 },
+    sharpJpegOptions: { quality: 78, mozjpeg: true },
   });
   return Image.generateHTML(meta, {
     alt,
