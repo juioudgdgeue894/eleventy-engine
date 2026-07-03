@@ -28,16 +28,50 @@ const escapeHtml = (value) =>
     "'": "&#39;",
   }[c]));
 
+// Redirect with an explicit Content-Type and a tiny HTML fallback body.
+// Response.redirect() emits a header-only response with no Content-Type;
+// Safari 26 mishandles that shape over HTTP/3 on Cloudflare and downloads a
+// 0-byte file named after the URL instead of following the Location header.
+// A text/html body makes every client either follow the redirect or render
+// the meta-refresh page.
+const redirectTo = (origin, path, status) => {
+  const url = origin + path;
+  const safe = escapeHtml(url);
+  return new Response(
+    `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">` +
+      `<meta http-equiv="refresh" content="0;url=${safe}">` +
+      `<title>Redirecting…</title></head>` +
+      `<body><p>Redirecting to <a href="${safe}">${safe}</a>…</p></body></html>`,
+    {
+      status,
+      headers: {
+        Location: url,
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store",
+      },
+    },
+  );
+};
+
+// Where validation failures land: the contact page (CONTACT_PAGE, default
+// home-page anchor) with ?error=1 inserted ahead of any #fragment.
+const errorTarget = (page) => {
+  const [path, hash] = page.split("#");
+  const sep = path.includes("?") ? "&" : "?";
+  return `${path}${sep}error=1${hash ? `#${hash}` : ""}`;
+};
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const origin = new URL(request.url).origin;
-  const seeOther = (path) => Response.redirect(origin + path, 303);
+  const contactPage = env.CONTACT_PAGE || "/#contact";
+  const seeOther = (path) => redirectTo(origin, path, 303);
 
   let form;
   try {
     form = await request.formData();
   } catch {
-    return seeOther("/contact/?error=1#contact");
+    return seeOther(errorTarget(contactPage));
   }
 
   const name = (form.get("name") || "").toString().trim();
@@ -49,7 +83,7 @@ export async function onRequestPost(context) {
   if (honeypot) return seeOther("/thanks/");
 
   if (!name || !email || !message) {
-    return seeOther("/contact/?error=1#contact");
+    return seeOther(errorTarget(contactPage));
   }
 
   const to = env.CONTACT_TO;
@@ -57,7 +91,7 @@ export async function onRequestPost(context) {
   if (!to || !from) {
     return new Response(
       "Contact form is not configured: set CONTACT_TO and CONTACT_FROM.",
-      { status: 500 },
+      { status: 500, headers: { "Content-Type": "text/plain; charset=utf-8" } },
     );
   }
 
@@ -78,7 +112,7 @@ export async function onRequestPost(context) {
   } catch (e) {
     return new Response(
       `Sorry, your message could not be sent right now. Please email us directly. (${e.code || ""} ${e.message || e})`,
-      { status: 502 },
+      { status: 502, headers: { "Content-Type": "text/plain; charset=utf-8" } },
     );
   }
 
@@ -91,5 +125,5 @@ export async function onRequestPost(context) {
 export async function onRequestGet(context) {
   const origin = new URL(context.request.url).origin;
   const target = context.env.CONTACT_PAGE || "/#contact";
-  return Response.redirect(origin + target, 302);
+  return redirectTo(origin, target, 302);
 }
