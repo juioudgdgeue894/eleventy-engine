@@ -8,6 +8,8 @@
  *   • Binding:  a "send_email" binding named  EMAIL
  *   • Variables:
  *       CONTACT_TO    — where enquiries are delivered (e.g. hello@yourdomain.com)
+ *       CONTACT_BCC   — optional blind-copy recipient(s), comma-separated; used
+ *                       for the agency archive/lead-count inbox
  *       CONTACT_FROM  — verified sender on an onboarded domain
  *                       (e.g. "Your Site <noreply@yourdomain.com>")
  *
@@ -98,9 +100,16 @@ export async function onRequestPost(context) {
     );
   }
 
+  // Optional archive copy (comma-separated list allowed).
+  const bcc = (env.CONTACT_BCC || "")
+    .split(",")
+    .map((a) => a.trim())
+    .filter(Boolean);
+
   try {
     await env.EMAIL.send({
       to,
+      ...(bcc.length ? { bcc } : {}),
       from,
       replyTo: { email, name },
       subject: `New enquiry from ${name}`,
