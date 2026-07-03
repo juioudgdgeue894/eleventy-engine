@@ -8,8 +8,12 @@
  *   • Binding:  a "send_email" binding named  EMAIL
  *   • Variables:
  *       CONTACT_TO    — where enquiries are delivered (e.g. hello@yourdomain.com)
- *       CONTACT_BCC   — optional blind-copy recipient(s), comma-separated; used
- *                       for the agency archive/lead-count inbox
+ *       CONTACT_ARCHIVE — optional archive recipient; receives a separate copy
+ *                       of every enquiry with the site domain prefixed to the
+ *                       subject (for backup + per-site lead counting). A
+ *                       separate send rather than BCC: a BCC copy is
+ *                       byte-identical, so mailboxes that receive both (e.g.
+ *                       catch-all routing into one inbox) dedupe it away.
  *       CONTACT_FROM  — verified sender on an onboarded domain
  *                       (e.g. "Your Site <noreply@yourdomain.com>")
  *
@@ -100,32 +104,46 @@ export async function onRequestPost(context) {
     );
   }
 
-  // Optional archive copy (comma-separated list allowed).
-  const bcc = (env.CONTACT_BCC || "")
-    .split(",")
-    .map((a) => a.trim())
-    .filter(Boolean);
+  const text = `Name: ${name}\nEmail: ${email}\n\n${message}\n`;
+  const html =
+    `<h2>New website enquiry</h2>` +
+    `<p><strong>Name:</strong> ${escapeHtml(name)}</p>` +
+    `<p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>` +
+    `<p><strong>Message:</strong></p>` +
+    `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`;
 
   try {
     await env.EMAIL.send({
       to,
-      ...(bcc.length ? { bcc } : {}),
       from,
       replyTo: { email, name },
       subject: `New enquiry from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}\n`,
-      html:
-        `<h2>New website enquiry</h2>` +
-        `<p><strong>Name:</strong> ${escapeHtml(name)}</p>` +
-        `<p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>` +
-        `<p><strong>Message:</strong></p>` +
-        `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
+      text,
+      html,
     });
   } catch (e) {
     return new Response(
       `Sorry, your message could not be sent right now. Please email us directly. (${e.code || ""} ${e.message || e})`,
       { status: 502, headers: { "Content-Type": "text/plain; charset=utf-8" } },
     );
+  }
+
+  // Best-effort archive copy — its own send (see CONTACT_ARCHIVE note above),
+  // with the site domain in the subject for per-site lead counting. Never
+  // fails the visitor's submission.
+  if (env.CONTACT_ARCHIVE) {
+    try {
+      await env.EMAIL.send({
+        to: env.CONTACT_ARCHIVE,
+        from,
+        replyTo: { email, name },
+        subject: `[${new URL(request.url).hostname}] New enquiry from ${name}`,
+        text,
+        html,
+      });
+    } catch {
+      // archive delivery must not affect the visitor
+    }
   }
 
   return seeOther("/thanks/");
