@@ -1,15 +1,16 @@
 ---
 layout: layouts/base.njk
-title: "[Blog Title — e.g. 'Insights & Articles']"
-description: "[Blog meta description — what the blog covers and who it's for.]"
 permalink: blog/index.html
+eleventyComputed:
+  title: "{{ business.blog.title or (business.blog.heading or 'Blog') }}"
+  description: "{{ business.blog.description or business.blog.intro }}"
 ---
 <section>
   <div class="cd-container cd-section">
     <div class="mx-auto max-w-2xl text-center">
-      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">Blog</span>
-      <h1 class="mt-2 text-3xl font-medium text-white sm:text-4xl">[Blog Heading]</h1>
-      <p class="mt-4 text-[var(--color-body-text)]">[Short blog intro line describing what readers will find here.]</p>
+      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">{{ business.blog.eyebrow or "Blog" }}</span>
+      {% if business.blog.heading %}<h1 class="mt-2 text-3xl font-medium text-white sm:text-4xl">{{ business.blog.heading }}</h1>{% endif %}
+      {% if business.blog.intro %}<p class="mt-4 text-[var(--color-body-text)]">{{ business.blog.intro }}</p>{% endif %}
     </div>
 
     <div class="mx-auto mt-14 grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

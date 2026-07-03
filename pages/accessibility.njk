@@ -8,19 +8,19 @@ permalink: accessibility/index.html
   <div class="mx-auto max-w-3xl">
 
     <h1 class="text-3xl sm:text-4xl">Accessibility Statement</h1>
-    <p class="mt-3 text-sm text-gray-500">This statement applies to <strong>{{ business.seo.site_url }}</strong>. Last reviewed: {{ (business.legal.accessibility_reviewed | readableDate) if (business.legal and business.legal.accessibility_reviewed) else ("now" | currentYear) }}. We review this statement annually and after any major site changes.</p>
+    <p class="mt-3 text-sm text-gray-400">This statement applies to <strong>{{ business.seo.site_url }}</strong>. Last reviewed: {{ (business.legal.accessibility_reviewed | readableDate) if (business.legal and business.legal.accessibility_reviewed) else ("now" | currentYear) }}. We review this statement annually and after any major site changes.</p>
 
-    <div class="mt-10 space-y-10 text-gray-700">
+    <div class="mt-10 space-y-10 text-[var(--color-body-text)]">
 
       <section>
-        <h2 class="text-xl text-gray-900">Our commitment</h2>
+        <h2 class="text-xl text-white">Our commitment</h2>
         <p class="mt-3">{{ business.business_name }} is committed to ensuring this website is accessible to the widest possible audience, including people with disabilities. We aim to conform to the <strong>Web Content Accessibility Guidelines (WCAG) 2.2 at Level AA</strong>.</p>
         <p class="mt-3">We actively work to make our websites usable by people who rely on keyboard navigation, screen readers, high-contrast modes, or other assistive technologies.</p>
         <p class="mt-3">Under the Equality Act 2010, we have a duty to make reasonable adjustments so that disabled people are not disadvantaged when using our website.</p>
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">Conformance status</h2>
+        <h2 class="text-xl text-white">Conformance status</h2>
         <p class="mt-3">This website is <strong>partially conformant</strong> with WCAG 2.2 Level AA. Partially conformant means that some parts of the content do not fully conform to the accessibility standard.</p>
         <p class="mt-3">Key accessibility features this site includes:</p>
         <ul class="mt-3 list-disc space-y-2 pl-5">
@@ -39,7 +39,7 @@ permalink: accessibility/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">Known limitations</h2>
+        <h2 class="text-xl text-white">Known limitations</h2>
         <p class="mt-3">We are aware of the following areas that may not fully meet WCAG 2.2 AA:</p>
         <ul class="mt-3 list-disc space-y-2 pl-5">
           <li><strong>Third-party embeds</strong> - booking widgets, maps, or video embeds from external providers may not fully conform. We encourage providers to meet accessibility standards but cannot guarantee them.</li>
@@ -49,7 +49,7 @@ permalink: accessibility/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">Technical information</h2>
+        <h2 class="text-xl text-white">Technical information</h2>
         <p class="mt-3">{{ business.business_name }} relies on the following technologies for WCAG 2.2 conformance:</p>
         <ul class="mt-3 list-disc space-y-1 pl-5">
           <li>HTML5</li>
@@ -59,23 +59,23 @@ permalink: accessibility/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">Feedback and contact</h2>
+        <h2 class="text-xl text-white">Feedback and contact</h2>
         <p class="mt-3">We welcome feedback on the accessibility of this website. If you experience any barriers or difficulty accessing content, please let us know:</p>
         <ul class="mt-3 space-y-1 text-sm">
-          <li><strong>Email:</strong> <a class="text-[var(--color-primary)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
-          <li><strong>Phone:</strong> <a class="text-[var(--color-primary)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
+          <li><strong>Email:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
+          <li><strong>Phone:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
         </ul>
         <p class="mt-3">We aim to respond to accessibility feedback within 5 business days and to resolve issues, or provide an alternative, within 30 days.</p>
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">Formal complaints procedure</h2>
+        <h2 class="text-xl text-white">Formal complaints procedure</h2>
         <p class="mt-3">If you are not satisfied with our response, or if you need to escalate a complaint, you can contact the <strong>Equality and Human Rights Commission (EHRC)</strong>:</p>
         <ul class="mt-3 list-disc space-y-1 pl-5 text-sm">
-          <li>Website: <a class="text-[var(--color-primary)] hover:underline" href="https://www.equalityhumanrights.com" target="_blank" rel="noopener">equalityhumanrights.com</a></li>
+          <li>Website: <a class="text-[var(--color-accent-link)] hover:underline" href="https://www.equalityhumanrights.com" target="_blank" rel="noopener">equalityhumanrights.com</a></li>
           <li>Helpline: 0808 800 0082</li>
         </ul>
-        <p class="mt-3 text-sm text-gray-500">In Scotland, contact <a class="text-[var(--color-primary)] hover:underline" href="https://www.equalityhumanrights.com/about-us/our-offices/scotland-office" target="_blank" rel="noopener">EHRC Scotland</a>.</p>
+        <p class="mt-3 text-sm text-gray-400">In Scotland, contact <a class="text-[var(--color-accent-link)] hover:underline" href="https://www.equalityhumanrights.com/about-us/our-offices/scotland-office" target="_blank" rel="noopener">EHRC Scotland</a>.</p>
       </section>
 
     </div>

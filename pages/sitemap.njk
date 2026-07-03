@@ -12,7 +12,7 @@ eleventyExcludeFromCollections: true
 {%- endfor %}
 {%- if business.service_areas.enabled %}{%- for town in towns %}
   <url>
-    <loc>{{ business.seo.site_url }}/{{ town.slug }}/</loc>
+    <loc>{{ business.seo.site_url }}/{{ business.service_areas.slug_prefix }}{{ town.slug }}/</loc>
   </url>
 {%- endfor %}{%- endif %}
 </urlset>
