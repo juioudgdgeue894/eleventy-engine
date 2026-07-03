@@ -362,7 +362,12 @@ the engine so it works on either Cloudflare host shape:
   syncs `worker/index.js`, which serves the built `_site` via the `ASSETS` binding and routes
   `POST /api/contact` to the shared handler. The site adds a **`wrangler.jsonc`** (site-owned)
   with `main: "worker/index.js"`, `assets.directory: "./_site"`, `send_email: [{ name: "EMAIL" }]`,
-  and `vars: { CONTACT_TO, CONTACT_FROM }`.
+  `vars: { CONTACT_TO, CONTACT_FROM }`, and — **required** — `assets.run_worker_first: ["/api/*"]`.
+  Without `run_worker_first`, the asset layer intercepts browser form submissions (requests
+  carrying `Sec-Fetch-Mode: navigate`) and answers `POST /api/contact` with an empty 405 before
+  the Worker runs; browsers save that as a 0-byte download named "contact". curl and `fetch()`
+  don't send that header, so API-level tests pass while every real-browser submission fails —
+  always test forms with a real browser or with `-H "Sec-Fetch-Mode: navigate"`.
 - **Cloudflare Pages** — the synced `functions/api/contact.js` runs automatically; set the
   `EMAIL` binding and `CONTACT_TO`/`CONTACT_FROM` vars on the Pages project.
 
