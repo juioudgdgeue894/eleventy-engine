@@ -85,8 +85,11 @@ export async function onRequestPost(context) {
   return seeOther("/thanks/");
 }
 
-// Anything other than a POST → send people to the contact page.
+// Anything other than a POST → send people to the contact section/page.
+// Defaults to the home-page contact anchor; sites with a dedicated contact page
+// can override by setting the CONTACT_PAGE var (e.g. "/contact/#contact").
 export async function onRequestGet(context) {
   const origin = new URL(context.request.url).origin;
-  return Response.redirect(origin + "/contact/#contact", 302);
+  const target = context.env.CONTACT_PAGE || "/#contact";
+  return Response.redirect(origin + target, 302);
 }
