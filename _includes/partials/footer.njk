@@ -28,7 +28,7 @@
       <p class="text-sm font-medium text-white">{{ business.service_areas.heading }}</p>
       <ul class="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
         {% for town in towns %}
-        <li><a class="text-gray-400 hover:text-white" href="/{{ town.slug }}/">{{ business.service_areas.link_prefix }} {{ town.name }}</a></li>
+        <li><a class="text-gray-400 hover:text-white" href="/{{ business.service_areas.slug_prefix }}{{ town.slug }}/">{{ business.service_areas.link_prefix }} {{ town.name }}</a></li>
         {% endfor %}
       </ul>
     </div>

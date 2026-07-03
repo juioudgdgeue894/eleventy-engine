@@ -8,23 +8,21 @@ permalink: privacy-policy/index.html
   <div class="mx-auto max-w-3xl">
 
     <h1 class="text-3xl sm:text-4xl">Privacy Policy</h1>
-    <p class="mt-3 text-sm text-gray-500">Last updated: {{ (business.legal.privacy_updated | readableDate) if (business.legal and business.legal.privacy_updated) else ("now" | currentYear) }}. This policy applies to the website <strong>{{ business.seo.site_url }}</strong>.</p>
+    <p class="mt-3 text-sm text-gray-400">Last updated: {{ (business.legal.privacy_updated | readableDate) if (business.legal and business.legal.privacy_updated) else ("now" | currentYear) }}. This policy applies to the website <strong>{{ business.seo.site_url }}</strong>.</p>
 
-    <div class="mt-10 space-y-10 text-gray-700">
+    <div class="mt-10 space-y-10 text-[var(--color-body-text)]">
 
       <section>
-        <h2 class="text-xl text-gray-900">1. Who we are</h2>
+        <h2 class="text-xl text-white">1. Who we are</h2>
         <p class="mt-3">{{ business.business_name }} is the data controller for personal data collected through this website. We are responsible for deciding how and why your personal data is used.</p>
-        <p class="mt-3"><strong>Contact:</strong> <a class="text-[var(--color-primary)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a> &mdash; {{ business.address.city }}, {{ business.address.region }}, {{ business.address.postcode }}.</p>
+        <p class="mt-3"><strong>Contact:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a> &mdash; {{ business.address.city }}, {{ business.address.region }}, {{ business.address.postcode }}.</p>
         {% if business.legal and business.legal.ico_number %}
         <p class="mt-3">We are registered with the Information Commissioner's Office (ICO). Registration number: <strong>{{ business.legal.ico_number }}</strong>.</p>
-        {% else %}
-        <p class="mt-3 text-sm text-gray-400 italic">[If applicable: We are registered with the ICO under registration number XXXXXXXX.]</p>
         {% endif %}
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">2. What personal data we collect</h2>
+        <h2 class="text-xl text-white">2. What personal data we collect</h2>
         <p class="mt-3">We may collect the following categories of personal data:</p>
         <ul class="mt-3 list-disc space-y-1 pl-5">
           <li><strong>Contact information</strong> - name, email address, phone number, and any message content submitted through our contact form.</li>
@@ -35,7 +33,7 @@ permalink: privacy-policy/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">3. How we collect your data</h2>
+        <h2 class="text-xl text-white">3. How we collect your data</h2>
         <ul class="mt-3 list-disc space-y-1 pl-5">
           <li><strong>Directly from you</strong> - when you fill in our contact form, send us an email, or call us.</li>
           <li><strong>Automatically</strong> - through cookies and similar tracking technologies when you browse our website.</li>
@@ -43,7 +41,7 @@ permalink: privacy-policy/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">4. Why we collect your data (legal basis)</h2>
+        <h2 class="text-xl text-white">4. Why we collect your data (legal basis)</h2>
         <p class="mt-3">Under UK GDPR, we must have a lawful basis for processing your personal data. We rely on the following:</p>
         <ul class="mt-3 list-disc space-y-2 pl-5">
           <li><strong>Legitimate interests (Article 6(1)(f))</strong> - to respond to enquiries you send us, to improve our website, and to understand how visitors use our site.</li>
@@ -53,7 +51,7 @@ permalink: privacy-policy/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">5. How long we keep your data</h2>
+        <h2 class="text-xl text-white">5. How long we keep your data</h2>
         <ul class="mt-3 list-disc space-y-2 pl-5">
           <li><strong>Contact form enquiries</strong> - retained for up to 2 years, then securely deleted.</li>
           <li><strong>Client records</strong> - retained for 6 years after the end of the business relationship, as required by HMRC guidance.</li>
@@ -63,7 +61,7 @@ permalink: privacy-policy/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">6. Who we share your data with</h2>
+        <h2 class="text-xl text-white">6. Who we share your data with</h2>
         <p class="mt-3">We do not sell your personal data. We may share it with trusted third parties who help us run our business:</p>
         <ul class="mt-3 list-disc space-y-2 pl-5">
           <li><strong>Hosting provider</strong> - our website is hosted on servers that may be located in the UK or EEA. Our host processes technical data to serve web pages to you.</li>
@@ -74,7 +72,7 @@ permalink: privacy-policy/index.html
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">7. Your rights</h2>
+        <h2 class="text-xl text-white">7. Your rights</h2>
         <p class="mt-3">Under UK GDPR, you have the following rights:</p>
         <ul class="mt-3 list-disc space-y-2 pl-5">
           <li><strong>Right of access</strong> - to request a copy of the personal data we hold about you.</li>
@@ -85,16 +83,16 @@ permalink: privacy-policy/index.html
           <li><strong>Right to object</strong> - to object to processing based on legitimate interests or for direct marketing.</li>
           <li><strong>Right to withdraw consent</strong> - where processing is based on consent, you can withdraw it at any time without affecting the lawfulness of prior processing.</li>
         </ul>
-        <p class="mt-3">To exercise any of these rights, email us at <a class="text-[var(--color-primary)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>. We will respond within one calendar month.</p>
-        <p class="mt-3">If you are unhappy with how we handle your request, you have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong> at <a class="text-[var(--color-primary)] hover:underline" href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a> or by calling 0303 123 1113.</p>
+        <p class="mt-3">To exercise any of these rights, email us at <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>. We will respond within one calendar month.</p>
+        <p class="mt-3">If you are unhappy with how we handle your request, you have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong> at <a class="text-[var(--color-accent-link)] hover:underline" href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a> or by calling 0303 123 1113.</p>
       </section>
 
       <section id="cookies">
-        <h2 class="text-xl text-gray-900">8. Cookies</h2>
+        <h2 class="text-xl text-white">8. Cookies</h2>
         <p class="mt-3">Cookies are small text files placed on your device. We use them as follows:</p>
         <div class="mt-4 overflow-x-auto">
           <table class="w-full min-w-[540px] text-left text-sm">
-            <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+            <thead class="bg-[var(--color-secondary)] text-xs uppercase text-gray-400">
               <tr>
                 <th class="px-4 py-3">Cookie</th>
                 <th class="px-4 py-3">Purpose</th>
@@ -102,36 +100,38 @@ permalink: privacy-policy/index.html
                 <th class="px-4 py-3">Duration</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-white/10">
               <tr>
                 <td class="px-4 py-3 font-mono text-xs">cd-cookie-consent</td>
                 <td class="px-4 py-3">Remembers your cookie preference</td>
                 <td class="px-4 py-3"><span class="rounded bg-green-50 px-2 py-0.5 text-xs text-green-700">Essential</span></td>
                 <td class="px-4 py-3">Until cleared</td>
               </tr>
+              {% if business.cookies and business.cookies.analytics %}
               <tr>
-                <td class="px-4 py-3 font-mono text-xs">[Analytics cookie]</td>
+                <td class="px-4 py-3 font-mono text-xs">{{ business.cookies.analytics }}</td>
                 <td class="px-4 py-3">Understand how visitors use the site</td>
                 <td class="px-4 py-3"><span class="rounded bg-blue-50 px-2 py-0.5 text-xs text-blue-700">Analytics</span></td>
                 <td class="px-4 py-3">Up to 2 years</td>
               </tr>
+              {% endif %}
             </tbody>
           </table>
         </div>
-        <p class="mt-4">You can change your cookie preferences at any time using the <button class="font-medium text-[var(--color-primary)] hover:underline" type="button" data-cd-cookie-settings>cookie settings</button> link in our footer, or by clearing your browser's cookies.</p>
+        <p class="mt-4">You can change your cookie preferences at any time using the <button class="font-medium text-[var(--color-accent-link)] hover:underline" type="button" data-cd-cookie-settings>cookie settings</button> link in our footer, or by clearing your browser's cookies.</p>
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">9. Changes to this policy</h2>
+        <h2 class="text-xl text-white">9. Changes to this policy</h2>
         <p class="mt-3">We may update this policy from time to time. When we do, we will update the "last updated" date at the top. Please check back occasionally. Continued use of this website after changes constitutes acceptance of the updated policy.</p>
       </section>
 
       <section>
-        <h2 class="text-xl text-gray-900">10. Contact us</h2>
+        <h2 class="text-xl text-white">10. Contact us</h2>
         <p class="mt-3">Questions about this policy or how we handle your data? Get in touch:</p>
         <ul class="mt-3 space-y-1 text-sm">
-          <li><strong>Email:</strong> <a class="text-[var(--color-primary)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
-          <li><strong>Phone:</strong> <a class="text-[var(--color-primary)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
+          <li><strong>Email:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
+          <li><strong>Phone:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
           <li><strong>Address:</strong> {{ business.address.city }}, {{ business.address.region }}, {{ business.address.postcode }}</li>
         </ul>
       </section>
