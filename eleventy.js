@@ -72,6 +72,12 @@ module.exports = function (eleventyConfig) {
   });
 
   // Handy in footers: {{ "now" | currentYear }} -> 2026
+  // Real engine version for the <meta name="generator"> tag in base.njk.
+  eleventyConfig.addGlobalData(
+    "engineVersion",
+    () => require("./package.json").version,
+  );
+
   eleventyConfig.addFilter("currentYear", () => new Date().getFullYear());
 
   // {{ post.date | readableDate }} -> 15 January 2026
