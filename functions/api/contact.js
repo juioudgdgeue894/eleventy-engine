@@ -30,10 +30,13 @@ const escapeHtml = (value) =>
 
 // Redirect with an explicit Content-Type and a tiny HTML fallback body.
 // Response.redirect() emits a header-only response with no Content-Type;
-// Safari 26 mishandles that shape over HTTP/3 on Cloudflare and downloads a
-// 0-byte file named after the URL instead of following the Location header.
-// A text/html body makes every client either follow the redirect or render
-// the meta-refresh page.
+// if a client ever fails to follow it, browsers save that shape as a
+// 0-byte download named after the URL. The text/html meta-refresh body
+// means the worst case is a visible "Redirecting…" page instead.
+// NOTE: sites deployed as a Worker with static assets must also set
+// assets.run_worker_first: ["/api/*"] in wrangler.jsonc — without it the
+// asset layer answers browser form posts (Sec-Fetch-Mode: navigate) with
+// an empty 405 before this handler ever runs.
 const redirectTo = (origin, path, status) => {
   const url = origin + path;
   const safe = escapeHtml(url);

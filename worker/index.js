@@ -9,6 +9,8 @@
  *
  * The site supplies a `wrangler.jsonc` that sets:
  *   • main = "worker/index.js"
+ *   • assets.run_worker_first = ["/api/*"]  (required: without it the asset layer
+ *     405s browser form posts — Sec-Fetch-Mode: navigate — before this Worker runs)
  *   • assets = { directory: "./_site", binding: "ASSETS", not_found_handling: "404-page" }
  *   • send_email = [{ name: "EMAIL" }]
  *   • vars = { CONTACT_TO, CONTACT_FROM }
