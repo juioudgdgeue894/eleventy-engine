@@ -61,26 +61,79 @@ npm run build     # one-shot production build
 
 ---
 
-## Component library
+## Building pages — bespoke design on the engine chassis
 
-> **Synced from the engine:** `src/components.njk`, `src/_includes/` and the framework pages are
-> **synced from `@jacklamond/eleventy-engine`** on install/build (and are gitignored in the site repo).
-> Do not edit these synced files in a client site — they're overwritten on the next sync. To change a
-> component, edit it in the engine, publish a new version, then bump the engine version in the site's
-> `package.json`. Only `business.json`, `user.css`, `index.njk` and assets are site-owned.
+The engine is the **functional chassis**; each site's visual layer is bespoke. The primary
+workflow is: design the site (e.g. a claude.ai/design handoff), then implement it as
+**site-owned section partials** on top of the engine shell. The engine's old content
+partials (hero, services, work, about, pricing, testimonials, faq, gallery, team, stats,
+statement, cta, newsletter-form, booking-embed, tools-strip) are **deprecated** — they are
+kept only so pinned sites keep building, are no longer maintained, render on no production
+page, and will be removed in v2.0.0. Do not build new pages with them.
 
-Browse all available components at `http://localhost:8080/components/`. Every component has a copyable ID (e.g. `hero-02`, `services-03`).
+**What every site must still inherit from the chassis (never rebuild these):**
 
-**When asked to build or update a page section, you must only use components from this library.** Do not invent new component layouts from scratch — pick the closest match from the library and use or adapt it. If nothing fits, add a new component to `src/components.njk` first, then use it.
+- `layouts/base.njk` — SEO head, JSON-LD, cookie banner, form enhancement script, skip link
+- `header.njk`, `footer.njk` and the other chrome partials (restyle via user.css, don't fork)
+- Contact forms: your own layout, but the fields come from
+  `{% include "partials/contact-fields.njk" %}` inside a `POST /api/contact` form
+  (see *Custom contact forms — the functional contract* below)
+- Framework pages: blog, legal, 404, thanks, sitemap, robots, feed, locations
+- The `{% image %}` shortcode, filters, and the tokens-only styling rule
 
-Each live page section is an include in `src/index.njk`:
+### Site-owned section partials
 
-```njk
-{% include "partials/hero.njk" %}
-{% include "partials/services.njk" %}
+Build each bespoke section as `src/_includes/partials/<prefix>-*.njk` (pick a short site
+prefix, e.g. `jl-`). The sync only overwrites engine-named files, so these survive every
+engine bump. Carve them out of `.gitignore` (order matters):
+
+```
+src/_includes/**
+!src/_includes/partials/
+!src/_includes/partials/<prefix>-*.njk
 ```
 
-To swap a section, replace the HTML in the relevant partial with the chosen component's markup. The partial filename stays the same; only its contents change.
+Compose them in `index.njk`. All copy from `business.json`; all colours/spacing from
+`user.css` tokens — never hardcode content or hex values in templates.
+
+### Re-lighting the synced chrome (light themes)
+
+The synced chrome assumes a dark theme (hardcoded `text-white`, `border-white/10`,
+`text-gray-400`). A light-themed site re-lights it from `user.css` with overrides —
+the standard set:
+
+```css
+header.sticky { background: ... !important; border-bottom-color: var(--color-border) !important; }
+header.sticky .text-white { color: var(--color-heading-text) !important; }
+main .text-white, footer .text-white { color: var(--color-heading-text) !important; }
+main .hover\:text-white:hover { color: var(--color-heading-text) !important; }
+main .group:hover [class*="group-hover:text-white"] { color: var(--color-heading-text) !important; }
+main [class*="border-white"], footer [class*="border-white"] { border-color: var(--color-border) !important; }
+main .text-gray-400, footer .text-gray-400 { color: var(--color-muted, #6f6f6f) !important; }
+```
+
+plus the `--color-menu-*` tokens for the mobile menu and a light `.cd-btn-outline`.
+Reference implementation: `jacklamond.co.uk claude-design/src/css/user.css` (RELIGHT block).
+
+### Bespoke location pages
+
+The synced `locations.njk` renders a neutral, token-styled default (below). To give
+location pages the site's bespoke design instead, disable it with a site-owned
+`src/locations.11tydata.js`:
+
+```js
+module.exports = { eleventyComputed: { permalink: () => false } };
+```
+
+(eleventyComputed outranks the synced front matter), then own the same URLs from a
+site page that paginates `towns` and reuses your `<prefix>-*.njk` partials. Keep
+`eleventyExcludeFromCollections: true` — sitemap.njk already lists every town URL.
+
+### Non-negotiables even when fully bespoke
+
+Sentence-case UI copy; measured WCAG AA contrast on every token pair (define paired
+`--color-on-*` tokens and `--color-error`); ≥24px tap targets; one primary action per
+screen; exactly one `h1` per page; alt text on every image; visible focus states.
 
 ---
 
@@ -88,7 +141,7 @@ To swap a section, replace the HTML in the relevant partial with the chosen comp
 
 When the user asks to "see options" or "show me variations" for a section:
 
-1. Create numbered variant files: `src/_includes/partials/hero-v2.njk`, `hero-v3.njk`, etc.
+1. Create numbered variant files next to your site-owned partials: `src/_includes/partials/<prefix>-hero-v2.njk`, `-v3.njk`, etc.
 2. Create a flat preview page (e.g. `src/hero-variations.njk`) that includes all variants with `permalink: hero-variations.html` and `eleventyExcludeFromCollections: true` in frontmatter.
 3. Present the options at `http://localhost:8080/hero-variations.html`.
 4. Once the user picks one, copy its contents into the canonical partial (`hero.njk`), then delete the variant files and preview page.
