@@ -32,6 +32,9 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
     sizes,
     loading,
     decoding: "async",
+    // Above-the-fold images (loading="eager") are almost always the LCP
+    // element - tell the browser to fetch them at high priority.
+    ...(loading === "eager" ? { fetchpriority: "high" } : {}),
     ...(cls ? { class: cls } : {}),
   });
 }
