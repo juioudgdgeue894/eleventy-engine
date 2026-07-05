@@ -28,6 +28,14 @@
     <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
   </div>
 
+  {# Turnstile (opt-in): renders when business.forms.turnstile_site_key is set.
+     Pair with the TURNSTILE_SECRET_KEY env var on the Pages/Worker project so
+     /api/contact verifies the token — the widget alone blocks nothing. #}
+  {% if business.forms.turnstile_site_key %}
+    <div class="cf-turnstile" data-sitekey="{{ business.forms.turnstile_site_key }}" data-theme="{{ business.forms.turnstile_theme | default("dark") }}"></div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  {% endif %}
+
   <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
 
   <p class="text-xs text-[var(--color-body-text)]">
