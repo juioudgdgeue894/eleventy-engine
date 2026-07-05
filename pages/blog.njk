@@ -19,7 +19,7 @@ eleventyComputed:
         <div class="flex items-center gap-2 text-xs uppercase tracking-wide text-[var(--color-accent-link)]">
           <span>{{ post.templateContent | readingTime }} min read</span>
         </div>
-        <h2 class="mt-3 text-lg font-medium leading-loose text-white group-hover:text-white">{{ post.data.title }}</h2>
+        <h2 class="mt-3 text-lg font-medium leading-snug text-white group-hover:text-white">{{ post.data.title }}</h2>
         <p class="mt-2 flex-1 text-sm leading-relaxed text-[var(--color-body-text)]">{{ post.data.description }}</p>
         <span class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-accent-link)] group-hover:text-white">
           Read article
@@ -28,5 +28,13 @@ eleventyComputed:
       </a>
       {% endfor %}
     </div>
+
+    {# Empty state — a bare heading with nothing under it looks broken #}
+    {% if not collections.posts.length %}
+    <div class="mx-auto mt-14 max-w-md text-center">
+      <p class="text-white">No articles yet.</p>
+      <p class="mt-2 text-sm text-[var(--color-body-text)]">New posts land here first — in the meantime, <a class="underline hover:text-white" href="/#contact">get in touch</a> with any questions.</p>
+    </div>
+    {% endif %}
   </div>
 </section>

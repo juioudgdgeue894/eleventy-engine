@@ -11,7 +11,8 @@
         <nav aria-label="Global" class="hidden md:block">
           <ul class="flex items-center gap-7 text-sm font-medium">
             {% for item in business.nav %}
-            <li><a class="text-[var(--color-body-text)] transition hover:text-white" href="{{ item.href }}">{{ item.label }}</a></li>
+            {# -my offsets the py so the ≥24px tap target adds no visual height #}
+            <li><a class="-my-2 inline-block py-2 text-[var(--color-body-text)] transition hover:text-white" href="{{ item.href }}">{{ item.label }}</a></li>
             {% endfor %}
           </ul>
         </nav>
