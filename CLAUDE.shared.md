@@ -124,6 +124,7 @@ src/
       newsletter-form.njk ← standalone newsletter block (data from business.newsletter.*)
       footer.njk          ← site footer (newsletter, columns, contact, legal disclosure)
       announcement.njk    ← top bar (self-guards on business.announcement.enabled)
+      utility-bar.njk     ← desktop-only top strip: address/email/phone + social icon chips (self-guards on business.utility_bar.enabled; themable via --color-utility-bar / --color-utility-bar-on)
       mobile-cta.njk      ← fixed bottom bar, mobile only
       cookie-banner.njk   ← PECR cookie consent with focus trap (auto-included in base.njk)
       schema.njk          ← JSON-LD structured data (included in base.njk head)
@@ -164,6 +165,7 @@ Several partials self-guard — they render nothing if the relevant data is empt
 - `faq.njk` — hidden when `business.faq` is empty
 - `gallery.njk` — hidden when `business.gallery` is empty
 - `announcement.njk` — hidden when `business.announcement.enabled` is false
+- `utility-bar.njk` — hidden when `business.utility_bar.enabled` is false (desktop-only strip above the header: address, email, phone toggled by `show_address` / `show_email` / `show_phone`; social chips from `business.social` — icons: facebook, instagram, x, tiktok, youtube, linkedin)
 - `booking-embed.njk` — hidden when `business.booking.enabled` is false
 
 You can safely include all of these in `index.njk` unconditionally; just leave the relevant data field empty or false in `business.json` to hide them.
