@@ -39,6 +39,28 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
   });
 }
 
+// {% preload_image "hero.jpg", "100vw" %} — emits a <link rel="preload"> for the
+// page's LCP hero image (same pipeline/widths as {% image %}, WebP entries), so
+// the fetch starts before the render-blocking stylesheet finishes. Pages opt in
+// via frontmatter (see base.njk); sizes must match the {% image %} call.
+async function preloadImageShortcode(src, sizes = "100vw") {
+  const input =
+    [`./src/photos/${src}`, `./src/images/${src}`].find((p) => fs.existsSync(p)) ||
+    `./src/images/${src}`;
+  const meta = await Image(input, {
+    widths: [480, 800, 1200],
+    formats: ["webp", "jpeg"],
+    outputDir: "./_site/images/",
+    urlPath: "/images/",
+    sharpWebpOptions: { quality: 72 },
+    sharpJpegOptions: { quality: 78, mozjpeg: true },
+  });
+  const webp = meta.webp || [];
+  if (!webp.length) return "";
+  const srcset = webp.map((w) => `${w.url} ${w.width}w`).join(", ");
+  return `<link rel="preload" as="image" imagesrcset="${srcset}" imagesizes="${sizes}" fetchpriority="high" />`;
+}
+
 /**
  * Shared Eleventy engine. A consuming site's .eleventy.js is just:
  *   module.exports = require("@jacklamond/eleventy-engine/eleventy");
@@ -52,6 +74,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.setUseGitIgnore(false);
 
   eleventyConfig.addAsyncShortcode("image", imageShortcode);
+  eleventyConfig.addAsyncShortcode("preload_image", preloadImageShortcode);
   // Tailwind CSS is output directly to _site/css/style.css by the css / css:watch scripts.
 
   eleventyConfig.addPassthroughCopy({ "src/fonts": "fonts" });

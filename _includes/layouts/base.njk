@@ -46,6 +46,12 @@
 {% for font in preloadFonts -%}
 <link rel="preload" href="{{ font }}" as="font" type="font/woff2" crossorigin />
 {% endfor -%}
+{#- LCP hero preload: pages with a full-bleed eager hero set `preload_image`
+   (and optionally `preload_image_sizes`) in frontmatter so the image fetch
+   starts before the render-blocking stylesheet finishes. -#}
+{%- if preload_image %}
+{% preload_image preload_image, preload_image_sizes or "100vw" %}
+{%- endif %}
 <link rel="stylesheet" href="/css/style.css" />
 <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ business.business_name }} Blog" />
 
