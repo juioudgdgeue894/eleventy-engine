@@ -373,6 +373,21 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
   `business.json` until the site is migrated to Cloudflare Pages, otherwise the form will
   POST to `/api/contact`, which Netlify won't handle.
 
+**Custom (site-owned) contact forms — the functional contract.** The engine is the single
+source of truth for form *function*; sites own only the *design*. A bespoke form must:
+
+- POST to `/api/contact` (this is also what the base.njk enhancement script keys off);
+- include the shared fields via `{% include "partials/contact-fields.njk" %}` wherever
+  possible — it renders the honeypot, visibly-labelled inputs with autocomplete, the
+  error notice, the Turnstile hook and the guarded submit button, all token-styled so it
+  adapts to the site's theme;
+- if the markup truly must be hand-rolled, it must still contain: the `bot-field`
+  honeypot, **visible** labels (never placeholder-only), `autocomplete` attributes, a
+  `data-cd-form-error` notice element, and a `data-cd-submit` submit button. The
+  base.njk script (shipped on every page) provides the error reveal and double-submit
+  guard either way, and injects a plain fallback notice into any `/api/contact` form
+  that lacks one. Define `--color-error` in `user.css` to colour error text.
+
 The contact form is same-origin (`form-action 'self'` already allows `/api/contact`), so no
 CSP change is needed. For any third-party processor instead, add its domain to
 `Content-Security-Policy` (connect-src) in your host's headers and list it in the Privacy

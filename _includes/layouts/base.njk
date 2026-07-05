@@ -76,6 +76,53 @@
 {% include "partials/cookie-banner.njk" %}
 
 {#
+  ── Contact-form enhancement (engine-owned, site-wide) ───────────────────────
+  Works with ANY form posting to /api/contact (or legacy data-netlify), engine
+  partial or site-owned custom markup:
+  1. reveals [data-cd-form-error] after the handler redirects back with
+     ?error=1 — and injects a plain fallback notice into forms that don't
+     provide one (style it per-site with --color-error, or add your own
+     data-cd-form-error element to control placement and copy);
+  2. disables [data-cd-submit] (or the submit button) once submission starts,
+     swapping its label for feedback — prevents double sends. pageshow resets
+     it when the page is restored from the back/forward cache.
+#}
+<script>
+(function () {
+  var forms = document.querySelectorAll('form[action="/api/contact"], form[data-netlify]');
+  if (!forms.length) return;
+  var hasError = new URLSearchParams(location.search).has("error");
+  forms.forEach(function (f) {
+    var notice = f.querySelector("[data-cd-form-error]");
+    if (!notice) {
+      notice = document.createElement("p");
+      notice.setAttribute("data-cd-form-error", "");
+      notice.setAttribute("role", "alert");
+      notice.hidden = true;
+      notice.style.cssText = "border-left:2px solid var(--color-error,currentColor);padding-left:.75rem;font-size:.875rem;color:var(--color-error,inherit);";
+      notice.textContent = "Something went wrong and your message wasn't sent. Please check your details and try again, or email us directly.";
+      f.insertBefore(notice, f.firstChild);
+    }
+    if (hasError) { notice.hidden = false; notice.classList.remove("hidden"); }
+    f.addEventListener("submit", function () {
+      var b = f.querySelector("[data-cd-submit]") || f.querySelector('button[type="submit"]');
+      if (!b || b.disabled) return;
+      b.dataset.restoreLabel = b.innerHTML;
+      b.textContent = b.dataset.sendingLabel || "Sending…";
+      b.disabled = true;
+    });
+  });
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    document.querySelectorAll("form [data-cd-submit][disabled], form button[type=submit][disabled]").forEach(function (b) {
+      if (b.dataset.restoreLabel) b.innerHTML = b.dataset.restoreLabel;
+      b.disabled = false;
+    });
+  });
+})();
+</script>
+
+{#
   ── Third-party / non-essential scripts ──────────────────────────────────────
   Analytics, pixels, chat widgets, A/B testing tools, and any other non-essential
   scripts MUST check cookie consent before loading. Unconditional loading violates PECR.
