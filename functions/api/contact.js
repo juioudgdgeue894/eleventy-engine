@@ -16,14 +16,50 @@
  *                       catch-all routing into one inbox) dedupe it away.
  *       CONTACT_FROM  — verified sender on an onboarded domain
  *                       (e.g. "Your Site <noreply@yourdomain.com>")
+ *       TURNSTILE_SECRET_KEY — optional; when set, submissions must carry a
+ *                       valid Cloudflare Turnstile token. Pair with
+ *                       business.forms.turnstile_site_key in the site's
+ *                       business.json (renders the widget) — setting the
+ *                       secret without the site key rejects every human.
+ *       CONTACT_ALLOW_LINKS — optional; set to any value to disable the
+ *                       link-spam filter for sites whose customers genuinely
+ *                       paste URLs into enquiries.
  *
  * The sender domain must be onboarded to Cloudflare Email Service and Email
  * Sending requires the Workers Paid plan. See:
  *   https://developers.cloudflare.com/email-service/
  *
- * No-JS friendly: on success it 303-redirects to /thanks/; the honeypot silently
- * accepts and drops bot submissions.
+ * No-JS friendly: on success it 303-redirects to /thanks/; the honeypot and the
+ * link-spam filter silently accept and drop bot submissions.
  */
+
+// Form spam is overwhelmingly link delivery — legit enquiries to a local
+// business almost never contain a URL. Full URLs (with protocol or www.) and
+// protocol-less link-shortener paths both count; either anywhere in the name
+// or message drops the submission.
+const URL_RE = /(?:https?:\/\/|www\.)\S+/i;
+const SHORTENER_RE =
+  /\b(?:tinyurl\.com|bit\.ly|t\.co|goo\.gl|is\.gd|cutt\.ly|rb\.gy|tiny\.cc|shorturl\.at|t\.ly|ow\.ly|buff\.ly|rebrand\.ly)\/\S+/i;
+const containsLink = (value) => URL_RE.test(value) || SHORTENER_RE.test(value);
+
+// Verify a Turnstile token with Cloudflare's siteverify endpoint. Fails open
+// on network errors — a siteverify blip must not cost the client a real lead.
+const turnstilePasses = async (secret, token, remoteip) => {
+  if (!token) return false;
+  try {
+    const resp = await fetch(
+      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+      {
+        method: "POST",
+        body: new URLSearchParams({ secret, response: token, remoteip }),
+      },
+    );
+    const outcome = await resp.json();
+    return outcome.success === true;
+  } catch {
+    return true;
+  }
+};
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (c) => ({
@@ -93,6 +129,25 @@ export async function onRequestPost(context) {
 
   if (!name || !email || !message) {
     return seeOther(errorTarget(contactPage));
+  }
+
+  // Link in the name or message → almost certainly spam. Pretend success like
+  // the honeypot (an error page would just invite retries); log for the
+  // dashboard's real-time logs so drops stay observable.
+  if (!env.CONTACT_ALLOW_LINKS && (containsLink(message) || containsLink(name))) {
+    console.log(`contact: dropped link-spam submission from "${name}" <${email}>`);
+    return seeOther("/thanks/");
+  }
+
+  // Turnstile (only when the site has opted in by configuring the secret).
+  // A missing or invalid token → error redirect, so a human whose challenge
+  // expired can simply resubmit.
+  if (env.TURNSTILE_SECRET_KEY) {
+    const token = (form.get("cf-turnstile-response") || "").toString();
+    const remoteip = request.headers.get("CF-Connecting-IP") || "";
+    if (!(await turnstilePasses(env.TURNSTILE_SECRET_KEY, token, remoteip))) {
+      return seeOther(errorTarget(contactPage));
+    }
   }
 
   const to = env.CONTACT_TO;
