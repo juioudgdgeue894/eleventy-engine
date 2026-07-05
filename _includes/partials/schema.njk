@@ -10,8 +10,17 @@
   "name": {{ business.business_name | dump | safe }},
   "description": {{ business.description | dump | safe }},
   "url": {{ business.seo.site_url | dump | safe }},
-  {% if business.contact.phone %}"telephone": {{ business.contact.phone | dump | safe }},
+  {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
   {% endif %}"email": {{ business.contact.email | dump | safe }},
+  {% if business.contact.phone or business.contact.email %}"contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
+    {% endif %}"email": {{ business.contact.email | dump | safe }},
+    "url": {{ (business.seo.site_url + "/contact/") | dump | safe }}
+  },
+  {% endif %}{% if business.address.map_url %}"hasMap": {{ business.address.map_url | dump | safe }},
+  {% endif %}
   "logo": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
   "image": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
   {% if business.service_areas.enabled and towns and towns.length %}"areaServed": [
