@@ -45,6 +45,9 @@
       </div>
       {%- endif %}
       {% include "partials/credit.njk" %}
+      {# Faint engine-version stamp — diagnostic chrome, hidden from screen
+         readers; lets anyone confirm which engine release a live site runs. #}
+      <p class="mt-3 select-none text-[10px] tracking-widest opacity-40" data-cd-engine aria-hidden="true">engine v{{ engineVersion }}</p>
     </div>
   </div>
 </footer>
