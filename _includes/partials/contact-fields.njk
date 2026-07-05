@@ -1,0 +1,49 @@
+{# ENGINE-OWNED functional core for ANY contact form — the single source of
+   truth for what a form must contain: honeypot, error notice, visibly-labelled
+   fields with autocomplete, optional Turnstile, and a submit button carrying
+   the double-send-guard hooks. The enhancement script lives in base.njk and
+   keys off form[action="/api/contact"] / [data-cd-form-error] / [data-cd-submit],
+   so it works wherever these fields are embedded.
+
+   Styling is token-driven (border/heading/bg/error tokens), so it renders
+   correctly on dark and light themes alike; sites restyle via user.css.
+   Custom site-owned forms should include this instead of hand-copying fields:
+     <form method="POST" action="/api/contact"> {% include "partials/contact-fields.njk" %} </form> #}
+
+{# Honeypot: hidden from real users, bots fill it in → submission discarded #}
+<p class="hidden" aria-hidden="true">
+  <label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+</p>
+
+{# Error state: revealed by the base.njk script after an ?error=1 redirect #}
+<p class="hidden border-l-2 border-[var(--color-error,#f87171)] pl-3 text-sm text-[var(--color-error,#f87171)]" data-cd-form-error role="alert">
+  Something went wrong and your message wasn't sent. Please check your details and try again,
+  or email us directly at <a class="underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>.
+</p>
+
+<div>
+  <label class="mb-1.5 block text-sm font-medium text-[var(--color-heading-text)]" for="name">Full name</label>
+  <input class="w-full rounded-[var(--radius-button)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 text-sm text-[var(--color-heading-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" autocomplete="name" required />
+</div>
+<div>
+  <label class="mb-1.5 block text-sm font-medium text-[var(--color-heading-text)]" for="email">Email address</label>
+  <input class="w-full rounded-[var(--radius-button)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 text-sm text-[var(--color-heading-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" autocomplete="email" required />
+</div>
+<div>
+  <label class="mb-1.5 block text-sm font-medium text-[var(--color-heading-text)]" for="message">Message</label>
+  <textarea class="w-full rounded-[var(--radius-button)] border border-[var(--color-border)] bg-[var(--color-bg)] p-3 text-sm text-[var(--color-heading-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" required></textarea>
+</div>
+
+{# Turnstile (opt-in): renders when business.forms.turnstile_site_key is set.
+   Pair with the TURNSTILE_SECRET_KEY env var on the Pages/Worker project so
+   /api/contact verifies the token — the widget alone blocks nothing. #}
+{% if business.forms.turnstile_site_key %}
+  <div class="cf-turnstile" data-sitekey="{{ business.forms.turnstile_site_key }}" data-theme="{{ business.forms.turnstile_theme | default("dark") }}"></div>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+{% endif %}
+
+<button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit" data-cd-submit data-sending-label="Sending…">Send message</button>
+
+<p class="text-xs text-[var(--color-body-text)]">
+  By sending this message you agree to our <a class="underline" href="/privacy-policy/">Privacy Policy</a>. We will only use your details to respond to your enquiry.
+</p>
