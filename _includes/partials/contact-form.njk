@@ -4,8 +4,10 @@
         enquiry via Cloudflare Email Sending (see functions/api/contact.js).
      • "netlify"    → legacy Netlify Forms markup (data-netlify + hidden
         form-name), for sites not yet migrated to Cloudflare Pages.
-   Labels are sr-only with mirrored placeholders - still WCAG AA (name is
-   programmatically determinable via the associated <label for>). #}
+   Labels are visible and persistent (placeholders are never the only label).
+   The handler redirects back with ?error=1 on validation/Turnstile failure —
+   the notice below (data-cd-form-error) is unhidden by the inline script.
+   The submit button disables itself on submit to prevent double sends. #}
 {% set formProvider = business.forms.provider | default("cloudflare") %}
 
 {# Shared input fields, reused by both handler variants. #}
@@ -15,17 +17,23 @@
     <label>Don't fill this out: <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
   </p>
 
+  {# Error state: shown when /api/contact redirects back with ?error=1 #}
+  <p class="hidden border-l-2 border-red-400 pl-3 text-sm text-red-400" data-cd-form-error role="alert">
+    Something went wrong and your message wasn't sent. Please check your details and try again,
+    or email us directly at <a class="underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>.
+  </p>
+
   <div>
-    <label class="sr-only" for="name">Full name</label>
-    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" placeholder="Name" autocomplete="name" required />
+    <label class="mb-1.5 block text-sm font-medium text-white" for="name">Full name</label>
+    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="text" name="name" id="name" autocomplete="name" required />
   </div>
   <div>
-    <label class="sr-only" for="email">Email address</label>
-    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" placeholder="Email" autocomplete="email" required />
+    <label class="mb-1.5 block text-sm font-medium text-white" for="email">Email address</label>
+    <input class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" type="email" name="email" id="email" autocomplete="email" required />
   </div>
   <div>
-    <label class="sr-only" for="message">Message</label>
-    <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" placeholder="Message" required></textarea>
+    <label class="mb-1.5 block text-sm font-medium text-white" for="message">Message</label>
+    <textarea class="w-full rounded-[var(--radius-button)] border border-white/10 bg-[var(--color-bg)] p-3 text-sm text-white placeholder:text-[var(--color-body-text)] focus:border-[var(--color-accent-link)] focus:outline-none" rows="6" name="message" id="message" required></textarea>
   </div>
 
   {# Turnstile (opt-in): renders when business.forms.turnstile_site_key is set.
@@ -36,7 +44,7 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   {% endif %}
 
-  <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit">Send message</button>
+  <button class="cd-btn cd-btn-primary w-full text-sm sm:w-auto" type="submit" data-cd-submit data-sending-label="Sending…">Send message</button>
 
   <p class="text-xs text-[var(--color-body-text)]">
     By sending this message you agree to our <a class="underline hover:text-white" href="/privacy-policy/">Privacy Policy</a>. We will only use your details to respond to your enquiry.
@@ -77,3 +85,31 @@
 
   </div>
 </section>
+
+{# Progressive enhancement, shared by any form posting to the contact handler:
+   1. reveal the error notice after an ?error=1 redirect back from /api/contact;
+   2. disable the submit button once submission starts (prevents double sends)
+      and swap its label for feedback. pageshow resets it for bfcache restores. #}
+<script>
+(function () {
+  if (new URLSearchParams(location.search).has("error")) {
+    document.querySelectorAll("[data-cd-form-error]").forEach(function (el) { el.classList.remove("hidden"); });
+  }
+  document.querySelectorAll("form[action=\"/api/contact\"], form[data-netlify]").forEach(function (f) {
+    f.addEventListener("submit", function () {
+      var b = f.querySelector("[data-cd-submit], button[type=submit]");
+      if (!b || b.disabled) return;
+      b.dataset.restoreLabel = b.textContent;
+      b.textContent = b.dataset.sendingLabel || "Sending…";
+      b.disabled = true;
+    });
+  });
+  window.addEventListener("pageshow", function (e) {
+    if (!e.persisted) return;
+    document.querySelectorAll("[data-cd-submit][disabled], form button[type=submit][disabled]").forEach(function (b) {
+      if (b.dataset.restoreLabel) b.textContent = b.dataset.restoreLabel;
+      b.disabled = false;
+    });
+  });
+})();
+</script>
