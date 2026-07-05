@@ -7,7 +7,7 @@
 {
   "@context": "https://schema.org",
   "@type": {{ business.seo.schema_type | dump | safe }},
-  "name": {{ business.business_name | dump | safe }},
+  "name": {{ (business.seo.schema_name or business.business_name) | dump | safe }},
   "description": {{ business.description | dump | safe }},
   "url": {{ business.seo.site_url | dump | safe }},
   {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
