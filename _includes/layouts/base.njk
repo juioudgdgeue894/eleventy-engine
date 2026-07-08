@@ -65,13 +65,17 @@
 
 {% include "partials/utility-bar.njk" %}
 {% include "partials/announcement.njk" %}
-{% include "partials/header.njk" %}
+{#- Chrome overrides: business.chrome.header / business.chrome.footer name a
+   site-owned partial (e.g. "partials/mo-header.njk") to replace the engine
+   chrome when CSS restyling isn't enough (mega menus, bespoke mastheads).
+   The override must honour the same functional contract — see CLAUDE.shared.md. -#}
+{% if business.chrome and business.chrome.header %}{% include business.chrome.header %}{% else %}{% include "partials/header.njk" %}{% endif %}
 
 <main id="main-content">
 {{ content | safe }}
 </main>
 
-{% include "partials/footer.njk" %}
+{% if business.chrome and business.chrome.footer %}{% include business.chrome.footer %}{% else %}{% include "partials/footer.njk" %}{% endif %}
 {% include "partials/mobile-cta.njk" %}
 {% include "partials/cookie-banner.njk" %}
 
