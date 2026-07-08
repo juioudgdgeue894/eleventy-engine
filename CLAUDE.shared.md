@@ -117,6 +117,13 @@ menu driven by Flowbite's `data-collapse-toggle`/`aria-controls`/`aria-expanded`
 so it's keyboard-reachable. A bespoke footer must keep the legal links, the
 `data-cd-cookie-settings` trigger, the disclosure block, and the engine-version stamp.
 
+**Gotcha — no async shortcodes in chrome partials.** Chrome overrides render as
+layout-level includes, and an async shortcode (`{% image %}`, `{% preload_image %}`)
+inside a layout-level `{% include %}` makes the whole include render as an empty
+string — silently, with no build error. If the header/footer needs an image (e.g. a
+mega-menu feature card), pre-size the asset into `src/images/` (raw passthrough) and
+use a plain `<img src="/images/…" width height loading="lazy">` instead.
+
 ### Re-lighting the synced chrome (light themes)
 
 The synced chrome assumes a dark theme (hardcoded `text-white`, `border-white/10`,
