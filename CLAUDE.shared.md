@@ -74,7 +74,8 @@ page, and will be removed in v2.0.0. Do not build new pages with them.
 **What every site must still inherit from the chassis (never rebuild these):**
 
 - `layouts/base.njk` — SEO head, JSON-LD, cookie banner, form enhancement script, skip link
-- `header.njk`, `footer.njk` and the other chrome partials (restyle via user.css, don't fork)
+- `header.njk`, `footer.njk` and the other chrome partials (restyle via user.css, don't fork —
+  see *Bespoke chrome* below for when CSS genuinely isn't enough)
 - Contact forms: your own layout, but the fields come from
   `{% include "partials/contact-fields.njk" %}` inside a `POST /api/contact` form
   (see *Custom contact forms — the functional contract* below)
@@ -95,6 +96,26 @@ src/_includes/**
 
 Compose them in `index.njk`. All copy from `business.json`; all colours/spacing from
 `user.css` tokens — never hardcode content or hex values in templates.
+
+### Bespoke chrome (header/footer overrides)
+
+When a design needs different header or footer *markup* — a mega menu, a two-tier
+masthead — CSS restyling isn't enough. Point `business.json → chrome` at site-owned
+partials and `base.njk` includes them instead of the engine chrome:
+
+```json
+"chrome": { "header": "partials/mo-header.njk", "footer": "partials/mo-footer.njk" }
+```
+
+(Either key alone is fine.) The override is a `<prefix>-*.njk` partial like any other,
+so it survives every sync. **The functional contract still applies** — a bespoke header
+must keep: the sticky/landmark semantics (`<header>` + `<nav aria-label>`), a mobile
+menu driven by Flowbite's `data-collapse-toggle`/`aria-controls`/`aria-expanded` on a
+`#mobile-menu` panel (the shared mobile-menu component in `input.css` styles it), the
+`aria-label`led hamburger, ≥24px tap targets, visible focus states, and all copy from
+`business.json`. Any dropdown/mega panel must open on `:focus-within` as well as hover,
+so it's keyboard-reachable. A bespoke footer must keep the legal links, the
+`data-cd-cookie-settings` trigger, the disclosure block, and the engine-version stamp.
 
 ### Re-lighting the synced chrome (light themes)
 
