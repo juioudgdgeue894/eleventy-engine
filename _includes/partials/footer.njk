@@ -9,7 +9,8 @@
       {% for column in business.footer.columns %}
       <div>
         <p class="font-medium text-white">{{ column.heading }}</p>
-        <nav class="mt-4 space-y-2 text-sm">
+        {# aria-label keeps each footer nav landmark unique (axe landmark-unique) #}
+        <nav class="mt-4 space-y-2 text-sm" aria-label="{{ column.heading }}">
           {% for link in column.links %}
           {% if link.href == "#cookies" %}
           <a class="-my-1 block py-1 text-gray-400 hover:text-white" href="#" data-cd-cookie-settings>{{ link.label }}</a>
