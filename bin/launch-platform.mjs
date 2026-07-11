@@ -89,6 +89,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // ═══ CLOUDFLARE ═══════════════════════════════════════════════════════════════
 const CF = "https://api.cloudflare.com/client/v4";
 const cfToken = ENV.CLOUDFLARE_API_TOKEN;
+// Web Analytics (RUM) site creation has NO API-token permission group (only
+// "Account Analytics: Read" exists) — the endpoint accepts the Global API Key.
+// Used exclusively for the rum/* calls below; everything else stays on the token.
+const cfGlobalAuth = ENV.CLOUDFLARE_EMAIL && ENV.CLOUDFLARE_GLOBAL_API_KEY
+  ? { "X-Auth-Email": ENV.CLOUDFLARE_EMAIL, "X-Auth-Key": ENV.CLOUDFLARE_GLOBAL_API_KEY }
+  : null;
 let cfZones = null, cfAccountId = null;
 
 async function cfInit() {
@@ -146,12 +152,15 @@ async function cfWwwRedirect(domain, zone) {
 }
 
 async function cfWebAnalytics(domain, zone) {
-  if (!cfAccountId) return log(domain, "Web Analytics", "fail", "no account id visible to token");
-  const list = await api(`${CF}/accounts/${cfAccountId}/rum/site_info/list?per_page=100`, { token: cfToken });
+  if (!cfGlobalAuth)
+    return log(domain, "Web Analytics", "skip", "needs CLOUDFLARE_EMAIL + CLOUDFLARE_GLOBAL_API_KEY (no token permission exists for RUM site creation) - or add the site once in the dashboard");
+  if (!cfAccountId) return log(domain, "Web Analytics", "fail", "set CLOUDFLARE_ACCOUNT_ID in .env");
+  const auth = { headers: cfGlobalAuth };
+  const list = await api(`${CF}/accounts/${cfAccountId}/rum/site_info/list?per_page=100`, auth);
   const existing = (list.json?.result || []).find((s) => s.ruleset?.zone_name === domain || s.host === domain);
   if (existing) return log(domain, "Web Analytics", "already", `site_tag ${existing.site_tag}`);
   const res = await api(`${CF}/accounts/${cfAccountId}/rum/site_info`, {
-    method: "POST", token: cfToken,
+    ...auth, method: "POST",
     body: { host: domain, zone_tag: zone, auto_install: true },
   });
   log(domain, "Web Analytics", res.json?.success ? "ok" : "fail",
