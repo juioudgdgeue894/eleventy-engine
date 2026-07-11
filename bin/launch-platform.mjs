@@ -292,6 +292,18 @@ async function bingSetup(domain, zone) {
   log(domain, "Bing sitemap submitted", feed.status === 200 ? "ok" : "fail", feed.status === 200 ? "" : JSON.stringify(feed.json).slice(0, 120));
 }
 
+// ═══ INDEXNOW ═══════════════════════════════════════════════════════════════════
+async function indexNowPing(domain) {
+  if (!ENV.INDEXNOW_KEY) return log(domain, "IndexNow ping", "skip", "INDEXNOW_KEY not configured");
+  const { execFileSync } = await import("node:child_process");
+  try {
+    const out = execFileSync(process.execPath, [path.join(engineRoot, "bin", "indexnow-ping.mjs"), domain], { encoding: "utf8" });
+    log(domain, "IndexNow ping", "ok", out.trim().replace(/^✓ /, ""));
+  } catch (e) {
+    log(domain, "IndexNow ping", "fail", (e.stdout || e.stderr || e.message || "").toString().trim().slice(0, 140));
+  }
+}
+
 // ═══ RUN ════════════════════════════════════════════════════════════════════════
 const haveCf = await cfInit();
 for (const domain of domains) {
@@ -306,6 +318,7 @@ for (const domain of domains) {
   }
   await googleSetup(domain, zone);
   await bingSetup(domain, zone);
+  await indexNowPing(domain);
 }
 
 // summary
