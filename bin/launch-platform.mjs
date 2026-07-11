@@ -164,7 +164,9 @@ async function cfWebAnalytics(domain, zone) {
     body: { host: domain, zone_tag: zone, auto_install: true },
   });
   log(domain, "Web Analytics", res.json?.success ? "ok" : "fail",
-    res.json?.success ? `site_tag ${res.json.result?.site_tag} (beacon auto-injected)` : JSON.stringify(res.json?.errors).slice(0, 160));
+    res.json?.success
+      ? `site_tag ${res.json.result?.site_tag} - set business.seo.cf_beacon_token to this (edge auto-injection skips Worker-served HTML; base.njk emits the beacon)`
+      : JSON.stringify(res.json?.errors).slice(0, 160));
 }
 
 // DNS record helpers (used by Google TXT + Bing CNAME verification)
