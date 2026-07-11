@@ -8,8 +8,14 @@ eleventyComputed:
 <section>
   <div class="cd-container cd-section">
     <div class="mx-auto max-w-2xl text-center">
-      <span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">{{ business.blog.eyebrow or "Blog" }}</span>
-      {% if business.blog.heading %}<h1 class="mt-2 text-3xl font-medium text-white sm:text-4xl">{{ business.blog.heading }}</h1>{% endif %}
+      {#- The h1 always renders (every indexable page needs exactly one), falling
+         back to the page title. Colour comes from the site token rather than
+         text-white so the fallback stays legible on light themes; the eyebrow is
+         suppressed when it would just duplicate the h1 text. -#}
+      {%- set _blogH1 = business.blog.heading or business.blog.title or "Blog" -%}
+      {%- set _blogEyebrow = business.blog.eyebrow or "Blog" -%}
+      {% if _blogEyebrow != _blogH1 %}<span class="text-xs font-semibold uppercase tracking-wide text-[var(--color-accent-link)]">{{ _blogEyebrow }}</span>{% endif %}
+      <h1 class="mt-2 text-3xl font-medium text-[var(--color-heading-text,#fff)] sm:text-4xl">{{ _blogH1 }}</h1>
       {% if business.blog.intro %}<p class="mt-4 text-[var(--color-body-text)]">{{ business.blog.intro }}</p>{% endif %}
     </div>
 
