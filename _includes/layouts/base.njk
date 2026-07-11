@@ -144,5 +144,14 @@
   ─────────────────────────────────────────────────────────────────────────────
 #}
 <script src="/js/flowbite.min.js" defer></script>
+{%- if business.seo.cf_beacon_token %}
+{#- Cloudflare Web Analytics — cookieless RUM beacon, so it needs no consent
+   gate (unlike the third-party scripts above). Emitted in markup because
+   Cloudflare's edge auto-injection does not rewrite Worker-served HTML.
+   The site's _headers CSP must allow static.cloudflareinsights.com in
+   script-src and cloudflareinsights.com in connect-src. Token = the RUM
+   site_tag (dashboard → Web Analytics, or bin/launch-platform.mjs output). -#}
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "{{ business.seo.cf_beacon_token }}"}'></script>
+{%- endif %}
 </body>
 </html>
