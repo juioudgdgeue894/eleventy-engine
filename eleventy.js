@@ -73,6 +73,13 @@ module.exports = function (eleventyConfig) {
   // wrongly skip them — disable that so the synced pages are always built.
   eleventyConfig.setUseGitIgnore(false);
 
+  // The synced /components/ page is a dev-time reference sheet (placeholder
+  // imagery, external avatar URLs, no canonical): keep it available under
+  // `--serve` for development, but out of built/deployed output.
+  if (process.env.ELEVENTY_RUN_MODE !== "serve") {
+    eleventyConfig.ignores.add("./src/components.njk");
+  }
+
   eleventyConfig.addAsyncShortcode("image", imageShortcode);
   eleventyConfig.addAsyncShortcode("preload_image", preloadImageShortcode);
   // Tailwind CSS is output directly to _site/css/style.css by the css / css:watch scripts.
