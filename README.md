@@ -78,6 +78,23 @@ released version and overwrites the local preview — just re-run `npm run sync:
 dev server running while you iterate. `sync:all` is for preview; production still uses the
 pinned tag (see *Releasing a new version*).
 
+## Platform setup for a live site (launch:platform)
+
+After a site is deployed (ship-site), one command wires up the platform layer:
+
+```sh
+npm run launch:platform -- newdomain.com     # or --all-sites
+```
+
+Idempotent per domain: Cloudflare Always Use HTTPS + www→apex redirect rule +
+Web Analytics (auto-injected beacon), Google Search Console (DNS-TXT
+verification, co-owner delegation, property + sitemap) and Bing Webmaster
+(add, CNAME verify, sitemap). Credentials live in the gitignored `.env` —
+`.env.example` documents each one and where to get it. Steps with missing
+credentials skip cleanly; re-run any time. Two provider quirks: Web Analytics
+site creation has no API-token permission (needs the Global API Key vars), and
+Bing's CNAME verification can lag DNS by 30+ minutes — just re-run.
+
 ## Notes / gotchas
 
 - **`content` lives in the site's `tailwind.config.js`, not this preset.** Tailwind resolves content
