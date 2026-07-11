@@ -87,13 +87,27 @@ npm run launch:platform -- newdomain.com     # or --all-sites
 ```
 
 Idempotent per domain: Cloudflare Always Use HTTPS + www→apex redirect rule +
-Web Analytics (auto-injected beacon), Google Search Console (DNS-TXT
-verification, co-owner delegation, property + sitemap) and Bing Webmaster
-(add, CNAME verify, sitemap). Credentials live in the gitignored `.env` —
+Web Analytics, Google Search Console (DNS-TXT verification, co-owner
+delegation, property + sitemap), Bing Webmaster (add, CNAME verify, sitemap)
+and an IndexNow ping. Credentials live in the gitignored `.env` —
 `.env.example` documents each one and where to get it. Steps with missing
-credentials skip cleanly; re-run any time. Two provider quirks: Web Analytics
-site creation has no API-token permission (needs the Global API Key vars), and
-Bing's CNAME verification can lag DNS by 30+ minutes — just re-run.
+credentials skip cleanly; re-run any time. Provider quirks: Web Analytics
+site creation has no API-token permission (needs the Global API Key vars);
+its edge beacon auto-injection skips Worker-served HTML (so base.njk emits
+the beacon from `business.seo.cf_beacon_token`); Bing's CNAME verification
+can lag DNS by 30+ minutes — just re-run.
+
+After content deploys (new pages, edited copy) ping IndexNow so Bing and the
+IndexNow-connected AI engines recrawl in minutes:
+
+```sh
+node bin/indexnow-ping.mjs <domain>          # all sitemap URLs
+node bin/indexnow-ping.mjs <domain> <url>…   # just the changed pages
+```
+
+Sites serve the required `/<key>.txt` when `business.seo.indexnow_key` is set
+(same value as `INDEXNOW_KEY` in `.env`). Google ignores IndexNow — it
+follows the submitted sitemap on its own cadence.
 
 ## Notes / gotchas
 
