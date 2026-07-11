@@ -228,10 +228,14 @@ async function googleSetup(domain, zone) {
 
   const owner = ENV.GSC_OWNER_EMAIL;
   if (owner && !(verified.owners || []).includes(owner)) {
-    const upd = await api(`https://www.googleapis.com/siteVerification/v1/webResource/${encodeURIComponent(verified.id)}`, {
+    // Google returns webResource ids already percent-encoded ("dns%3A%2F%2F…");
+    // encoding again double-escapes and the API rejects the site as invalid.
+    const idPath = verified.id.includes("%") ? verified.id : encodeURIComponent(verified.id);
+    const upd = await api(`https://www.googleapis.com/siteVerification/v1/webResource/${idPath}`, {
       method: "PUT", token, body: { id: verified.id, site: verified.site, owners: [...(verified.owners || []), owner] },
     });
-    log(domain, "Search Console co-owner", upd.json?.owners?.includes(owner) ? "ok" : "fail", owner);
+    const coOk = upd.json?.owners?.includes(owner);
+    log(domain, "Search Console co-owner", coOk ? "ok" : "fail", coOk ? owner : `${owner}: ${JSON.stringify(upd.json?.error || upd.json).slice(0, 160)}`);
   }
 
   const prop = `sc-domain:${domain}`;
