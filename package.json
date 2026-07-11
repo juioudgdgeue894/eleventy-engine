@@ -14,7 +14,8 @@
   },
   "scripts": {
     "sync:all": "node bin/sync-all.mjs",
-    "release": "node bin/release.mjs"
+    "release": "node bin/release.mjs",
+    "launch:platform": "node bin/launch-platform.mjs"
   },
   "files": [
     "eleventy.js",
