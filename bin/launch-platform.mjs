@@ -6,6 +6,10 @@
  *   Cloudflare: · Always Use HTTPS on
  *               · www → apex 301 redirect rule (dynamic redirect phase)
  *               · Web Analytics (RUM) site with auto-injected beacon
+ *               · Turnstile widget + site key in business.json; once the live
+ *                 site renders the widget, TURNSTILE_SECRET_KEY on the worker
+ *                 (typically: first run writes the key → deploy → re-run sets
+ *                 the secret)
  *   Google:     · domain ownership verified via DNS TXT (service account)
  *               · you added as co-owner (property shows in YOUR Search Console)
  *               · sc-domain property registered + sitemap submitted
@@ -169,6 +173,114 @@ async function cfWebAnalytics(domain, zone) {
       : JSON.stringify(res.json?.errors).slice(0, 160));
 }
 
+// ═══ TURNSTILE (contact-form spam protection) ═══════════════════════════════════
+// Three halves that must land in the right order: the widget (account API), the
+// site key in business.json (renders the widget), and TURNSTILE_SECRET_KEY on
+// the worker (enforces). The secret is only set once the LIVE site renders the
+// widget — setting it against HTML without the widget rejects every human — so
+// on a first run this step typically ends at "deploy, then re-run".
+function findSiteDir(domain) {
+  const siblings = path.resolve(engineRoot, "..");
+  for (const entry of fs.readdirSync(siblings, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const bj = path.join(siblings, entry.name, "src", "_data", "business.json");
+    if (!fs.existsSync(bj)) continue;
+    try {
+      const url = JSON.parse(fs.readFileSync(bj, "utf8"))?.seo?.site_url;
+      if (url && new URL(url).hostname === domain) return path.join(siblings, entry.name);
+    } catch {}
+  }
+  return null;
+}
+
+async function cfTurnstile(domain, zone) {
+  // Widget creation works with the Global API Key; the scoped token would need
+  // the "Account → Turnstile → Edit" permission group added.
+  if (!cfGlobalAuth)
+    return log(domain, "Turnstile widget", "skip", "needs CLOUDFLARE_EMAIL + CLOUDFLARE_GLOBAL_API_KEY (or add Account → Turnstile → Edit to the token and adapt, or create the widget in the dashboard)");
+  if (!cfAccountId) return log(domain, "Turnstile widget", "fail", "set CLOUDFLARE_ACCOUNT_ID in .env");
+  const auth = { headers: cfGlobalAuth };
+
+  // 1. widget — one per hostname, managed mode (usually invisible to humans)
+  const list = await api(`${CF}/accounts/${cfAccountId}/challenges/widgets?per_page=100`, auth);
+  let widget = (list.json?.result || []).find((w) => (w.domains || []).includes(domain));
+  if (widget) log(domain, "Turnstile widget", "already", `sitekey ${widget.sitekey}`);
+  else {
+    // allow the account's workers.dev too so preview URLs pass the domain check
+    const sub = await api(`${CF}/accounts/${cfAccountId}/workers/subdomain`, auth);
+    const widgetDomains = [domain, ...(sub.json?.result?.subdomain ? [`${sub.json.result.subdomain}.workers.dev`] : [])];
+    const res = await api(`${CF}/accounts/${cfAccountId}/challenges/widgets`, {
+      ...auth, method: "POST",
+      body: { name: domain, domains: widgetDomains, mode: "managed" },
+    });
+    if (!res.json?.success) return log(domain, "Turnstile widget", "fail", JSON.stringify(res.json?.errors).slice(0, 160));
+    widget = res.json.result;
+    log(domain, "Turnstile widget", "ok", `sitekey ${widget.sitekey}`);
+  }
+
+  // 2. site key in business.json (matched sibling site dir; text-level insert
+  //    so the diff stays minimal). Every form POSTing to /api/contact must
+  //    render the widget — the engine partial does; bespoke forms need the
+  //    conditional block from contact-fields.njk.
+  const siteDir = findSiteDir(domain);
+  if (!siteDir)
+    return log(domain, "Turnstile site key", "skip", `no sibling site dir with seo.site_url ${domain} — set business.forms.turnstile_site_key = ${widget.sitekey} and TURNSTILE_SECRET_KEY manually`);
+  const bjPath = path.join(siteDir, "src", "_data", "business.json");
+  const parsed = JSON.parse(fs.readFileSync(bjPath, "utf8"));
+  if (parsed.forms?.turnstile_site_key) {
+    if (parsed.forms.turnstile_site_key !== widget.sitekey)
+      return log(domain, "Turnstile site key", "fail", `business.json has sitekey ${parsed.forms.turnstile_site_key} but the widget for this domain is ${widget.sitekey}`);
+    log(domain, "Turnstile site key", "already");
+  } else {
+    let bj = fs.readFileSync(bjPath, "utf8");
+    bj = /"forms":\s*\{/.test(bj)
+      ? bj.replace(/"forms":\s*\{/, `"forms": {\n    "turnstile_site_key": "${widget.sitekey}",`)
+      : bj.replace(/^(\s*"business_name":.*)$/m, `$1\n  "forms": {\n    "provider": "cloudflare",\n    "turnstile_site_key": "${widget.sitekey}"\n  },`);
+    try { JSON.parse(bj); } catch { return log(domain, "Turnstile site key", "fail", "business.json edit produced invalid JSON — add forms.turnstile_site_key by hand"); }
+    fs.writeFileSync(bjPath, bj);
+    log(domain, "Turnstile site key", "ok", "written to business.json — commit, rebuild + redeploy, then re-run to set the secret");
+  }
+
+  // CSP: the widget script/iframe need challenges.cloudflare.com allowed
+  const headersPath = path.join(siteDir, "src", "_headers");
+  if (fs.existsSync(headersPath)) {
+    const h = fs.readFileSync(headersPath, "utf8");
+    if (/content-security-policy/i.test(h) && !h.includes("challenges.cloudflare.com"))
+      log(domain, "Turnstile CSP", "fail", "src/_headers CSP must allow https://challenges.cloudflare.com in script-src and frame-src");
+  }
+
+  // 3. secret on the worker — only once the live site renders this widget.
+  // wrangler must NOT see the scoped CLOUDFLARE_API_TOKEN from .env (it can't
+  // manage Workers and wrangler prefers the env var over its own OAuth login).
+  const { execFileSync } = await import("node:child_process");
+  const wranglerEnv = { ...process.env };
+  delete wranglerEnv.CLOUDFLARE_API_TOKEN;
+  try {
+    const secrets = execFileSync("npx", ["wrangler", "secret", "list"], { cwd: siteDir, env: wranglerEnv, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    if (secrets.includes("TURNSTILE_SECRET_KEY")) return log(domain, "Turnstile secret", "already");
+  } catch {} // list failing is fine — put below reports its own error
+  let live = "";
+  for (const p of ["/", "/contact/"]) {
+    try { live = await (await fetch(`https://${domain}${p}`)).text(); } catch {}
+    if (live.includes(widget.sitekey)) break;
+  }
+  if (!live.includes(widget.sitekey))
+    return log(domain, "Turnstile secret", "skip", "live site doesn't render the widget yet — deploy the site key first, then re-run (secret without widget rejects every human)");
+  if (!widget.secret) {
+    // the list endpoint omits the secret; the per-widget GET returns it
+    const detail = await api(`${CF}/accounts/${cfAccountId}/challenges/widgets/${widget.sitekey}`, auth);
+    widget.secret = detail.json?.result?.secret;
+  }
+  if (!widget.secret)
+    return log(domain, "Turnstile secret", "skip", "API didn't return the widget secret — copy it from dash → Turnstile and `npx wrangler secret put TURNSTILE_SECRET_KEY` in the site dir");
+  try {
+    execFileSync("npx", ["wrangler", "secret", "put", "TURNSTILE_SECRET_KEY"], { cwd: siteDir, env: wranglerEnv, input: widget.secret, stdio: ["pipe", "pipe", "pipe"] });
+    log(domain, "Turnstile secret", "ok", "set on the worker (takes ~30–60s to propagate)");
+  } catch (e) {
+    log(domain, "Turnstile secret", "fail", (e.stderr || e.message || "").toString().trim().slice(0, 140));
+  }
+}
+
 // DNS record helpers (used by Google TXT + Bing CNAME verification)
 async function cfEnsureRecord(domain, zone, type, name, content) {
   const q = await api(`${CF}/zones/${zone}/dns_records?type=${type}&name=${encodeURIComponent(name)}`, { token: cfToken });
@@ -315,6 +427,7 @@ for (const domain of domains) {
     await cfAlwaysHttps(domain, zone);
     await cfWwwRedirect(domain, zone);
     await cfWebAnalytics(domain, zone);
+    await cfTurnstile(domain, zone);
   }
   await googleSetup(domain, zone);
   await bingSetup(domain, zone);
