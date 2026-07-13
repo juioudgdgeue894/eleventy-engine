@@ -455,6 +455,11 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
     including `partials/contact-fields.njk` must add the widget block from that
     partial by hand, or enforcement breaks them. Verification fails open on
     siteverify network errors so a Cloudflare blip never costs a lead.
+    **Testing rule: ANY Turnstile test that can deliver an email must only ever
+    land at form@jacklamond.co.uk — never the client's inbox.** A test POST that
+    arrives before the secret has propagated (~30–60 s) is delivered to
+    `CONTACT_TO` for real, so temporarily point `CONTACT_TO` at
+    form@jacklamond.co.uk while testing enforcement, then restore it.
 
 - **`"netlify"`** (legacy, for sites still on Netlify) — renders the old Netlify Forms
   markup (`data-netlify`, `data-netlify-honeypot`, hidden `form-name`). Set this in
