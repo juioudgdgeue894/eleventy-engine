@@ -87,15 +87,27 @@ npm run launch:platform -- newdomain.com     # or --all-sites
 ```
 
 Idempotent per domain: Cloudflare Always Use HTTPS + www→apex redirect rule +
-Web Analytics, Google Search Console (DNS-TXT verification, co-owner
-delegation, property + sitemap), Bing Webmaster (add, CNAME verify, sitemap)
-and an IndexNow ping. Credentials live in the gitignored `.env` —
-`.env.example` documents each one and where to get it. Steps with missing
-credentials skip cleanly; re-run any time. Provider quirks: Web Analytics
-site creation has no API-token permission (needs the Global API Key vars);
-its edge beacon auto-injection skips Worker-served HTML (so base.njk emits
-the beacon from `business.seo.cf_beacon_token`); Bing's CNAME verification
-can lag DNS by 30+ minutes — just re-run.
+Web Analytics, a Turnstile widget for the contact form (site key written into
+the site's `business.json`, `TURNSTILE_SECRET_KEY` set on the worker), Google
+Search Console (DNS-TXT verification, co-owner delegation, property +
+sitemap), Bing Webmaster (add, CNAME verify, sitemap) and an IndexNow ping.
+Credentials live in the gitignored `.env` — `.env.example` documents each one
+and where to get it. Steps with missing credentials skip cleanly; re-run any
+time. Provider quirks: Web Analytics site creation has no API-token
+permission and Turnstile widget management isn't in the scoped token either
+(both use the Global API Key vars); the Web Analytics edge beacon
+auto-injection skips Worker-served HTML (so base.njk emits the beacon from
+`business.seo.cf_beacon_token`); Bing's CNAME verification can lag DNS by
+30+ minutes — just re-run.
+
+Turnstile lands in two runs by design: the first writes the site key into
+`business.json` (commit, rebuild, deploy), and the re-run sets the worker
+secret once the live site renders the widget — enforcing the secret against
+HTML without the widget would reject every human. The CSP in the site's
+`src/_headers` must allow `https://challenges.cloudflare.com` in `script-src`
+and `frame-src` (the script flags this). Bespoke forms that POST to
+`/api/contact` without including `partials/contact-fields.njk` need the
+widget block from that partial added by hand.
 
 After content deploys (new pages, edited copy) ping IndexNow so Bing and the
 IndexNow-connected AI engines recrawl in minutes:

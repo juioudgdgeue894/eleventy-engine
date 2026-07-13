@@ -434,8 +434,12 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
     real-time logs as `contact: dropped link-spam…`). Legit enquiries to a local
     business almost never contain links; if a site's customers genuinely do paste
     URLs, set the **`CONTACT_ALLOW_LINKS`** env var to any value to disable it.
-  - **Cloudflare Turnstile** (opt-in, per site) — the strongest layer, free, and
-    usually invisible to humans. To enable on a site:
+  - **Cloudflare Turnstile** (per site; enabled on the whole fleet since July 2026)
+    — the strongest layer, free, and usually invisible to humans. **Preferred setup:
+    `npm run launch:platform -- <domain>`** from the engine repo automates all of it
+    (creates the managed widget, writes the site key into `business.json`, and —
+    once the live site renders the widget — sets the worker secret). Manual steps,
+    for reference or when the script's credentials are missing:
     1. Cloudflare dashboard → Turnstile → create a widget for the site's hostname
        (mode: Managed). Copy the **site key** and **secret key**.
     2. Put the site key in `business.json`: `"forms": { "turnstile_site_key": "0x…" }`
@@ -444,10 +448,13 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
     3. Set **`TURNSTILE_SECRET_KEY`** on the Pages/Worker project (as a **secret**,
        not a plain-text var) — this makes `/api/contact` verify the token.
     Both halves are required together: the widget without the secret blocks nothing,
-    and the secret without the widget rejects every human. If the site sends a
+    and the secret without the widget rejects every human — always deploy the
+    widget-rendering HTML **before** setting the secret. If the site sends a
     `Content-Security-Policy`, allow `https://challenges.cloudflare.com` in
-    `script-src` and `frame-src`. Verification fails open on siteverify network
-    errors so a Cloudflare blip never costs a lead.
+    `script-src` and `frame-src`. Bespoke forms that POST to `/api/contact` without
+    including `partials/contact-fields.njk` must add the widget block from that
+    partial by hand, or enforcement breaks them. Verification fails open on
+    siteverify network errors so a Cloudflare blip never costs a lead.
 
 - **`"netlify"`** (legacy, for sites still on Netlify) — renders the old Netlify Forms
   markup (`data-netlify`, `data-netlify-honeypot`, hidden `form-name`). Set this in
