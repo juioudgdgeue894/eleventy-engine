@@ -29,6 +29,15 @@ eleventyExcludeFromCollections: true
 </section>
 {% endmacro %}
 
+{# Placeholder-safe fallbacks — the library must render on ANY site, including
+   ones whose business.json leaves these arrays empty. Indexed access on an
+   empty array is fine in Nunjucks, but piping the result through a filter
+   (e.g. `| first`) throws, and empty showcases look broken; so every indexed
+   showcase below draws from these instead. #}
+{% set libStat = business.stats[0] if business.stats and business.stats.length else {"value": "10+", "label": "Years of experience"} %}
+{% set libTestimonial = business.testimonials[0] if business.testimonials and business.testimonials.length else {"quote": "A short, specific, believable client quote goes here.", "name": "Client Name", "role": "Role / Company"} %}
+{% set libAboutPara = business.about.paragraphs[0] if business.about and business.about.paragraphs and business.about.paragraphs.length else "About paragraph placeholder - your story, background, and what you do." %}
+
 <div class="sticky top-0 z-20 border-b border-gray-200 bg-white/95 backdrop-blur">
   <div class="mx-auto max-w-5xl px-4 py-4">
     <h1 class="text-lg font-semibold">Component Library</h1>
@@ -190,7 +199,7 @@ eleventyExcludeFromCollections: true
       <div class="cd-container cd-section text-center">
         <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-medium text-gray-600">
           <span class="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]"></span>
-          {{ business.stats[0].value }} {{ business.stats[0].label | lower }}
+          {{ libStat.value }} {{ libStat.label | lower }}
         </span>
         <h1 class="mx-auto mt-6 max-w-3xl text-4xl sm:text-6xl">{{ business.tagline }}</h1>
         <p class="mx-auto mt-4 max-w-xl text-lg text-gray-600">{{ business.description }}</p>
@@ -508,7 +517,7 @@ eleventyExcludeFromCollections: true
         <div class="cd-rounded-img aspect-[4/3] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)]"></div>
         <div>
           <h2 class="text-3xl sm:text-4xl">{{ business.about.heading }}</h2>
-          <p class="mt-4 text-gray-600">{{ business.about.paragraphs[0] }}</p>
+          <p class="mt-4 text-gray-600">{{ libAboutPara }}</p>
           <a class="cd-btn cd-btn-primary mt-8 inline-block text-sm" href="{{ business.about.cta_href }}">{{ business.about.cta_label }}</a>
         </div>
       </div>
@@ -517,7 +526,7 @@ eleventyExcludeFromCollections: true
   {% call card("About", "Quote-led minimal", "about-03", "Oxbow-style") %}
     <section class="bg-gray-50">
       <div class="cd-container cd-section text-center">
-        <p class="mx-auto max-w-2xl text-2xl sm:text-3xl">{{ business.about.paragraphs[0] }}</p>
+        <p class="mx-auto max-w-2xl text-2xl sm:text-3xl">{{ libAboutPara }}</p>
         <a class="cd-btn cd-btn-outline mt-8 inline-block text-sm" href="{{ business.about.cta_href }}">{{ business.about.cta_label }}</a>
       </div>
     </section>
@@ -589,12 +598,12 @@ eleventyExcludeFromCollections: true
     <section class="bg-[var(--color-secondary)]">
       <div class="cd-container cd-section">
         <div class="mx-auto max-w-3xl text-center">
-          <p class="text-2xl text-white sm:text-3xl">&ldquo;{{ business.testimonials[0].quote }}&rdquo;</p>
+          <p class="text-2xl text-white sm:text-3xl">&ldquo;{{ libTestimonial.quote }}&rdquo;</p>
           <div class="mt-6 flex items-center justify-center gap-3">
-            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm text-white">{{ business.testimonials[0].name | first }}</span>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-sm text-white">{{ libTestimonial.name | first }}</span>
             <div class="text-left">
-              <p class="text-sm text-white">{{ business.testimonials[0].name }}</p>
-              <p class="text-xs text-white/60">{{ business.testimonials[0].role }}</p>
+              <p class="text-sm text-white">{{ libTestimonial.name }}</p>
+              <p class="text-xs text-white/60">{{ libTestimonial.role }}</p>
             </div>
           </div>
         </div>
