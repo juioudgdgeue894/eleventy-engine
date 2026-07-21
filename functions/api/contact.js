@@ -24,6 +24,13 @@
  *       CONTACT_ALLOW_LINKS — optional; set to any value to disable the
  *                       link-spam filter for sites whose customers genuinely
  *                       paste URLs into enquiries.
+ *       CONTACT_TEST_SECRET — optional; enables the Jack HQ daily synthetic
+ *                       form check. A request whose X-Contact-Test header
+ *                       matches runs the real pipeline but delivers to
+ *                       CONTACT_TEST_TO (default form@jacklamond.co.uk —
+ *                       NEVER the client) and answers JSON instead of a
+ *                       redirect. See "Synthetic test mode" below.
+ *       CONTACT_TEST_TO — optional; overrides the synthetic-test recipient.
  *
  * The sender domain must be onboarded to Cloudflare Email Service and Email
  * Sending requires the Workers Paid plan. See:
@@ -42,10 +49,10 @@ const SHORTENER_RE =
   /\b(?:tinyurl\.com|bit\.ly|t\.co|goo\.gl|is\.gd|cutt\.ly|rb\.gy|tiny\.cc|shorturl\.at|t\.ly|ow\.ly|buff\.ly|rebrand\.ly)\/\S+/i;
 const containsLink = (value) => URL_RE.test(value) || SHORTENER_RE.test(value);
 
-// Verify a Turnstile token with Cloudflare's siteverify endpoint. Fails open
-// on network errors — a siteverify blip must not cost the client a real lead.
-const turnstilePasses = async (secret, token, remoteip) => {
-  if (!token) return false;
+// Verify a Turnstile token with Cloudflare's siteverify endpoint.
+// Returns "pass" | "fail" | "error" (error = siteverify unreachable).
+const turnstileVerify = async (secret, token, remoteip) => {
+  if (!token) return "fail";
   try {
     const resp = await fetch(
       "https://challenges.cloudflare.com/turnstile/v0/siteverify",
@@ -55,11 +62,32 @@ const turnstilePasses = async (secret, token, remoteip) => {
       },
     );
     const outcome = await resp.json();
-    return outcome.success === true;
+    return outcome.success === true ? "pass" : "fail";
   } catch {
-    return true;
+    return "error";
   }
 };
+
+// ── Synthetic test mode (Jack HQ daily form check) ──────────────────────────
+// The monitor authenticates with the X-Contact-Test header. Test requests run
+// the real pipeline but can never reach the client: delivery is forced to the
+// test recipient and the Turnstile-enforcement probe never sends at all. A GET
+// with the header answers a capability check, so the monitor never POSTs to a
+// site that hasn't deployed test mode (where the POST would be a real enquiry).
+const TEST_FALLBACK_TO = "form@jacklamond.co.uk";
+
+const isTestRequest = (request, env) =>
+  Boolean(env.CONTACT_TEST_SECRET) &&
+  request.headers.get("X-Contact-Test") === env.CONTACT_TEST_SECRET;
+
+const testJson = (body, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"']/g, (c) => ({
@@ -112,10 +140,16 @@ export async function onRequestPost(context) {
   const contactPage = env.CONTACT_PAGE || "/#contact";
   const seeOther = (path) => redirectTo(origin, path, 303);
 
+  const isTest = isTestRequest(request, env);
+  const testMode = isTest
+    ? request.headers.get("X-Contact-Test-Mode") || "delivery"
+    : null;
+
   let form;
   try {
     form = await request.formData();
   } catch {
+    if (isTest) return testJson({ ok: false, error: "unreadable form body" }, 400);
     return seeOther(errorTarget(contactPage));
   }
 
@@ -125,9 +159,13 @@ export async function onRequestPost(context) {
   const honeypot = (form.get("bot-field") || "").toString().trim();
 
   // Honeypot tripped → pretend success, send nothing.
-  if (honeypot) return seeOther("/thanks/");
+  if (honeypot) {
+    if (isTest) return testJson({ ok: false, error: "honeypot tripped" }, 400);
+    return seeOther("/thanks/");
+  }
 
   if (!name || !email || !message) {
+    if (isTest) return testJson({ ok: false, error: "missing fields" }, 400);
     return seeOther(errorTarget(contactPage));
   }
 
@@ -139,20 +177,46 @@ export async function onRequestPost(context) {
     return seeOther("/thanks/");
   }
 
-  // Turnstile (only when the site has opted in by configuring the secret).
-  // A missing or invalid token → error redirect, so a human whose challenge
-  // expired can simply resubmit.
-  if (env.TURNSTILE_SECRET_KEY) {
+  // Turnstile-enforcement probe: verify the (deliberately invalid) token for
+  // real and report the outcome — never sends an email in any branch.
+  // "enforced" (gate rejected it) and "unreachable" (siteverify down; the
+  // handler fails open by design) are healthy; "not-configured" while the page
+  // renders the widget, or "not-enforced", mean the gate is broken.
+  if (isTest && testMode === "turnstile") {
+    if (!env.TURNSTILE_SECRET_KEY) {
+      return testJson({ ok: false, mode: "turnstile", turnstile: "not-configured" });
+    }
     const token = (form.get("cf-turnstile-response") || "").toString();
     const remoteip = request.headers.get("CF-Connecting-IP") || "";
-    if (!(await turnstilePasses(env.TURNSTILE_SECRET_KEY, token, remoteip))) {
+    const outcome = await turnstileVerify(env.TURNSTILE_SECRET_KEY, token, remoteip);
+    if (outcome === "fail") {
+      return testJson({ ok: true, mode: "turnstile", turnstile: "enforced" });
+    }
+    if (outcome === "error") {
+      return testJson({ ok: true, mode: "turnstile", turnstile: "unreachable" });
+    }
+    return testJson({ ok: false, mode: "turnstile", turnstile: "not-enforced" });
+  }
+
+  // Turnstile (only when the site has opted in by configuring the secret).
+  // A missing or invalid token → error redirect, so a human whose challenge
+  // expired can simply resubmit. Fails open on siteverify network errors — a
+  // Cloudflare blip must not cost the client a real lead. Skipped for the
+  // delivery probe: the monitor is a bot by definition; the shared secret is
+  // its authentication instead.
+  if (env.TURNSTILE_SECRET_KEY && !isTest) {
+    const token = (form.get("cf-turnstile-response") || "").toString();
+    const remoteip = request.headers.get("CF-Connecting-IP") || "";
+    if ((await turnstileVerify(env.TURNSTILE_SECRET_KEY, token, remoteip)) === "fail") {
       return seeOther(errorTarget(contactPage));
     }
   }
 
-  const to = env.CONTACT_TO;
+  // Test delivery is forced to the test recipient — never the client.
+  const to = isTest ? env.CONTACT_TEST_TO || TEST_FALLBACK_TO : env.CONTACT_TO;
   const from = env.CONTACT_FROM;
   if (!to || !from) {
+    if (isTest) return testJson({ ok: false, error: "CONTACT_TO / CONTACT_FROM not configured" }, 500);
     return new Response(
       "Contact form is not configured: set CONTACT_TO and CONTACT_FROM.",
       { status: 500, headers: { "Content-Type": "text/plain; charset=utf-8" } },
@@ -167,20 +231,35 @@ export async function onRequestPost(context) {
     `<p><strong>Message:</strong></p>` +
     `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`;
 
+  const hostname = new URL(request.url).hostname;
   try {
     await env.EMAIL.send({
       to,
       from,
       replyTo: { email, name },
-      subject: `New enquiry from ${name}`,
+      subject: isTest
+        ? `[TEST ${hostname}] Synthetic form check`
+        : `New enquiry from ${name}`,
       text,
       html,
     });
   } catch (e) {
+    if (isTest) return testJson({ ok: false, mode: "delivery", error: `send failed: ${e.code || ""} ${e.message || e}` }, 502);
     return new Response(
       `Sorry, your message could not be sent right now. Please email us directly. (${e.code || ""} ${e.message || e})`,
       { status: 502, headers: { "Content-Type": "text/plain; charset=utf-8" } },
     );
+  }
+
+  // Delivery probe done: the send above proved the binding, verified sender
+  // and pipeline. No archive copy for tests — one email per probe is enough.
+  if (isTest) {
+    return testJson({
+      ok: true,
+      mode: "delivery",
+      sent: true,
+      turnstile: env.TURNSTILE_SECRET_KEY ? "skipped" : "not-configured",
+    });
   }
 
   // Best-effort archive copy — its own send (see CONTACT_ARCHIVE note above),
@@ -192,7 +271,7 @@ export async function onRequestPost(context) {
         to: env.CONTACT_ARCHIVE,
         from,
         replyTo: { email, name },
-        subject: `[${new URL(request.url).hostname}] New enquiry from ${name}`,
+        subject: `[${hostname}] New enquiry from ${name}`,
         text,
         html,
       });
@@ -207,8 +286,21 @@ export async function onRequestPost(context) {
 // Anything other than a POST → send people to the contact section/page.
 // Defaults to the home-page contact anchor; sites with a dedicated contact page
 // can override by setting the CONTACT_PAGE var (e.g. "/contact/#contact").
+//
+// Exception: a GET carrying a valid X-Contact-Test header is the monitor's
+// capability check — it proves this deployment supports test mode (and that
+// the secret matches) before any POST is made. Sites on an older engine, or
+// without CONTACT_TEST_SECRET set, answer with the normal redirect, which
+// tells the monitor NOT to probe (a probe POST would land as a real enquiry).
 export async function onRequestGet(context) {
-  const origin = new URL(context.request.url).origin;
-  const target = context.env.CONTACT_PAGE || "/#contact";
+  const { request, env } = context;
+  if (isTestRequest(request, env)) {
+    return testJson({
+      test: true,
+      turnstile: Boolean(env.TURNSTILE_SECRET_KEY),
+    });
+  }
+  const origin = new URL(request.url).origin;
+  const target = env.CONTACT_PAGE || "/#contact";
   return redirectTo(origin, target, 302);
 }

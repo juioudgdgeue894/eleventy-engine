@@ -461,6 +461,26 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
     `CONTACT_TO` for real, so temporarily point `CONTACT_TO` at
     form@jacklamond.co.uk while testing enforcement, then restore it.
 
+  **Synthetic daily form check (Jack HQ monitor).** With the
+  **`CONTACT_TEST_SECRET`** env var set on the Pages/Worker project (same shared
+  secret as the dashboard's `check-forms` function), a request whose
+  `X-Contact-Test` header matches runs `/api/contact` in test mode:
+  - **GET** answers `{"test":true,"turnstile":…}` — the monitor's capability
+    check. Sites without the secret (or on an older engine) answer the normal
+    302, which tells the monitor **not** to probe (its POST would otherwise be
+    delivered to the client as a real enquiry).
+  - **POST** (delivery probe) runs the real pipeline — validation, spam layers,
+    `EMAIL.send` — but skips Turnstile (the monitor is a bot; the secret is its
+    authentication) and delivers to `CONTACT_TEST_TO` (default
+    form@jacklamond.co.uk, **never** the client) with a
+    `[TEST hostname] Synthetic form check` subject. Answers JSON, no redirect.
+  - **POST with `X-Contact-Test-Mode: turnstile`** verifies the deliberately
+    invalid token for real and reports `enforced` / `not-configured` /
+    `not-enforced` / `unreachable` — never sends an email in any branch, so
+    even the fail-open path can't leak a test to the client.
+  Results light up the dashboard's Systems page (green/amber/red per site) and
+  failures land in Open Loops + the alert email.
+
 - **`"netlify"`** (legacy, for sites still on Netlify) — renders the old Netlify Forms
   markup (`data-netlify`, `data-netlify-honeypot`, hidden `form-name`). Set this in
   `business.json` until the site is migrated to Cloudflare Pages, otherwise the form will
