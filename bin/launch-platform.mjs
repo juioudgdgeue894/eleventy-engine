@@ -384,7 +384,13 @@ async function bingSetup(domain, zone) {
   } else log(domain, "Bing site added", "already", existing.IsVerified ? "verified" : "not yet verified");
 
   if (!existing?.IsVerified) {
-    const code = ENV.BING_VERIFICATION_CODE;
+    // Bing's DNS verification code is PER-SITE (Site.DnsVerificationCode from the
+    // API), not account-wide — the static BING_VERIFICATION_CODE env var is only a
+    // fallback and will silently never verify for most sites. Re-fetch after
+    // AddSite so a brand-new site gets its code on the first run.
+    const refreshed = existing || (await api(`${B}/GetUserSites?apikey=${key}`)).json?.d?.find((s) => (s.Url || "").includes(domain));
+    const perSite = (refreshed?.DnsVerificationCode || "").split(".")[0];
+    const code = perSite || ENV.BING_VERIFICATION_CODE;
     if (code && cfToken && zone) {
       const rec = await cfEnsureRecord(domain, zone, "CNAME", `${code}.${domain}`, "verify.bing.com");
       if (rec.startsWith("fail")) return log(domain, "Bing verification CNAME", "fail", rec);
