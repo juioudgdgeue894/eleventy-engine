@@ -2,21 +2,45 @@ const path = require("path");
 const fs = require("fs");
 const Image = require("@11ty/eleventy-img");
 
+// Pages CMS (and some editors) store image fields as "/name.jpg",
+// "src/photos/name.jpg", or a full URL path. The shortcode always wants a
+// bare filename under src/photos or src/images.
+function normalizeImageSrc(src) {
+  if (src == null || src === "") return src;
+  let s = String(src).trim();
+  // Drop query/hash if a URL-ish value sneaks in.
+  s = s.split("?")[0].split("#")[0];
+  // Absolute site paths and repo-relative folders → basename.
+  s = s.replace(/^\/+/, "");
+  s = s.replace(/^(?:src\/)?(?:photos|images)\//i, "");
+  // Any remaining path segments → final filename only.
+  s = s.split("/").filter(Boolean).pop() || s;
+  return s;
+}
+
+function resolveImageInput(src) {
+  const name = normalizeImageSrc(src);
+  // Resolve from src/photos first — that folder is NOT passthrough-copied, so the
+  // full-res originals never ship (only the optimised output below does). Falls
+  // back to src/images for backward compatibility with existing sites.
+  return (
+    [`./src/photos/${name}`, `./src/images/${name}`].find((p) => fs.existsSync(p)) ||
+    `./src/images/${name}`
+  );
+}
+
 // {% image "filename.jpg", "Alt text" %}
 // {% image "filename.jpg", "Alt text", "(min-width:640px) 50vw, 100vw" %}
 // {% image "filename.jpg", "Alt text", "100vw", "cd-rounded-img object-cover" %}
-// Source files must live in src/images/. Outputs WebP + JPEG at 480/800/1200 w.
+// Source files live in src/photos/ (preferred) or src/images/.
+// Outputs WebP + JPEG at 480/800/1200 w.
 // Alt text is required; pass "" for purely decorative images.
+// Accepts bare filenames or Pages CMS paths ("/file.jpg", "src/photos/file.jpg").
 async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "lazy") {
   if (alt === undefined) {
     throw new Error(`{% image %} is missing alt text for: ${src}`);
   }
-  // Resolve from src/photos first — that folder is NOT passthrough-copied, so the
-  // full-res originals never ship (only the optimised output below does). Falls
-  // back to src/images for backward compatibility with existing sites.
-  const input =
-    [`./src/photos/${src}`, `./src/images/${src}`].find((p) => fs.existsSync(p)) ||
-    `./src/images/${src}`;
+  const input = resolveImageInput(src);
   const meta = await Image(input, {
     widths: [480, 800, 1200],
     formats: ["webp", "jpeg"],
@@ -44,9 +68,7 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
 // the fetch starts before the render-blocking stylesheet finishes. Pages opt in
 // via frontmatter (see base.njk); sizes must match the {% image %} call.
 async function preloadImageShortcode(src, sizes = "100vw") {
-  const input =
-    [`./src/photos/${src}`, `./src/images/${src}`].find((p) => fs.existsSync(p)) ||
-    `./src/images/${src}`;
+  const input = resolveImageInput(src);
   const meta = await Image(input, {
     widths: [480, 800, 1200],
     formats: ["webp", "jpeg"],
@@ -82,6 +104,8 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addAsyncShortcode("image", imageShortcode);
   eleventyConfig.addAsyncShortcode("preload_image", preloadImageShortcode);
+  // Bare filename helper for templates that need the path Pages CMS stored.
+  eleventyConfig.addFilter("imageName", normalizeImageSrc);
   // Tailwind CSS is output directly to _site/css/style.css by the css / css:watch scripts.
 
   eleventyConfig.addPassthroughCopy({ "src/fonts": "fonts" });
