@@ -33,23 +33,27 @@ function resolveImageInput(src) {
 // {% image "filename.jpg", "Alt text", "(min-width:640px) 50vw, 100vw" %}
 // {% image "filename.jpg", "Alt text", "100vw", "cd-rounded-img object-cover" %}
 // Source files live in src/photos/ (preferred) or src/images/.
-// Outputs WebP + JPEG at 480/800/1200 w.
+// Outputs WebP + JPEG across phone → retina desktop widths. Cap is 2400 so a
+// full-bleed hero on a 2x 1200 CSS-px display stays sharp; eleventy-img will not
+// upscale past the source pixel width.
 // Alt text is required; pass "" for purely decorative images.
 // Accepts bare filenames or Pages CMS paths ("/file.jpg", "src/photos/file.jpg").
+const IMAGE_WIDTHS = [480, 800, 1200, 1600, 1920, 2400];
+
 async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "lazy") {
   if (alt === undefined) {
     throw new Error(`{% image %} is missing alt text for: ${src}`);
   }
   const input = resolveImageInput(src);
   const meta = await Image(input, {
-    widths: [480, 800, 1200],
+    widths: IMAGE_WIDTHS,
     formats: ["webp", "jpeg"],
     outputDir: "./_site/images/",
     urlPath: "/images/",
-    // Lean, visually-lossless compression. WebP q72 and mozjpeg q78 roughly
-    // halve photo weight versus the sharp defaults with no perceptible loss.
-    sharpWebpOptions: { quality: 72 },
-    sharpJpegOptions: { quality: 78, mozjpeg: true },
+    // Slightly higher than the old q72/q78 pair — heroes at full-bleed were
+    // showing compression mush once we also stopped capping at 1200w.
+    sharpWebpOptions: { quality: 80 },
+    sharpJpegOptions: { quality: 84, mozjpeg: true },
   });
   return Image.generateHTML(meta, {
     alt,
@@ -70,12 +74,12 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
 async function preloadImageShortcode(src, sizes = "100vw") {
   const input = resolveImageInput(src);
   const meta = await Image(input, {
-    widths: [480, 800, 1200],
+    widths: IMAGE_WIDTHS,
     formats: ["webp", "jpeg"],
     outputDir: "./_site/images/",
     urlPath: "/images/",
-    sharpWebpOptions: { quality: 72 },
-    sharpJpegOptions: { quality: 78, mozjpeg: true },
+    sharpWebpOptions: { quality: 80 },
+    sharpJpegOptions: { quality: 84, mozjpeg: true },
   });
   const webp = meta.webp || [];
   if (!webp.length) return "";
