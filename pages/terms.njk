@@ -96,7 +96,7 @@ permalink: terms/index.html
       </section>
 
       <div class="mt-10 cd-rounded-img border border-white/10 bg-[var(--color-secondary)] p-6 text-sm text-[var(--color-body-text)]">
-        <p><strong>Questions about these terms?</strong> Contact us at <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a> or <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>.</p>
+        <p><strong>Questions about these terms?</strong> Contact us at <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>{% if business.contact.phone %} or <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>{% endif %}.</p>
       </div>
 
     </div>
