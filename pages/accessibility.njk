@@ -63,7 +63,9 @@ permalink: accessibility/index.html
         <p class="mt-3">We welcome feedback on the accessibility of this website. If you experience any barriers or difficulty accessing content, please let us know:</p>
         <ul class="mt-3 space-y-1 text-sm">
           <li><strong>Email:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
+          {% if business.contact.phone %}
           <li><strong>Phone:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
+          {% endif %}
         </ul>
         <p class="mt-3">We aim to respond to accessibility feedback within 5 business days and to resolve issues, or provide an alternative, within 30 days.</p>
       </section>
