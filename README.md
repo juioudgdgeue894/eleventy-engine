@@ -95,9 +95,11 @@ Credentials live in the gitignored `.env` — `.env.example` documents each one
 and where to get it. Steps with missing credentials skip cleanly; re-run any
 time. Provider quirks: Web Analytics site creation has no API-token
 permission and Turnstile widget management isn't in the scoped token either
-(both use the Global API Key vars); the Web Analytics edge beacon
-auto-injection skips Worker-served HTML (so base.njk emits the beacon from
-`business.seo.cf_beacon_token`); Bing's CNAME verification can lag DNS by
+(both use the Global API Key vars); Web Analytics is a manual install only:
+the script turns edge auto-injection off and writes the RUM `site_token`
+(never the `site_tag`) to `business.seo.cf_beacon_token`, which base.njk
+emits (a token is accepted only by the endpoint matching its mode, so edge +
+markup beacons together fail with a CORS error); Bing's CNAME verification can lag DNS by
 30+ minutes — just re-run.
 
 Turnstile lands in two runs by design: the first writes the site key into
