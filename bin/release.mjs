@@ -29,9 +29,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteDirs } from "./sites.mjs";
 
 const engineRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const siblingsRoot = path.resolve(engineRoot, "..");
 const pkgPath = path.join(engineRoot, "package.json");
 const pkgName = "@jacklamond/eleventy-engine";
 
@@ -76,11 +76,8 @@ if (next === cur) { console.error(`✗ ${next} is the current version`); process
 // ---- discover consuming sites ----------------------------------------------
 const sites = [];
 if (!opts.engineOnly) {
-  for (const entry of fs.readdirSync(siblingsRoot, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const dir = path.join(siblingsRoot, entry.name);
-    if (dir === engineRoot) continue;
-    if (opts.sites && !opts.sites.includes(entry.name)) continue;
+  for (const { name, dir } of siteDirs()) {
+    if (opts.sites && !opts.sites.includes(name)) continue;
     const sp = path.join(dir, "package.json");
     if (!fs.existsSync(sp)) continue;
     let spkg;
@@ -88,7 +85,7 @@ if (!opts.engineOnly) {
     const field = spkg.dependencies?.[pkgName] ? "dependencies"
       : spkg.devDependencies?.[pkgName] ? "devDependencies" : null;
     if (!field) continue;
-    sites.push({ name: entry.name, dir, sp, field });
+    sites.push({ name, dir, sp, field });
   }
 }
 
