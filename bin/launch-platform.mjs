@@ -5,7 +5,8 @@
  * For each domain it ensures, using provider APIs (no dashboards):
  *   Cloudflare: · Always Use HTTPS on
  *               · www → apex 301 redirect rule (dynamic redirect phase)
- *               · Web Analytics (RUM) site with auto-injected beacon
+ *               · Web Analytics (RUM) site, manual beacon: edge injection off,
+ *                 site_token written to business.json (seo.cf_beacon_token)
  *               · Turnstile widget + site key in business.json; once the live
  *                 site renders the widget, TURNSTILE_SECRET_KEY on the worker
  *                 (typically: first run writes the key → deploy → re-run sets
@@ -17,8 +18,9 @@
  *
  * Usage (from the engine repo):
  *   npm run launch:platform -- <domain> [<domain>…]
- *   npm run launch:platform -- --all-sites     # every sibling site dir with a
+ *   npm run launch:platform -- --all-sites     # every site dir with a
  *                                              # src/_data/business.json site_url
+ *   npm run launch:platform -- <domain> --analytics-only   # Web Analytics step only
  *
  * Credentials come from .env in the engine root (gitignored) or the
  * environment — see .env.example for what each one is and where to get it.
@@ -42,23 +44,39 @@ if (fs.existsSync(envFile)) {
 }
 const ENV = process.env;
 
-// ---- args ---------------------------------------------------------------------
-const argv = process.argv.slice(2);
-let domains = argv.filter((a) => !a.startsWith("--"));
-if (argv.includes("--all-sites")) {
-  const siblings = path.resolve(engineRoot, "..");
-  for (const entry of fs.readdirSync(siblings, { withFileTypes: true })) {
-    const bj = path.join(siblings, entry.name, "src", "_data", "business.json");
-    if (entry.isDirectory() && fs.existsSync(bj)) {
+// ---- site dirs ------------------------------------------------------------------
+// Sites live at 40_Business/{Clients,Own Brands}/<name>/Site/<domain>; the engine
+// sits at 40_Business/Templates/eleventy-engine. Engine siblings are scanned too.
+function listSiteDirs() {
+  const business = path.resolve(engineRoot, "..", "..");
+  const parents = [path.resolve(engineRoot, "..")];
+  for (const group of ["Clients", "Own Brands"]) {
+    const g = path.join(business, group);
+    if (!fs.existsSync(g)) continue;
+    for (const c of fs.readdirSync(g, { withFileTypes: true }))
+      if (c.isDirectory()) parents.push(path.join(g, c.name, "Site"));
+  }
+  const dirs = [];
+  for (const parent of parents) {
+    if (!fs.existsSync(parent)) continue;
+    for (const entry of fs.readdirSync(parent, { withFileTypes: true })) {
+      const dir = path.join(parent, entry.name);
+      if (!entry.isDirectory() || !fs.existsSync(path.join(dir, "src", "_data", "business.json"))) continue;
       try {
-        const url = JSON.parse(fs.readFileSync(bj, "utf8"))?.seo?.site_url;
+        const url = JSON.parse(fs.readFileSync(path.join(dir, "src", "_data", "business.json"), "utf8"))?.seo?.site_url;
         const host = url && new URL(url).hostname;
         // starter/template placeholders aren't real sites
-        if (host && host !== "example.com") domains.push(host);
+        if (host && host !== "example.com") dirs.push({ host, dir });
       } catch {}
     }
   }
+  return dirs;
 }
+
+// ---- args ---------------------------------------------------------------------
+const argv = process.argv.slice(2);
+let domains = argv.filter((a) => !a.startsWith("--"));
+if (argv.includes("--all-sites")) domains.push(...listSiteDirs().map((s) => s.host));
 domains = [...new Set(domains)];
 if (!domains.length) {
   console.error("usage: launch-platform.mjs <domain>… | --all-sites");
@@ -159,18 +177,63 @@ async function cfWebAnalytics(domain, zone) {
   if (!cfGlobalAuth)
     return log(domain, "Web Analytics", "skip", "needs CLOUDFLARE_EMAIL + CLOUDFLARE_GLOBAL_API_KEY (no token permission exists for RUM site creation) - or add the site once in the dashboard");
   if (!cfAccountId) return log(domain, "Web Analytics", "fail", "set CLOUDFLARE_ACCOUNT_ID in .env");
+  // One pattern only: MANUAL install. base.njk emits the beacon with the RUM
+  // site_token (not the site_tag) and it reports to cloudflareinsights.com.
+  // A RUM site's token is accepted at one endpoint only: edge mode
+  // (auto_install) takes it at https://<site>/cdn-cgi/rum, manual mode at
+  // cloudflareinsights.com. Edge injection also skips some visitors (lite
+  // zones skip EU/UK) and doubles up with the markup beacon, so it stays off
+  // (auto_install false AND ruleset disabled — auto_install alone leaves the
+  // edge injecting).
   const auth = { headers: cfGlobalAuth };
   const list = await api(`${CF}/accounts/${cfAccountId}/rum/site_info/list?per_page=100`, auth);
-  const existing = (list.json?.result || []).find((s) => s.ruleset?.zone_name === domain || s.host === domain);
-  if (existing) return log(domain, "Web Analytics", "already", `site_tag ${existing.site_tag}`);
-  const res = await api(`${CF}/accounts/${cfAccountId}/rum/site_info`, {
-    ...auth, method: "POST",
-    body: { host: domain, zone_tag: zone, auto_install: true },
-  });
-  log(domain, "Web Analytics", res.json?.success ? "ok" : "fail",
-    res.json?.success
-      ? `site_tag ${res.json.result?.site_tag} - set business.seo.cf_beacon_token to this (edge auto-injection skips Worker-served HTML; base.njk emits the beacon)`
-      : JSON.stringify(res.json?.errors).slice(0, 160));
+  let site = (list.json?.result || []).find((s) => s.ruleset?.zone_name === domain || s.host === domain);
+  if (!site) {
+    const res = await api(`${CF}/accounts/${cfAccountId}/rum/site_info`, {
+      ...auth, method: "POST",
+      body: { host: domain, zone_tag: zone, auto_install: false },
+    });
+    if (!res.json?.success) return log(domain, "Web Analytics", "fail", JSON.stringify(res.json?.errors).slice(0, 160));
+    site = res.json.result;
+    log(domain, "Web Analytics", "ok", `site_token ${site.site_token}`);
+  } else log(domain, "Web Analytics", "already", `site_token ${site.site_token}`);
+
+  if (site.auto_install || site.ruleset?.enabled) {
+    const res = await api(`${CF}/accounts/${cfAccountId}/rum/site_info/${site.site_tag}`, {
+      ...auth, method: "PUT",
+      body: { zone_tag: zone, auto_install: false, enabled: false },
+    });
+    log(domain, "Web Analytics edge injection off", res.json?.success ? "ok" : "fail",
+      res.json?.success ? "can take a few minutes to stop at the edge" : JSON.stringify(res.json?.errors).slice(0, 160));
+  } else log(domain, "Web Analytics edge injection off", "already");
+
+  // site_token into business.seo.cf_beacon_token (text-level, minimal diff)
+  const siteDir = findSiteDir(domain);
+  if (!siteDir)
+    return log(domain, "Web Analytics token", "skip", `no site dir with seo.site_url ${domain} — set business.seo.cf_beacon_token = ${site.site_token} by hand`);
+  const bjPath = path.join(siteDir, "src", "_data", "business.json");
+  let bj = fs.readFileSync(bjPath, "utf8");
+  const current = JSON.parse(bj).seo?.cf_beacon_token;
+  if (current === site.site_token) log(domain, "Web Analytics token", "already");
+  else {
+    bj = current
+      ? bj.replace(/("cf_beacon_token":\s*)"[^"]*"/, `$1"${site.site_token}"`)
+      : bj.replace(/"seo":\s*\{/, `"seo": {\n    "cf_beacon_token": "${site.site_token}",`);
+    try {
+      if (JSON.parse(bj).seo?.cf_beacon_token !== site.site_token) throw 0;
+    } catch { return log(domain, "Web Analytics token", "fail", `business.json edit failed — set seo.cf_beacon_token = ${site.site_token} by hand`); }
+    fs.writeFileSync(bjPath, bj);
+    log(domain, "Web Analytics token", "ok", `${current ? "replaced" : "written"} in business.json — commit, rebuild + redeploy`);
+  }
+
+  // CSP: beacon script + its POST to cloudflareinsights.com
+  const headersPath = path.join(siteDir, "src", "_headers");
+  if (fs.existsSync(headersPath)) {
+    const csp = (fs.readFileSync(headersPath, "utf8").match(/content-security-policy:(.*)/i) || [])[1] || "";
+    const directive = (name) => (csp.match(new RegExp(`${name}([^;]*)`)) || [])[1] || "";
+    if (csp && (!directive("script-src").includes("static.cloudflareinsights.com") || !/(^|\s)https:\/\/cloudflareinsights\.com/.test(directive("connect-src"))))
+      log(domain, "Web Analytics CSP", "fail", "src/_headers CSP must allow https://static.cloudflareinsights.com in script-src and https://cloudflareinsights.com in connect-src");
+  }
 }
 
 // ═══ TURNSTILE (contact-form spam protection) ═══════════════════════════════════
@@ -180,17 +243,7 @@ async function cfWebAnalytics(domain, zone) {
 // widget — setting it against HTML without the widget rejects every human — so
 // on a first run this step typically ends at "deploy, then re-run".
 function findSiteDir(domain) {
-  const siblings = path.resolve(engineRoot, "..");
-  for (const entry of fs.readdirSync(siblings, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const bj = path.join(siblings, entry.name, "src", "_data", "business.json");
-    if (!fs.existsSync(bj)) continue;
-    try {
-      const url = JSON.parse(fs.readFileSync(bj, "utf8"))?.seo?.site_url;
-      if (url && new URL(url).hostname === domain) return path.join(siblings, entry.name);
-    } catch {}
-  }
-  return null;
+  return listSiteDirs().find((s) => s.host === domain)?.dir || null;
 }
 
 async function cfTurnstile(domain, zone) {
@@ -429,6 +482,7 @@ for (const domain of domains) {
   const zone = haveCf ? cfZones.get(domain) : null;
   if (haveCf && !zone) { log(domain, "Cloudflare zone", "fail", "domain not in this account"); }
   if (!haveCf) log(domain, "Cloudflare (HTTPS, redirect, analytics)", "skip", "CLOUDFLARE_API_TOKEN not configured");
+  if (argv.includes("--analytics-only")) { if (zone) await cfWebAnalytics(domain, zone); continue; }
   if (zone) {
     await cfAlwaysHttps(domain, zone);
     await cfWwwRedirect(domain, zone);
