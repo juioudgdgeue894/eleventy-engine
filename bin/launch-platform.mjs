@@ -31,6 +31,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { siteDirs } from "./sites.mjs";
 
 const engineRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -45,30 +46,19 @@ if (fs.existsSync(envFile)) {
 const ENV = process.env;
 
 // ---- site dirs ------------------------------------------------------------------
-// Sites live at 40_Business/{Clients,Own Brands}/<name>/Site/<domain>; the engine
-// sits at 40_Business/Templates/eleventy-engine. Engine siblings are scanned too.
+// Live sites: every fleet site dir (bin/sites.mjs) whose business.json has a
+// real seo.site_url.
 function listSiteDirs() {
-  const business = path.resolve(engineRoot, "..", "..");
-  const parents = [path.resolve(engineRoot, "..")];
-  for (const group of ["Clients", "Own Brands"]) {
-    const g = path.join(business, group);
-    if (!fs.existsSync(g)) continue;
-    for (const c of fs.readdirSync(g, { withFileTypes: true }))
-      if (c.isDirectory()) parents.push(path.join(g, c.name, "Site"));
-  }
   const dirs = [];
-  for (const parent of parents) {
-    if (!fs.existsSync(parent)) continue;
-    for (const entry of fs.readdirSync(parent, { withFileTypes: true })) {
-      const dir = path.join(parent, entry.name);
-      if (!entry.isDirectory() || !fs.existsSync(path.join(dir, "src", "_data", "business.json"))) continue;
-      try {
-        const url = JSON.parse(fs.readFileSync(path.join(dir, "src", "_data", "business.json"), "utf8"))?.seo?.site_url;
-        const host = url && new URL(url).hostname;
-        // starter/template placeholders aren't real sites
-        if (host && host !== "example.com") dirs.push({ host, dir });
-      } catch {}
-    }
+  for (const { dir } of siteDirs()) {
+    const bj = path.join(dir, "src", "_data", "business.json");
+    if (!fs.existsSync(bj)) continue;
+    try {
+      const url = JSON.parse(fs.readFileSync(bj, "utf8"))?.seo?.site_url;
+      const host = url && new URL(url).hostname;
+      // starter/template placeholders aren't real sites
+      if (host && host !== "example.com") dirs.push({ host, dir });
+    } catch {}
   }
   return dirs;
 }

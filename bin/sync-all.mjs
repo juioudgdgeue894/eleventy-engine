@@ -23,20 +23,17 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteDirs } from "./sites.mjs";
 
 const engineRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const siblingsRoot = path.resolve(engineRoot, "..");
 const syncBin = path.join(engineRoot, "bin", "sync.mjs");
 const pkgName = "@jacklamond/eleventy-engine";
 
 const only = process.argv.slice(2); // optional: limit to named dirs, e.g. `sync:all ivylounge.uk`
 
 let synced = 0;
-for (const entry of fs.readdirSync(siblingsRoot, { withFileTypes: true })) {
-  if (!entry.isDirectory()) continue;
-  const dir = path.join(siblingsRoot, entry.name);
-  if (dir === engineRoot) continue;
-  if (only.length && !only.includes(entry.name)) continue;
+for (const { name, dir } of siteDirs()) {
+  if (only.length && !only.includes(name)) continue;
 
   const pkgPath = path.join(dir, "package.json");
   if (!fs.existsSync(pkgPath)) continue;
@@ -46,10 +43,10 @@ for (const entry of fs.readdirSync(siblingsRoot, { withFileTypes: true })) {
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   if (!deps[pkgName]) continue;
 
-  process.stdout.write(`→ ${entry.name}\n`);
+  process.stdout.write(`→ ${name}\n`);
   execFileSync(process.execPath, [syncBin], { cwd: dir, stdio: "inherit" });
   synced++;
 }
 
 console.log(`\n[sync:all] pushed local engine (${JSON.parse(fs.readFileSync(path.join(engineRoot, "package.json"), "utf8")).version}) into ${synced} site(s).`);
-if (!synced) console.log("[sync:all] no consuming sites found next to the engine.");
+if (!synced) console.log("[sync:all] no consuming sites found under Clients/, Own Brands/ or Templates/.");
