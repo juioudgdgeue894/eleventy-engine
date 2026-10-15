@@ -39,7 +39,7 @@
       <p>&copy; {{ "now" | currentYear }} {{ business.business_name }}. All rights reserved.</p>
       {%- if business.legal and (business.legal.company_number or business.legal.place_of_registration or business.legal.vat_number or business.legal.ico_number) %}
       <div class="mt-2 space-y-0.5">
-        {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
+        {% if business.legal.company_number or business.legal.place_of_registration %}<p>{{ business.legal.registered_name or business.business_name }}{% if business.legal.place_of_registration %} registered in {{ business.legal.place_of_registration }}{% endif %}{% if business.legal.company_number %} (Co.&nbsp;{{ business.legal.company_number }}){% endif %}.</p>{% endif %}
         {% if not business.legal.registered_address_same and business.legal.registered_address and business.legal.registered_address.line1 %}<p>Registered office: {{ business.legal.registered_address.line1 }}, {{ business.legal.registered_address.city }}, {{ business.legal.registered_address.postcode }}.</p>{% endif %}
         {% if business.legal.vat_number %}<p>VAT {{ business.legal.vat_number }}.</p>{% endif %}
         {% if business.legal.ico_number %}<p>ICO {{ business.legal.ico_number }}.</p>{% endif %}

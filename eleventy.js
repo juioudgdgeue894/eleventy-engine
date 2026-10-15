@@ -99,6 +99,24 @@ module.exports = function (eleventyConfig) {
   // wrongly skip them — disable that so the synced pages are always built.
   eleventyConfig.setUseGitIgnore(false);
 
+  // Jottacloud sync leaves "<name>(Jack's conflicted copy <date>).<ext>" files
+  // beside the originals. Never build them, and clear any that landed in the
+  // output folder (where a deploy would publish them as duplicate pages).
+  eleventyConfig.ignores.add("**/*conflicted copy*");
+  eleventyConfig.on("eleventy.before", ({ directories, dir }) => {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const walk = (d) => {
+      if (!fs.existsSync(d)) return;
+      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, e.name);
+        if (e.name.includes("conflicted copy")) fs.rmSync(p, { recursive: true, force: true });
+        else if (e.isDirectory()) walk(p);
+      }
+    };
+    walk((directories && directories.output) || (dir && dir.output) || "_site");
+  });
+
   // The synced /components/ page is a dev-time reference sheet (placeholder
   // imagery, external avatar URLs, no canonical): keep it available under
   // `--serve` for development, but out of built/deployed output.

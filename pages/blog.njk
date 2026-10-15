@@ -2,8 +2,8 @@
 layout: layouts/base.njk
 permalink: blog/index.html
 eleventyComputed:
-  title: "{{ business.blog.title or (business.blog.heading or 'Blog') }}"
-  description: "{{ business.blog.description or business.blog.intro }}"
+  title: "{{ (business.blog.title or (business.blog.heading or 'Blog')) | safe }}"
+  description: "{{ (business.blog.description or business.blog.intro) | safe }}"
 ---
 <section>
   <div class="cd-container cd-section">
