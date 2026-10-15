@@ -1,9 +1,9 @@
 # 11ty Client Site — Shared Conventions
 
 Shared operating rules for every Eleventy client site built from the master template. This file
-is the single source of truth for these conventions — it lives in
-`~/Developer/Claude/11ty-components/` and each project pulls it in with an `@import` line in its
-own `CLAUDE.md`. Edit it here once and every linked project gets the update.
+is the single source of truth for these conventions — it lives in the engine repo
+(`~/Jottacloud/40_Business/Templates/eleventy-engine/`), is synced to each site's `.engine/` folder on
+install, and each project pulls it in with an `@import` line in its own `CLAUDE.md`. Edit it here once and every linked project gets the update.
 
 ---
 
@@ -54,10 +54,17 @@ npm run build     # one-shot production build
 
 **`legal` object** — full list of fields:
 - `company_number`, `vat_number`, `ico_number`, `place_of_registration` — Companies Act / GDPR mandatory disclosures
+- `registered_name` — the registered company name for the footer disclosure (e.g. "Mòrachd Ltd"); falls back to `business_name`
 - `registered_address_same` / `registered_address` — set `false` + fill address if different from trading address
 - `accessibility_reviewed` — ISO date, used in Accessibility Statement (update annually)
 - `privacy_updated` — ISO date, shown in Privacy Policy "Last updated" line
 - `terms_updated` — ISO date, shown in Terms "Last updated" line
+
+**`contact.page`** — path of the contact page (default `/contact/`), used as `contactPoint.url` in the LocalBusiness JSON-LD. Set it when the site's contact page lives elsewhere (e.g. `/contact-us/`, `/#contact`).
+
+Optional schema fields (`address.line1`, `address.postcode`, `contact.email`, `seo.price_range`, `description`) can be left out: the JSON-LD falls back to empty strings instead of breaking.
+
+Build output: Jottacloud conflict copies (`*conflicted copy*`) are never built and are cleared from `_site` before every build.
 
 ---
 

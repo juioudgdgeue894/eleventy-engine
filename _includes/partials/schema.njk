@@ -2,22 +2,24 @@
    business.faq has entries - that's a free shot at FAQ rich snippets in
    Google since the data already exists for the on-page accordion.
    Every value goes through the `dump` filter (JSON.stringify) rather than
-   manual quoting, so apostrophes/quotes in client data can't break the JSON. -#}
+   manual quoting, so apostrophes/quotes in client data can't break the JSON.
+   Optional strings fall back to "" (`or ""`): `dump` of an undefined value
+   renders nothing, which would make the whole block invalid JSON. -#}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": {{ business.seo.schema_type | dump | safe }},
   "name": {{ (business.seo.schema_name or business.business_name) | dump | safe }},
-  "description": {{ business.description | dump | safe }},
+  "description": {{ (business.description or "") | dump | safe }},
   "url": {{ business.seo.site_url | dump | safe }},
   {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
-  {% endif %}"email": {{ business.contact.email | dump | safe }},
+  {% endif %}"email": {{ (business.contact.email or "") | dump | safe }},
   {% if business.contact.phone or business.contact.email %}"contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",
     {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
-    {% endif %}"email": {{ business.contact.email | dump | safe }},
-    "url": {{ (business.seo.site_url + "/contact/") | dump | safe }}
+    {% endif %}"email": {{ (business.contact.email or "") | dump | safe }},
+    "url": {{ (business.seo.site_url + (business.contact.page or "/contact/")) | dump | safe }}
   },
   {% endif %}{% if business.address.map_url %}"hasMap": {{ business.address.map_url | dump | safe }},
   {% endif %}
@@ -27,13 +29,13 @@
     {% for town in towns %}{{ town.name | dump | safe }}{% if not loop.last %}, {% endif %}{% endfor %}
   ],
   {% endif %}
-  "priceRange": {{ business.seo.price_range | dump | safe }},
+  "priceRange": {{ (business.seo.price_range or "") | dump | safe }},
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": {{ business.address.line1 | dump | safe }},
-    "addressLocality": {{ business.address.city | dump | safe }},
-    "addressRegion": {{ business.address.region | dump | safe }},
-    "postalCode": {{ business.address.postcode | dump | safe }},
+    "streetAddress": {{ (business.address.line1 or "") | dump | safe }},
+    "addressLocality": {{ (business.address.city or "") | dump | safe }},
+    "addressRegion": {{ (business.address.region or "") | dump | safe }},
+    "postalCode": {{ (business.address.postcode or "") | dump | safe }},
     "addressCountry": "GB"
   }{% if business.seo.geo %},
   "geo": {

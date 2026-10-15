@@ -14,8 +14,8 @@ layout: layouts/base.njk
 permalink: "/{{ business.service_areas.slug_prefix }}{{ town.slug }}/"
 eleventyExcludeFromCollections: true
 eleventyComputed:
-  title: "{{ town.title or (business.business_name + ' in ' + town.name) }}"
-  description: "{{ town.meta or town.intro }}"
+  title: "{{ (town.title or (business.business_name + ' in ' + town.name)) | safe }}"
+  description: "{{ (town.meta or town.intro) | safe }}"
 ---
 {# LOCATION HERO — area-specific headline + intro, data-driven from towns.json #}
 <section class="border-b border-[var(--color-border)]">
