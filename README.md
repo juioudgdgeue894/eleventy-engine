@@ -21,8 +21,8 @@ A client site depends on this package and runs `eleventy-engine-sync` on `postin
 (see the `eleventy-client-starter`). The sync copies layouts, partials, framework pages, the CSS
 mechanism file and the shared Claude rules into the site's `src/` (and `.engine/`). Those copies are
 **gitignored** in the site repo — so the site only ever commits its own content, and always rebuilds
-against the engine version pinned in its `package.json`. The same sync runs in CI (Netlify), so
-deploys are self-contained.
+against the engine version pinned in its `package.json`. The same sync runs on every build
+(local `npm run deploy:production` or the deploy workflow), so deploys are self-contained.
 
 **Site-owned (the only things that change per client):** `business.json`, `towns.json`, `user.css`,
 `index.njk` + custom pages, `images/`, `fonts/`, `posts/`.

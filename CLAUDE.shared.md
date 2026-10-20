@@ -227,7 +227,7 @@ src/
   posts/                  ← markdown blog posts
   index.njk               ← homepage
   blog.njk                ← blog listing
-  404.njk                 ← branded 404 page (served automatically by Netlify/Vercel)
+  404.njk                 ← branded 404 page (served by the Worker's `not_found_handling: "404-page"`)
   feed.njk                ← Atom RSS feed at /feed.xml
   components.njk          ← component library (synced from the engine; internal, noindex)
   sitemap.njk             ← sitemap.xml
@@ -347,12 +347,12 @@ Business data:
 Forms:
 - [ ] Set `action` in `contact-form.njk` (Netlify Forms: no action needed; Formspree: use your endpoint URL)
 - [ ] Test form submission end to end
-- [ ] If using a third-party form processor, add their domain to CSP in `netlify.toml` / `vercel.json` and list them in the Privacy Policy data table
+- [ ] If using a third-party form processor, add their domain to the CSP in `src/_headers` and list them in the Privacy Policy data table
 
 Compliance:
 - [ ] Privacy Policy cookie table updated if analytics were added
-- [ ] CSP in `netlify.toml` / `vercel.json` updated if third-party scripts were added
-- [ ] Confirm `Strict-Transport-Security` header is in both `netlify.toml` and `vercel.json` (already set; verify after deployment)
+- [ ] CSP in `src/_headers` updated if third-party scripts were added
+- [ ] Confirm `Strict-Transport-Security` is in `src/_headers` (verify on the live site after deployment)
 
 Quality:
 - [ ] Run Lighthouse in Chrome DevTools: aim for 90+ on Performance, Accessibility, Best Practices, SEO
@@ -380,7 +380,7 @@ A comment block in `base.njk` (just above the Flowbite script tag) shows the req
 
 1. Wrap the snippet: `if (localStorage.getItem('cd-cookie-consent') === 'all') { /* snippet */ }`
 2. Update the cookie table in `src/privacy-policy.njk` to list the new cookies.
-3. Add any new external domains to the `Content-Security-Policy` in both `netlify.toml` and `vercel.json`. Examples:
+3. Add any new external domains to the `Content-Security-Policy` in `src/_headers`. Examples:
    - Google Analytics 4: add `https://www.googletagmanager.com https://www.google-analytics.com` to `script-src` and `connect-src`
    - Hotjar: add `https://static.hotjar.com https://script.hotjar.com` to `script-src`, and `https://*.hotjar.com` to `connect-src` and `frame-src`
    - Crisp chat: add `https://client.crisp.chat` to `script-src` and `connect-src`
@@ -535,7 +535,7 @@ Cloudflare Email Service** (`CONTACT_FROM` must be on that domain).
 
 ### 404 page
 
-`src/404.njk` generates `_site/404.html`. Netlify and Vercel both serve this file automatically for unmatched routes — no extra config required.
+`src/404.njk` generates `_site/404.html`. The Worker serves it for unmatched routes through `"not_found_handling": "404-page"` in `wrangler.jsonc` / `wrangler.production.jsonc`.
 
 ### RSS / Atom feed
 
@@ -546,7 +546,7 @@ Cloudflare Email Service** (`CONTACT_FROM` must be on that domain).
 Post bodies render inside `class="prose"` in `post.njk`. Prose styles are hand-rolled in `user.css` (`.prose { ... }`) using design tokens, so they pick up the client's colours and radii automatically. No `@tailwindcss/typography` dependency required.
 
 ### Security headers
-`netlify.toml` and `vercel.json` at the project root set security headers for every response:
+`src/_headers` (copied to `_site/_headers`, read by Cloudflare's static assets) sets security headers for every response. Any `netlify.toml` / `vercel.json` left in an older site is not used on Cloudflare:
 - `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` — enforces HTTPS; note that HSTS only works over HTTPS, so it's a no-op until the domain is live with SSL
 - `X-Frame-Options: SAMEORIGIN` — prevents clickjacking
 - `X-Content-Type-Options: nosniff` — prevents MIME-sniffing
