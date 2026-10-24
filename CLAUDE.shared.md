@@ -68,6 +68,32 @@ Build output: Jottacloud conflict copies (`*conflicted copy*`) are never built a
 
 ---
 
+## Site-owned files (the only files a site edits)
+
+Everything else in a site is synced from the engine on `npm install` and gitignored. This list
+is the one copy: site `CLAUDE.md` files and the `new-site` skill point here.
+
+- `src/_data/business.json` - all content (SEO block, geo, legal, forms, `contact.page` if the
+  contact page isn't `/contact/`, `legal.registered_name` for a Ltd company)
+- `src/_data/towns.json` - service-area data driving the `/[town]/` pages
+- `src/css/user.css` - design tokens + any chrome re-light overrides
+- `src/index.njk` - homepage composition
+- `src/_includes/partials/<prefix>-*.njk` (and `src/_includes/layouts/<prefix>-*.njk`) - bespoke
+  partials, carved out of `.gitignore` (see *Site-owned section partials* below); the sync never
+  touches them
+- custom pages under `src/`, site `*.11tydata.js` switches, `src/_headers`, `src/_redirects`
+- `src/images/` (raw-referenced assets), `src/photos/` (sources for `{% image %}`), `src/fonts/`
+  (self-hosted; update `business.seo.preload_fonts`), `src/posts/`
+- `wrangler.jsonc` (the preview Worker, no custom domains) and `wrangler.production.jsonc`
+  (production: routes + the `cf-build-gate` build command) - Worker names, `EMAIL` binding,
+  contact vars
+
+**Never edit synced files** (the engine's files in `src/_includes/`, `src/components.njk`,
+framework pages, `worker/`, `functions/`, `.engine/`). They are overwritten on every sync. To
+change shared markup, SEO or JS, change the engine and release a new version.
+
+---
+
 ## Building pages — bespoke design on the engine chassis
 
 The engine is the **functional chassis**; each site's visual layer is bespoke. The primary
@@ -119,7 +145,7 @@ so it survives every sync. **The functional contract still applies** — a bespo
 must keep: the sticky/landmark semantics (`<header>` + `<nav aria-label>`), a mobile
 menu driven by Flowbite's `data-collapse-toggle`/`aria-controls`/`aria-expanded` on a
 `#mobile-menu` panel (the shared mobile-menu component in `input.css` styles it), the
-`aria-label`led hamburger, ≥24px tap targets, visible focus states, and all copy from
+`aria-label`led hamburger, 44×44px tap targets, visible focus states, and all copy from
 `business.json`. Any dropdown/mega panel must open on `:focus-within` as well as hover,
 so it's keyboard-reachable. A bespoke footer must keep the legal links, the
 `data-cd-cookie-settings` trigger, the disclosure block, and the engine-version stamp.
@@ -148,7 +174,9 @@ main .text-gray-400, footer .text-gray-400 { color: var(--color-muted, #6f6f6f) 
 ```
 
 plus the `--color-menu-*` tokens for the mobile menu and a light `.cd-btn-outline`.
-Reference implementation: `jacklamond.co.uk claude-design/src/css/user.css` (RELIGHT block).
+These re-light overrides are the one allowed use of `!important` (`/sweep` knows this).
+Reference implementation: `~/Jottacloud/40_Business/Clients/At Home Hearing/Site/athomehearing.co.uk/src/css/user.css`
+(RELIGHT block).
 
 ### Bespoke location pages
 
@@ -167,19 +195,20 @@ site page that paginates `towns` and reuses your `<prefix>-*.njk` partials. Keep
 ### Non-negotiables even when fully bespoke
 
 Sentence-case UI copy; measured WCAG AA contrast on every token pair (define paired
-`--color-on-*` tokens and `--color-error`); ≥24px tap targets; one primary action per
+`--color-on-*` tokens and `--color-error`); 44×44px tap targets (24px is the WCAG floor, for
+inline text links only); one primary action per
 screen; exactly one `h1` per page; alt text on every image; visible focus states.
 
 ---
 
 ## Variation workflow
 
-When the user asks to "see options" or "show me variations" for a section:
+When the user asks to "see options" or "show me variations" for a section (Jack picks by letter and may mix):
 
-1. Create numbered variant files next to your site-owned partials: `src/_includes/partials/<prefix>-hero-v2.njk`, `-v3.njk`, etc.
-2. Create a flat preview page (e.g. `src/hero-variations.njk`) that includes all variants with `permalink: hero-variations.html` and `eleventyExcludeFromCollections: true` in frontmatter.
-3. Present the options at `http://localhost:8080/hero-variations.html`.
-4. Once the user picks one, copy its contents into the canonical partial (`hero.njk`), then delete the variant files and preview page.
+1. Create lettered variant files next to your site-owned partials: `src/_includes/partials/<prefix>-hero-a.njk`, `-b.njk`, `-c.njk`, etc.
+2. Create a flat preview page (e.g. `src/hero-variations.njk`) that includes all variants, labelled A, B, C, with `permalink: hero-variations.html` and `eleventyExcludeFromCollections: true` in frontmatter.
+3. Present the options at `http://localhost:8080/hero-variations.html` (or a `client-preview` link for a client).
+4. Once the user picks one (or a mix), put it into the site-owned partial (`<prefix>-hero.njk`), then delete the variant files and preview page.
 
 ---
 
@@ -194,7 +223,8 @@ src/
       base.njk            ← full site shell (head, SEO, schema, header, footer)
       bare.njk            ← minimal shell for internal tool pages (no nav/footer)
       post.njk            ← blog post layout, chains to base.njk
-    partials/             ← synced from the engine package
+    partials/             ← synced from the engine package (the content partials - hero to cta,
+                            newsletter-form, booking-embed - are deprecated, see *Building pages*)
       header.njk          ← sticky nav + utility bar (desktop + Flowbite mobile menu; styled by the shared mobile-menu component in input.css)
       hero.njk            ← page hero section (CTAs from business.sections.hero)
       services.njk        ← services grid (heading/intro from business.sections.services)
@@ -345,8 +375,8 @@ Business data:
 - [ ] Set `business.booking.enabled: false` if no booking widget
 
 Forms:
-- [ ] Set `action` in `contact-form.njk` (Netlify Forms: no action needed; Formspree: use your endpoint URL)
-- [ ] Test form submission end to end
+- [ ] `EMAIL` binding and `CONTACT_TO` / `CONTACT_FROM` set in both Wrangler files; `CONTACT_FROM` on the onboarded domain
+- [ ] Test form submission end to end in a real browser, with `CONTACT_TO` pointed at form@jacklamond.co.uk while testing
 - [ ] If using a third-party form processor, add their domain to the CSP in `src/_headers` and list them in the Privacy Policy data table
 
 Compliance:
@@ -355,7 +385,7 @@ Compliance:
 - [ ] Confirm `Strict-Transport-Security` is in `src/_headers` (verify on the live site after deployment)
 
 Quality:
-- [ ] Run Lighthouse in Chrome DevTools: aim for 90+ on Performance, Accessibility, Best Practices, SEO
+- [ ] Lighthouse (mobile): 95+ Performance, 100 Accessibility, Best Practices and SEO
 - [ ] Check Core Web Vitals: LCP < 2.5 s, CLS < 0.1, INP < 200 ms
 - [ ] Test keyboard-only navigation end to end
 - [ ] Test with a screen reader (VoiceOver on Mac: Cmd+F5)
@@ -415,16 +445,16 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
 - Mobile nav has `aria-label="Mobile navigation"`; hamburger button has `aria-label="Open navigation menu"`
 - External links (`target="_blank"`) include `<span class="sr-only"> (opens in new tab)</span>`
 - Contact form uses visible labels (not just `sr-only`) and `autocomplete` attributes
-- When adding new interactive components, ensure they are keyboard-reachable, have visible focus styles, and meet ≥24×24 px touch target size (WCAG 2.5.8)
+- When adding new interactive components, ensure they are keyboard-reachable, have visible focus styles, and meet the 44×44px tap target (24×24px, WCAG 2.5.8, is the floor for inline text links only)
 
 ### Contact and newsletter forms
 
 `contact-form.njk` is driven by **`business.forms.provider`** (default `"cloudflare"`):
 
-- **`"cloudflare"`** (default, for sites on Cloudflare Pages) — the form POSTs to the
-  `/api/contact` Pages Function (`functions/api/contact.js`, synced from the engine),
-  which sends the enquiry via **Cloudflare Email Sending** (`env.EMAIL.send`). It needs,
-  per Pages project:
+- **`"cloudflare"`** (default) — the form POSTs to `/api/contact`, which the site's Worker
+  (`worker/index.js`, synced from the engine; the fleet default) hands to the shared handler.
+  Legacy Pages projects use the synced `functions/api/contact.js` instead. It sends the
+  enquiry via **Cloudflare Email Sending** (`env.EMAIL.send`) and needs, per Worker:
   - a **`send_email` binding named `EMAIL`**,
   - env vars **`CONTACT_TO`** (recipient) and **`CONTACT_FROM`** (verified sender on an
     onboarded domain, e.g. `"Site Name <noreply@yourdomain.com>"`),
@@ -490,7 +520,7 @@ The template targets WCAG 2.2 Level AA (Equality Act 2010 duty to make reasonabl
 
 - **`"netlify"`** (legacy, for sites still on Netlify) — renders the old Netlify Forms
   markup (`data-netlify`, `data-netlify-honeypot`, hidden `form-name`). Set this in
-  `business.json` until the site is migrated to Cloudflare Pages, otherwise the form will
+  `business.json` until the site is migrated to Cloudflare, otherwise the form will
   POST to `/api/contact`, which Netlify won't handle.
 
 **Custom (site-owned) contact forms — the functional contract.** The engine is the single
@@ -517,7 +547,8 @@ Newsletter forms (footer and `newsletter-form.njk`) include a **required consent
 
 **Deploying with Cloudflare Email Sending.** The `/api/contact` handler ships two ways from
 the engine so it works on either Cloudflare host shape:
-- **Worker with static assets** (the git-connected default on Workers & Pages) — the engine
+- **Worker with static assets** (the fleet default: `wrangler.jsonc` is the preview Worker,
+  `wrangler.production.jsonc` production, deployed as Jack's deploy rules say) — the engine
   syncs `worker/index.js`, which serves the built `_site` via the `ASSETS` binding and routes
   `POST /api/contact` to the shared handler. The site adds a **`wrangler.jsonc`** (site-owned)
   with `main: "worker/index.js"`, `assets.directory: "./_site"`, `send_email: [{ name: "EMAIL" }]`,
@@ -527,7 +558,7 @@ the engine so it works on either Cloudflare host shape:
   the Worker runs; browsers save that as a 0-byte download named "contact". curl and `fetch()`
   don't send that header, so API-level tests pass while every real-browser submission fails —
   always test forms with a real browser or with `-H "Sec-Fetch-Mode: navigate"`.
-- **Cloudflare Pages** — the synced `functions/api/contact.js` runs automatically; set the
+- **Cloudflare Pages** (legacy sites only) — the synced `functions/api/contact.js` runs automatically; set the
   `EMAIL` binding and `CONTACT_TO`/`CONTACT_FROM` vars on the Pages project.
 
 Both require the account on the **Workers Paid plan** and the sender domain **onboarded to
