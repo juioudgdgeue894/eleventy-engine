@@ -1,6 +1,8 @@
 const path = require("path");
 const fs = require("fs");
-const Image = require("@11ty/eleventy-img");
+// eleventy-img v7 is ESM-only; require() returns its namespace, so take the
+// default export (the queueing Image function with generateHTML attached).
+const Image = require("@11ty/eleventy-img").default;
 
 // Pages CMS (and some editors) store image fields as "/name.jpg",
 // "src/photos/name.jpg", or a full URL path. The shortcode always wants a
@@ -55,7 +57,7 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
     sharpWebpOptions: { quality: 80 },
     sharpJpegOptions: { quality: 84, mozjpeg: true },
   });
-  return Image.generateHTML(meta, {
+  const html = Image.generateHTML(meta, {
     alt,
     sizes,
     loading,
@@ -65,6 +67,14 @@ async function imageShortcode(src, alt, sizes = "100vw", cls = "", loading = "la
     ...(loading === "eager" ? { fetchpriority: "high" } : {}),
     ...(cls ? { class: cls } : {}),
   });
+  // eleventy-img v7 writes a single-width srcset as a bare URL, but we always
+  // pass `sizes`, which the HTML spec only allows alongside `w` descriptors.
+  // Put the descriptor back (same markup as v6).
+  return Object.values(meta).reduce((out, entries) => {
+    if (entries.length !== 1) return out;
+    const { url, width } = entries[0];
+    return out.replace(`srcset="${url}"`, `srcset="${url} ${width}w"`);
+  }, html);
 }
 
 // {% preload_image "hero.jpg", "100vw" %} — emits a <link rel="preload"> for the

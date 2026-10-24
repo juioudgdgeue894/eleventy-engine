@@ -132,4 +132,5 @@ follows the submitted sitemap on its own cadence.
   gitignored in the site repo; without it Eleventy would skip them.
 - Engine deps (`@11ty/eleventy`, `eleventy-img`, `flowbite`, `tailwindcss`, `concurrently`) are
   regular `dependencies`, so a site gets them transitively — its own `package.json` only needs this
-  one package.
+  one package. `postcss` is listed only as a security floor: it lifts the copy Tailwind uses past
+  patched advisories, because a site's existing lockfile would otherwise keep the old one.
