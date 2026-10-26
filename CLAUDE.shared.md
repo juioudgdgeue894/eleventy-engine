@@ -421,7 +421,7 @@ A comment block in `base.njk` (just above the Flowbite script tag) shows the req
 ### Legal pages
 | Page | URL | Notes |
 |---|---|---|
-| Privacy Policy | `/privacy-policy/` | UK GDPR. The default adapts to consent cookies, Cloudflare Web Analytics (`seo.cf_beacon_token`) and a newsletter (`newsletter.heading`). Replace it entirely with `legal.privacy_sections` |
+| Privacy Policy | `/privacy-policy/` | UK GDPR. The default adapts to consent cookies, Cloudflare Web Analytics (`seo.cf_beacon_token`) and a newsletter (`newsletter.enabled: true`, only when a signup form really renders). Replace it entirely with `legal.privacy_sections` |
 | Terms & Conditions | `/terms/` | The default is written for **appointment businesses** (bookings, patch tests, age limits). Any other kind of business needs `legal.terms_sections`. The client should have a solicitor review |
 | Accessibility Statement | `/accessibility/` | WCAG 2.2 AA. Known limitations only list what applies (booking widget, blog posts); the escalation route is EASS. Replace it entirely with `legal.accessibility_sections` |
 

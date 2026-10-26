@@ -6,11 +6,11 @@ permalink: privacy-policy/index.html
 ---
 {#- Default wording adapts to what the site really has: consent cookies (business.cookies.analytics/marketing),
    cookieless Cloudflare Web Analytics (business.seo.cf_beacon_token) and an email newsletter
-   (business.newsletter.heading). A site can replace the body entirely with business.legal.privacy_sections
+   (business.newsletter.enabled: true - set it only when a signup form really renders). A site can replace the body entirely with business.legal.privacy_sections
    ([{h, id?, p: [], ul: [], p2: []}]; strings may contain links). -#}
 {%- set consent = business.cookies and (business.cookies.analytics or business.cookies.marketing) %}
 {%- set cfStats = business.seo and business.seo.cf_beacon_token %}
-{%- set newsletter = business.newsletter and business.newsletter.heading %}
+{%- set newsletter = business.newsletter and business.newsletter.enabled %}
 {%- set ps = business.legal.privacy_sections if (business.legal and business.legal.privacy_sections and business.legal.privacy_sections.length) else null %}
 <div class="cd-container cd-section">
   <div class="mx-auto max-w-3xl">
