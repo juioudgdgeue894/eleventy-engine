@@ -298,8 +298,11 @@ async function cfTurnstile(domain, zone) {
   const { execFileSync } = await import("node:child_process");
   const wranglerEnv = { ...process.env };
   delete wranglerEnv.CLOUDFLARE_API_TOKEN;
+  // The live site is the production Worker; bare `wrangler` in a site dir targets the preview one.
+  const prodConfig = path.join(siteDir, "wrangler.production.jsonc");
+  const configArgs = fs.existsSync(prodConfig) ? ["--config", prodConfig] : [];
   try {
-    const secrets = execFileSync("npx", ["wrangler", "secret", "list"], { cwd: siteDir, env: wranglerEnv, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    const secrets = execFileSync("npx", ["wrangler", "secret", "list", ...configArgs], { cwd: siteDir, env: wranglerEnv, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
     if (secrets.includes("TURNSTILE_SECRET_KEY")) return log(domain, "Turnstile secret", "already");
   } catch {} // list failing is fine — put below reports its own error
   let live = "";
@@ -317,7 +320,7 @@ async function cfTurnstile(domain, zone) {
   if (!widget.secret)
     return log(domain, "Turnstile secret", "skip", "API didn't return the widget secret — copy it from dash → Turnstile and `npx wrangler secret put TURNSTILE_SECRET_KEY` in the site dir");
   try {
-    execFileSync("npx", ["wrangler", "secret", "put", "TURNSTILE_SECRET_KEY"], { cwd: siteDir, env: wranglerEnv, input: widget.secret, stdio: ["pipe", "pipe", "pipe"] });
+    execFileSync("npx", ["wrangler", "secret", "put", "TURNSTILE_SECRET_KEY", ...configArgs], { cwd: siteDir, env: wranglerEnv, input: widget.secret, stdio: ["pipe", "pipe", "pipe"] });
     log(domain, "Turnstile secret", "ok", "set on the worker (takes ~30–60s to propagate)");
   } catch (e) {
     log(domain, "Turnstile secret", "fail", (e.stderr || e.message || "").toString().trim().slice(0, 140));
