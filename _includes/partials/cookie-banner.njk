@@ -5,7 +5,14 @@
    - On mobile it sits above the fixed mobile-cta bar (bottom-16 = 4rem clearance).
    - Any footer link with data-cd-cookie-settings triggers re-display.
    - Focus is moved into the banner on show and returned to the trigger on close.
-   - Tab/Shift+Tab are trapped within the banner while it is visible. -#}
+   - Tab/Shift+Tab are trapped within the banner while it is visible.
+   - Only rendered when the site declares cookies that need consent
+     (business.cookies.analytics or business.cookies.marketing). Essential cookies
+     and cookieless analytics (Cloudflare Web Analytics) need no consent under PECR,
+     so without them there is no banner, and data-cd-cookie-settings links go to the
+     privacy policy's cookie section instead. -#}
+{%- set cdConsent = business.cookies and (business.cookies.analytics or business.cookies.marketing) %}
+{%- if cdConsent %}
 <div
   id="cd-cookie-banner"
   class="hidden fixed inset-x-0 bottom-16 z-50 sm:bottom-0"
@@ -101,3 +108,11 @@
   });
 })();
 </script>
+{%- else %}
+<script>
+/* No consent cookies on this site: "Cookie settings" links explain what the site stores. */
+document.querySelectorAll('[data-cd-cookie-settings]').forEach(function (el) {
+  el.setAttribute('href', '/privacy-policy/#cookies');
+});
+</script>
+{%- endif %}

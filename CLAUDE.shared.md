@@ -334,6 +334,8 @@ All images in templates and blog posts should use the `{% image %}` shortcode in
 - `user.css` is imported first in `input.css`, before `@tailwind` directives, so custom properties are always available to Tailwind.
 - Corner radii are globally overridden in `user.css` — `.rounded-*` classes all resolve to `var(--radius-button)`. To exempt an element (e.g. a circular image), add the class `cd-rounded-img` instead, which uses `var(--radius-image)`.
 - Never use `color-mix()` inside Tailwind arbitrary value brackets — it silently fails. Always define pre-computed shade variables in `user.css` (e.g. `--color-primary-light`) and reference those.
+- Production CSS: the starter's `tailwind.config.js` skips the deprecated content partials and (outside `npm run dev`) `components.njk`, which roughly cuts a quarter of the CSS. Older sites can copy that `content` list, after checking that none of their pages include those partials.
+- The mobile CTA bar is an `<aside aria-label="Quick contact">`, so it sits in a landmark. A site replacing it should do the same.
 - Common layout helpers defined in `user.css`: `.cd-container`, `.cd-section`, `.cd-btn`, `.cd-btn-primary`, `.cd-btn-outline`, `.cd-btn-light`.
 
 ### Mobile menu (shared component, in `input.css`)
@@ -380,7 +382,8 @@ Forms:
 - [ ] If using a third-party form processor, add their domain to the CSP in `src/_headers` and list them in the Privacy Policy data table
 
 Compliance:
-- [ ] Privacy Policy cookie table updated if analytics were added
+- [ ] Privacy Policy cookie table updated if analytics were added (set `business.cookies.analytics` so the consent banner appears)
+- [ ] Legal pages read end to end as text and true for THIS business (see Legal pages)
 - [ ] CSP in `src/_headers` updated if third-party scripts were added
 - [ ] Confirm `Strict-Transport-Security` is in `src/_headers` (verify on the live site after deployment)
 
@@ -399,7 +402,7 @@ Quality:
 Every site built from this template includes the following by default. Do not remove them.
 
 ### Cookie consent (PECR)
-`src/_includes/partials/cookie-banner.njk` is included in `base.njk` automatically. It:
+`src/_includes/partials/cookie-banner.njk` is included in `base.njk` automatically. It only renders when the site declares cookies that need consent: `business.cookies.analytics` and/or `business.cookies.marketing` (cookie names, listed in the privacy policy's table). Essential cookies and Cloudflare Web Analytics (cookieless) need no consent under PECR, so a site with neither has **no banner**, and its `data-cd-cookie-settings` links go to `/privacy-policy/#cookies` instead. When it does render, it:
 - Shows on first visit; stores choice in `localStorage` under key `cd-cookie-consent` (`'all'` or `'essential'`).
 - Has equal-weight Accept / Essential-only buttons (ICO requirement — rejecting must be as easy as accepting).
 - The "Cookie Settings" link in the footer re-opens the banner via `data-cd-cookie-settings` attribute — do not replace this with a plain href.
@@ -418,9 +421,13 @@ A comment block in `base.njk` (just above the Flowbite script tag) shows the req
 ### Legal pages
 | Page | URL | Notes |
 |---|---|---|
-| Privacy Policy | `/privacy-policy/` | UK GDPR compliant; update the cookie table if analytics change |
-| Terms & Conditions | `/terms/` | Service business template; client should have a solicitor review |
-| Accessibility Statement | `/accessibility/` | Declares WCAG 2.2 AA intent; update Known Limitations honestly |
+| Privacy Policy | `/privacy-policy/` | UK GDPR. The default adapts to consent cookies, Cloudflare Web Analytics (`seo.cf_beacon_token`) and a newsletter (`newsletter.heading`). Replace it entirely with `legal.privacy_sections` |
+| Terms & Conditions | `/terms/` | The default is written for **appointment businesses** (bookings, patch tests, age limits). Any other kind of business needs `legal.terms_sections`. The client should have a solicitor review |
+| Accessibility Statement | `/accessibility/` | WCAG 2.2 AA. Known limitations only list what applies (booking widget, blog posts); the escalation route is EASS. Replace it entirely with `legal.accessibility_sections` |
+
+`legal.privacy_sections`, `legal.terms_sections` and `legal.accessibility_sections` are arrays of `{h, id?, p: [], ul: [], p2: []}` (`p` before the list, `p2` after). Privacy and accessibility strings may contain links (rendered unescaped). Terms strings are escaped.
+
+**Read the rendered legal pages as text before launch.** They must name the legal entity, describe what this site really collects and who receives it (form copies, email provider, host), and claim no cookies, sign-ups or features it doesn't have. On 26 Oct 2026 a commercial cleaning site went through two sweeps with salon terms.
 
 These pages are linked from the "Legal" column in the footer. Do not remove those links.
 
@@ -570,7 +577,7 @@ Cloudflare Email Service** (`CONTACT_FROM` must be on that domain).
 
 ### RSS / Atom feed
 
-`src/feed.njk` generates `/feed.xml` — an Atom feed of all blog posts. The feed link is auto-included in `<head>` via `base.njk`. Browsers and feed readers discover it automatically.
+`src/feed.njk` generates `/feed.xml` — an Atom feed of all blog posts. The feed link is auto-included in `<head>` via `base.njk`, except when `business.blog.enabled` is `false`. Browsers and feed readers discover it automatically.
 
 ### Blog prose typography
 

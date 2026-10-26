@@ -53,7 +53,9 @@
 {% preload_image preload_image, preload_image_sizes or "100vw" %}
 {%- endif %}
 <link rel="stylesheet" href="/css/style.css" />
+{%- if not (business.blog and business.blog.enabled == false) %}
 <link rel="alternate" type="application/atom+xml" href="/feed.xml" title="{{ business.business_name }} Blog" />
+{%- endif %}
 
 {% include "partials/schema.njk" %}
 </head>
