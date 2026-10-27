@@ -4,12 +4,14 @@ eleventyExcludeFromCollections: true
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{%- for entry in collections.all %}
+{#- A page switched off with permalink: false still sits in collections.all with url false; skip it
+   (it once put "https://<site>false" into a sitemap and made IndexNow reject the whole list). #}
+{%- for entry in collections.all %}{% if entry.url %}
   <url>
     <loc>{{ business.seo.site_url }}{{ entry.url }}</loc>
     {% if entry.date %}<lastmod>{{ entry.date | isoDate }}</lastmod>{% endif %}
   </url>
-{%- endfor %}
+{%- endif %}{% endfor %}
 {%- if business.service_areas.enabled %}{%- for town in towns %}
   <url>
     <loc>{{ business.seo.site_url }}/{{ business.service_areas.slug_prefix }}{{ town.slug }}/</loc>
