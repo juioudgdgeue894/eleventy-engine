@@ -1,7 +1,7 @@
 {
   "name": "@jacklamond/eleventy-engine",
-  "version": "1.21.2",
-  "description": "Shared Eleventy engine \u2014 layouts, partials, SEO scaffolding, component library and UK compliance \u2014 for client websites.",
+  "version": "1.21.3",
+  "description": "Shared Eleventy engine — layouts, partials, SEO scaffolding, component library and UK compliance — for client websites.",
   "type": "commonjs",
   "main": "eleventy.js",
   "exports": {
