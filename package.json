@@ -1,7 +1,7 @@
 {
   "name": "@jacklamond/eleventy-engine",
   "version": "1.21.2",
-  "description": "Shared Eleventy engine — layouts, partials, SEO scaffolding, component library and UK compliance — for client websites.",
+  "description": "Shared Eleventy engine \u2014 layouts, partials, SEO scaffolding, component library and UK compliance \u2014 for client websites.",
   "type": "commonjs",
   "main": "eleventy.js",
   "exports": {
@@ -15,7 +15,8 @@
   "scripts": {
     "sync:all": "node bin/sync-all.mjs",
     "release": "node bin/release.mjs",
-    "launch:platform": "node bin/launch-platform.mjs"
+    "launch:platform": "node bin/launch-platform.mjs",
+    "email:check": "node bin/email-check.mjs"
   },
   "files": [
     "eleventy.js",
