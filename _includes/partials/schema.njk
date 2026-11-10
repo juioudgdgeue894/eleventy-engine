@@ -1,10 +1,12 @@
-{#- JSON-LD structured data. LocalBusiness always renders; FAQPage only if
-   business.faq has entries - that's a free shot at FAQ rich snippets in
-   Google since the data already exists for the on-page accordion.
+{#- JSON-LD structured data. LocalBusiness always renders. FAQPage renders only
+   for the business.faq questions that are actually in this page's text (Google
+   requires marked-up FAQ content to be visible on the same page), so a page
+   without the FAQ block gets no FAQ schema.
    Every value goes through the `dump` filter (JSON.stringify) rather than
    manual quoting, so apostrophes/quotes in client data can't break the JSON.
-   Optional strings fall back to "" (`or ""`): `dump` of an undefined value
-   renders nothing, which would make the whole block invalid JSON. -#}
+   Empty optional fields are left out rather than emitted as "".
+   business.seo.logo (a path like /images/logo.png) sets `logo`; without it the
+   share image is used. -#}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -13,30 +15,30 @@
   "description": {{ (business.description or "") | dump | safe }},
   "url": {{ business.seo.site_url | dump | safe }},
   {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
-  {% endif %}"email": {{ (business.contact.email or "") | dump | safe }},
-  {% if business.contact.phone or business.contact.email %}"contactPoint": {
+  {% endif %}{% if business.contact.email %}"email": {{ business.contact.email | dump | safe }},
+  {% endif %}{% if business.contact.phone or business.contact.email %}"contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",
     {% if business.contact.phone %}"telephone": {{ (business.contact.phone_intl or business.contact.phone) | dump | safe }},
-    {% endif %}"email": {{ (business.contact.email or "") | dump | safe }},
-    "url": {{ (business.seo.site_url + (business.contact.page or "/contact/")) | dump | safe }}
+    {% endif %}{% if business.contact.email %}"email": {{ business.contact.email | dump | safe }},
+    {% endif %}"url": {{ (business.seo.site_url + (business.contact.page or "/contact/")) | dump | safe }}
   },
   {% endif %}{% if business.address.map_url %}"hasMap": {{ business.address.map_url | dump | safe }},
   {% endif %}
-  "logo": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
+  "logo": {{ (business.seo.site_url + (business.seo.logo or business.seo.og_image)) | dump | safe }},
   "image": {{ (business.seo.site_url + business.seo.og_image) | dump | safe }},
   {% if business.service_areas.enabled and towns and towns.length %}"areaServed": [
     {% for town in towns %}{{ town.name | dump | safe }}{% if not loop.last %}, {% endif %}{% endfor %}
   ],
-  {% endif %}
-  "priceRange": {{ (business.seo.price_range or "") | dump | safe }},
+  {% endif %}{% if business.seo.price_range %}
+  "priceRange": {{ business.seo.price_range | dump | safe }},{% endif %}
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": {{ (business.address.line1 or "") | dump | safe }},
-    "addressLocality": {{ (business.address.city or "") | dump | safe }},
-    "addressRegion": {{ (business.address.region or "") | dump | safe }},
-    "postalCode": {{ (business.address.postcode or "") | dump | safe }},
-    "addressCountry": "GB"
+    {% if business.address.line1 %}"streetAddress": {{ business.address.line1 | dump | safe }},
+    {% endif %}{% if business.address.city %}"addressLocality": {{ business.address.city | dump | safe }},
+    {% endif %}{% if business.address.region %}"addressRegion": {{ business.address.region | dump | safe }},
+    {% endif %}{% if business.address.postcode %}"postalCode": {{ business.address.postcode | dump | safe }},
+    {% endif %}"addressCountry": "GB"
   }{% if business.seo.geo %},
   "geo": {
     "@type": "GeoCoordinates",
@@ -48,13 +50,21 @@
 }
 </script>
 
-{% if business.faq and business.faq.length %}
+{#- `content` is this page's rendered body. A question counts as shown when its
+   escaped text is in it (templates print {{ item.question }} with autoescape on). -#}
+{%- set _faqShown = [] -%}
+{%- if content and business.faq and business.faq.length -%}
+  {%- for item in business.faq -%}
+    {%- if (item.question | escape | string) in (content | string) -%}{%- set _pushed = _faqShown.push(item) -%}{%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+{% if _faqShown.length %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {% for item in business.faq %}
+    {% for item in _faqShown %}
     {
       "@type": "Question",
       "name": {{ item.question | dump | safe }},

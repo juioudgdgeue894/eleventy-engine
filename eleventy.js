@@ -167,6 +167,18 @@ module.exports = function (eleventyConfig) {
     () => require("./package.json").version,
   );
 
+  // <lastmod> for the generated town pages in sitemap.xml: the date towns.json
+  // last changed in git (a real edit date, not the build date). Empty outside a
+  // git checkout or before the file's first commit, and the sitemap then omits it.
+  eleventyConfig.addGlobalData("townsLastmod", () => {
+    try {
+      return require("node:child_process")
+        .execFileSync("git", ["log", "-1", "--format=%cs", "--", "src/_data/towns.json"], {
+          cwd: process.cwd(), encoding: "utf8", stdio: ["ignore", "pipe", "ignore"],
+        }).trim();
+    } catch { return ""; }
+  });
+
   eleventyConfig.addFilter("currentYear", () => new Date().getFullYear());
 
   // {{ post.date | readableDate }} -> 15 January 2026

@@ -11,8 +11,12 @@
 {%- set fullTitle = _t if (business.business_name in _t) else _t + " | " + business.business_name -%}
 <title>{{ fullTitle }}</title>
 <meta name="description" content="{{ description or business.description }}" />
-<meta name="robots" content="{{ 'noindex, nofollow' if noindex else 'index, follow' }}" />
-<link rel="canonical" href="{{ business.seo.site_url }}{{ page.url }}" />
+{#- Never index the 404 page or a blog index with no posts yet ("No articles yet"
+   is a thin page); the 404 also carries no canonical. -#}
+{%- set _is404 = page.url == "/404.html" -%}
+{%- set _emptyBlog = page.url == "/blog/" and not (collections.posts and collections.posts.length) -%}
+<meta name="robots" content="{{ 'noindex, nofollow' if (noindex or _is404 or _emptyBlog) else 'index, follow' }}" />
+{% if not _is404 %}<link rel="canonical" href="{{ business.seo.site_url }}{{ page.url }}" />{% endif %}
 
 <!-- Open Graph -->
 <meta property="og:type" content="{{ og_type or 'website' }}" />

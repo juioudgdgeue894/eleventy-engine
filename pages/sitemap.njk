@@ -6,7 +6,9 @@ eleventyExcludeFromCollections: true
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {#- A page switched off with permalink: false still sits in collections.all with url false; skip it
    (it once put "https://<site>false" into a sitemap and made IndexNow reject the whole list). #}
-{%- for entry in collections.all %}{% if entry.url %}
+{#- Also skipped: pages marked noindex, and the blog index while it has no posts. #}
+{%- set _hasPosts = collections.posts and collections.posts.length %}
+{%- for entry in collections.all %}{% if entry.url and not entry.data.noindex and not (entry.url == "/blog/" and not _hasPosts) %}
   <url>
     <loc>{{ business.seo.site_url }}{{ entry.url }}</loc>
     {% if entry.date %}<lastmod>{{ entry.date | isoDate }}</lastmod>{% endif %}
@@ -15,6 +17,7 @@ eleventyExcludeFromCollections: true
 {%- if business.service_areas.enabled %}{%- for town in towns %}
   <url>
     <loc>{{ business.seo.site_url }}/{{ business.service_areas.slug_prefix }}{{ town.slug }}/</loc>
+    {% if townsLastmod %}<lastmod>{{ townsLastmod }}</lastmod>{% endif %}
   </url>
 {%- endfor %}{%- endif %}
 </urlset>

@@ -1,15 +1,16 @@
 ---
 layout: layouts/base.njk
 title: Terms & Conditions
-description: The terms that govern our services.
 permalink: terms/index.html
+eleventyComputed:
+  description: "Terms and conditions for using the {{ business.business_name | safe }} website and services."
 ---
 {% set ts = (business.legal.terms_sections) if (business.legal and business.legal.terms_sections and business.legal.terms_sections.length) else null %}
 <div class="cd-container cd-section">
   <div class="mx-auto max-w-3xl">
 
     <h1 class="text-3xl sm:text-4xl">Terms &amp; Conditions</h1>
-    <p class="mt-3 text-sm text-gray-400">Last updated: {{ (business.legal.terms_updated | readableDate) if (business.legal and business.legal.terms_updated) else ("now" | currentYear) }}. These terms apply to all services provided by <strong>{{ business.business_name }}</strong>, {{ business.address.city }}.</p>
+    <p class="mt-3 text-sm text-[var(--color-body-text)]">Last updated: {{ (business.legal.terms_updated | readableDate) if (business.legal and business.legal.terms_updated) else ("now" | currentYear) }}. These terms apply to all services provided by <strong>{{ business.business_name }}</strong>, {{ business.address.city }}.</p>
 
     <div class="mt-10 space-y-10 text-[var(--color-body-text)]">
 
@@ -70,12 +71,12 @@ permalink: terms/index.html
 
       <section>
         <h2 class="text-xl text-white">7. Complaints</h2>
-        <p class="mt-3">If you are unhappy with any aspect of our service, please contact us at <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>{% if business.contact.phone %} or <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>{% endif %} and we will do our best to resolve the issue promptly and fairly.</p>
+        <p class="mt-3">If you are unhappy with any aspect of our service, please contact us at <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>{% if business.contact.phone %} or <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>{% endif %} and we will do our best to resolve the issue promptly and fairly.</p>
       </section>
 
       <section>
         <h2 class="text-xl text-white">8. Your data</h2>
-        <p class="mt-3">We only use your personal details to manage your appointments and provide our services. See our <a class="text-[var(--color-accent-link)] hover:underline" href="/privacy-policy/">Privacy Policy</a> for full details.</p>
+        <p class="mt-3">We only use your personal details to manage your appointments and provide our services. See our <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="/privacy-policy/">Privacy Policy</a> for full details.</p>
       </section>
 
       <section>
@@ -86,7 +87,7 @@ permalink: terms/index.html
       {% endif %}
 
       <div class="mt-10 cd-rounded-img border border-white/10 bg-[var(--color-secondary)] p-6 text-sm text-[var(--color-body-text)]">
-        <p><strong>Questions about these terms?</strong> Contact us at <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>{% if business.contact.phone %} or <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>{% endif %}.</p>
+        <p><strong>Questions about these terms?</strong> Contact us at <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a>{% if business.contact.phone %} or <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a>{% endif %}.</p>
       </div>
 
     </div>

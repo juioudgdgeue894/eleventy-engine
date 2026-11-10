@@ -1,8 +1,9 @@
 ---
 layout: layouts/base.njk
 title: Accessibility Statement
-description: Our commitment to making this website accessible to everyone.
 permalink: accessibility/index.html
+eleventyComputed:
+  description: "Accessibility statement for the {{ business.business_name | safe }} website: what works, known limits and how to report a problem."
 ---
 {#- A site can replace the body with business.legal.accessibility_sections ([{h, id?, p: [], ul: [], p2: []}];
    strings may contain links). The default only lists limitations that apply to the site. -#}
@@ -11,7 +12,7 @@ permalink: accessibility/index.html
   <div class="mx-auto max-w-3xl">
 
     <h1 class="text-3xl sm:text-4xl">Accessibility Statement</h1>
-    <p class="mt-3 text-sm text-gray-400">This statement applies to <strong>{{ business.seo.site_url }}</strong>. Last reviewed: {{ (business.legal.accessibility_reviewed | readableDate) if (business.legal and business.legal.accessibility_reviewed) else ("now" | currentYear) }}. We review this statement annually and after any major site changes.</p>
+    <p class="mt-3 text-sm text-[var(--color-body-text)]">This statement applies to <strong>{{ business.seo.site_url }}</strong>. Last reviewed: {{ (business.legal.accessibility_reviewed | readableDate) if (business.legal and business.legal.accessibility_reviewed) else ("now" | currentYear) }}. We review this statement annually and after any major site changes.</p>
 
     <div class="mt-10 space-y-10 text-[var(--color-body-text)]">
       {% if as %}
@@ -75,9 +76,9 @@ permalink: accessibility/index.html
         <h2 class="text-xl text-white">Feedback and contact</h2>
         <p class="mt-3">We welcome feedback on the accessibility of this website. If you experience any barriers or difficulty accessing content, please let us know:</p>
         <ul class="mt-3 space-y-1 text-sm">
-          <li><strong>Email:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
+          <li><strong>Email:</strong> <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="mailto:{{ business.contact.email }}">{{ business.contact.email }}</a></li>
           {% if business.contact.phone %}
-          <li><strong>Phone:</strong> <a class="text-[var(--color-accent-link)] hover:underline" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
+          <li><strong>Phone:</strong> <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="{{ business.contact.phone_href }}">{{ business.contact.phone }}</a></li>
           {% endif %}
         </ul>
         <p class="mt-3">We aim to respond to accessibility feedback within 5 business days and to resolve issues, or provide an alternative, within 30 days.</p>
@@ -87,7 +88,7 @@ permalink: accessibility/index.html
         <h2 class="text-xl text-white">Formal complaints procedure</h2>
         <p class="mt-3">If you are not satisfied with our response, you can contact the <strong>Equality Advisory and Support Service (EASS)</strong>, which advises on discrimination and accessibility complaints across England, Scotland and Wales:</p>
         <ul class="mt-3 list-disc space-y-1 pl-5 text-sm">
-          <li>Website: <a class="text-[var(--color-accent-link)] hover:underline" href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener">equalityadvisoryservice.com</a></li>
+          <li>Website: <a class="text-[var(--color-accent-link)] underline underline-offset-2" href="https://www.equalityadvisoryservice.com" target="_blank" rel="noopener">equalityadvisoryservice.com</a></li>
           <li>Helpline: 0808 800 0082</li>
         </ul>
       </section>
