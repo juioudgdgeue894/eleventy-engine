@@ -119,5 +119,15 @@ if (fs.existsSync(wranglerPath)) {
   }
 }
 
+// 5. Deploy safety (v1.23.0): production must build and check before upload.
+const prodPath = path.join(site, "wrangler.production.jsonc");
+if (fs.existsSync(prodPath) && !/"command"\s*:\s*"[^"]*eleventy-engine-predeploy/.test(fs.readFileSync(prodPath, "utf8"))) {
+  console.warn(
+    '\n[eleventy-engine] WARNING: wrangler.production.jsonc build.command does not run eleventy-engine-predeploy.\n' +
+      '  Set "build": { "command": "node scripts/cf-build-gate.mjs && npx eleventy-engine-predeploy" } so a deploy\n' +
+      "  can never ship a _site without CSS (README, Deploys).\n"
+  );
+}
+
 const pkg = JSON.parse(fs.readFileSync(path.join(engineRoot, "package.json"), "utf8"));
 console.log(`[eleventy-engine] synced ${pkg.name}@${pkg.version} (${copied} shared files) into ./src`);

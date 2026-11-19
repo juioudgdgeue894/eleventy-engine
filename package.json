@@ -10,7 +10,10 @@
     "./tailwind-preset": "./tailwind-preset.js"
   },
   "bin": {
-    "eleventy-engine-sync": "bin/sync.mjs"
+    "eleventy-engine-sync": "bin/sync.mjs",
+    "eleventy-engine-predeploy": "bin/predeploy.mjs",
+    "eleventy-engine-check-live": "bin/check-live.mjs",
+    "eleventy-engine-deploy-production": "bin/deploy-production.mjs"
   },
   "scripts": {
     "sync:all": "node bin/sync-all.mjs",

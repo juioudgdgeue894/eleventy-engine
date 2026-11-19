@@ -14,6 +14,7 @@ Improve SEO/CSS/JS/components here once, publish a new version, and bump each si
 | `css/input.css` | Imports the site's `user.css`, then the Tailwind layers. |
 | `CLAUDE.shared.md` | Shared conventions, imported by each site's `CLAUDE.md`. |
 | `bin/sync.mjs` | `eleventy-engine-sync` — materialises the above into a consuming site. |
+| `bin/predeploy.mjs`, `bin/check-live.mjs`, `bin/deploy-production.mjs` | Deploy safety (see Deploys). |
 
 ## How a site consumes it
 
@@ -21,8 +22,27 @@ A client site depends on this package and runs `eleventy-engine-sync` on `postin
 (see the `eleventy-client-starter`). The sync copies layouts, partials, framework pages, the CSS
 mechanism file and the shared Claude rules into the site's `src/` (and `.engine/`). Those copies are
 **gitignored** in the site repo — so the site only ever commits its own content, and always rebuilds
-against the engine version pinned in its `package.json`. The same sync runs on every build
-(local `npm run deploy:production` or the deploy workflow), so deploys are self-contained.
+against the engine version pinned in its `package.json`. The same sync runs on every build.
+
+## Deploys (from v1.23.0)
+
+Every Worker deploy builds first and checks its output, whatever path it takes:
+
+- `wrangler.production.jsonc` (and the preview `wrangler.jsonc`) set
+  `build.command` to `node scripts/cf-build-gate.mjs && npx eleventy-engine-predeploy`
+  (preview: just `npx eleventy-engine-predeploy`). Wrangler runs it before any upload, so
+  `npm run deploy:production`, a manual `npx wrangler deploy --config wrangler.production.jsonc`
+  and the GitHub Actions workflow all get a clean build.
+- `eleventy-engine-predeploy`: empties `_site` (keeps the `_site/images` cache), runs
+  `npm run build`, then blocks the deploy if `index.html` or a non-empty `css/style.css` is
+  missing, or any built page links a local stylesheet, script, preload, icon, manifest, share
+  image or `<img>` that is not in `_site`.
+- `eleventy-engine-deploy-production` (a site's `npm run deploy:production`): main-only gate,
+  notes the live version id, deploys, then runs the live check.
+- `eleventy-engine-check-live [url]`: homepage plus 4 sitemap pages; every asset must be 200
+  with the right content-type. Retries for 3 minutes, then exits 1 with the rollback command.
+  Turnstile's `api.js` (302 to a versioned file) and the Cloudflare beacon are allow-listed.
+  Also the last step of each site's Deploy production workflow.
 
 **Site-owned (the only things that change per client):** `business.json`, `towns.json`, `user.css`,
 `index.njk` + custom pages, `images/`, `fonts/`, `posts/`.

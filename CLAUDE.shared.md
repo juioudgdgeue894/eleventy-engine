@@ -85,8 +85,10 @@ is the one copy: site `CLAUDE.md` files and the `new-site` skill point here.
 - `src/images/` (raw-referenced assets), `src/photos/` (sources for `{% image %}`), `src/fonts/`
   (self-hosted; update `business.seo.preload_fonts`), `src/posts/`
 - `wrangler.jsonc` (the preview Worker, no custom domains) and `wrangler.production.jsonc`
-  (production: routes + the `cf-build-gate` build command) - Worker names, `EMAIL` binding,
-  contact vars
+  (production: routes + the `cf-build-gate && eleventy-engine-predeploy` build command) - Worker
+  names, `EMAIL` binding, contact vars. From engine v1.23.0 every `wrangler deploy` builds `_site`
+  from clean and blocks the upload if CSS or any linked local asset is missing; never remove the
+  build command. `npm run deploy:production` also checks the live site afterwards (README, Deploys).
 
 **Never edit synced files** (the engine's files in `src/_includes/`, `src/components.njk`,
 framework pages, `worker/`, `functions/`, `.engine/`). They are overwritten on every sync. To
