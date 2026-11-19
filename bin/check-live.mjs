@@ -42,12 +42,16 @@ for (let i = 0; i < argv.length; i++) {
 }
 if (!opt.url) {
   const p = path.join(process.cwd(), opt.config);
-  const m = fs.existsSync(p) && fs.readFileSync(p, "utf8").match(/"pattern"\s*:\s*"([^"/*]+)"\s*,\s*"custom_domain"\s*:\s*true/);
-  if (!m) {
-    console.error(`[check-live] no url given and no custom_domain route in ${opt.config}`);
+  // Route patterns: "example.com" (custom domain) or "example.com/*" (zone route).
+  const hosts = fs.existsSync(p)
+    ? [...fs.readFileSync(p, "utf8").matchAll(/"pattern"\s*:\s*"([^"/*]+)/g)].map((m) => m[1])
+    : [];
+  const host = hosts.find((h) => !h.startsWith("www.")) || hosts[0];
+  if (!host) {
+    console.error(`[check-live] no url given and no route pattern in ${opt.config}`);
     process.exit(2);
   }
-  opt.url = `https://${m[1]}/`;
+  opt.url = `https://${host}/`;
 }
 const base = new URL(opt.url);
 const siteHost = base.hostname.replace(/^www\./, "");
